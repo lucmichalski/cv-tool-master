@@ -204,7 +204,6 @@ class InputTextFormfield extends StatelessWidget{
      ),
    );
   }
-
 }
 class HorirontalLine extends StatelessWidget {
   final String title;
@@ -233,6 +232,42 @@ class HorirontalLine extends StatelessWidget {
                   right: MediaQuery.of(context).size.width/ 4),
               child: Divider(color: Colors.black)),
         ],
+      ),
+    );
+  }
+}
+
+class FormInputData extends StatelessWidget{
+  TextEditingController controller ;
+  String onChangedt;
+  FormInputData(this.controller,this.onChangedt);
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 40,
+      child: TextFormField(
+        onChanged: (val)
+        {
+          onChangedt = val;
+          print(onChangedt);
+        },
+        controller: controller,
+        decoration: InputDecoration(
+          fillColor: Colors.white,
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(0.0),
+            borderSide: BorderSide(
+              color: Colors.black,
+            ),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(0.0),
+            borderSide: BorderSide(
+              color: Colors.black,
+              width: 1.0,
+            ),
+          ),
+        ),
       ),
     );
   }

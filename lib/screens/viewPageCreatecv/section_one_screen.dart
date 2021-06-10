@@ -101,9 +101,9 @@ class _SectionOneScreenState extends State<SectionOneScreen> {
                 child: Form(
                     child: Column(
                   children: [
-                    InputTextFormfield('Full Name', _fullNameController),
+                    InputTextFormfield('Full Name', _fullNameController,),
                     _buildGender(context),
-                    InputTextFormfield('Email', _emailController),
+                    InputTextFormfield('Email', _emailController,),
                     SizedBox(
                       height: 20,
                     ),

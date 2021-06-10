@@ -5,9 +5,10 @@ class CVModel {
   String position;
   bool status;
   List<Role> role;
-  Education education;
+  List<Education> education;
   List<String> technicalSummaryList;
   List<String> skillList;
+  List<Skills> skills;
 
   CVModel(
       {this.name,
@@ -18,7 +19,8 @@ class CVModel {
       this.status,
       this.technicalSummaryList,
       this.education,
-        this.skillList
+        this.skillList,
+        this.skills
       });
 }
 
@@ -30,10 +32,15 @@ class Role {
   Role({this.roleNm, this.level, this.technicals});
 }
 class Education{
-  List<String> schools;
-  List<String> majors;
-  List<String> year;
-  Education({this.schools , this.majors , this.year});
+  String schoolNm;
+  String majorMn;
+  String classYear;
+  Education({this.schoolNm , this.majorMn , this.classYear});
+}
+class Skills{
+  String skillNm;
+  String skillData;
+  Skills({this.skillNm,this.skillData});
 }
 
 
