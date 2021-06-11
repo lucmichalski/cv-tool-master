@@ -8,6 +8,7 @@ import 'package:flutter_cv_maker/extensions/size_extension.dart';
 class ButtonCommon extends StatefulWidget {
   final double borderRadius;
   final double height;
+  final Icon icon;
   final EdgeInsetsGeometry padding;
   final String buttonText;
   final TextStyle textStyle;
@@ -16,11 +17,11 @@ class ButtonCommon extends StatefulWidget {
   final Gradient gradient;
   final double width;
   final bool isCircle;
-  final bool isLoading;
 
   ButtonCommon(
       {this.borderRadius,
       this.height,
+      this.icon,
       this.width,
       this.isCircle,
       @required this.buttonText,
@@ -28,7 +29,6 @@ class ButtonCommon extends StatefulWidget {
       this.padding,
       this.gradient,
       this.color,
-      this.isLoading = false,
       @required this.onClick});
 
   @override
@@ -47,19 +47,18 @@ class _ButtonCommonState extends State<ButtonCommon> {
       child: InkWell(
         customBorder: RoundedRectangleBorder(
           borderRadius:
-              BorderRadius.circular(this.widget.borderRadius ?? w * 0.005),
+              BorderRadius.circular(this.widget.borderRadius ?? w * 0.001),
         ),
         onTap: () {
           widget.onClick();
         },
         child: Container(
           width: widget.width,
-          padding: EdgeInsets.symmetric(horizontal: 12),
+          padding: EdgeInsets.symmetric(horizontal: w * 0.001, vertical: 12),
           alignment: Alignment.center,
-          height: this.widget.height ?? (h * 0.06),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.all(
-                Radius.circular(this.widget.borderRadius ?? 10)),
+                Radius.circular(this.widget.borderRadius ?? w * 0.001)),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -69,14 +68,10 @@ class _ButtonCommonState extends State<ButtonCommon> {
                 style: widget.textStyle ?? CommonStyle.white700Size22(context),
               ),
               Visibility(
-                visible: widget.isLoading,
+                visible: widget.icon != null,
                 child: Padding(
                   padding: EdgeInsets.only(left: w * 0.01),
-                  child: CircularProgressIndicator(
-                    strokeWidth: 3,
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                    backgroundColor: Colors.transparent,
-                  ),
+                  child: widget.icon,
                 ),
               )
             ],
@@ -315,7 +310,7 @@ class TextFieldCommon extends StatelessWidget {
   Widget build(BuildContext context) {
     var w = MediaQuery.of(context).size.width;
     return Container(
-     // height: 35,
+      // height: 35,
       child: TextFormField(
         onChanged: onChange,
         controller: controller,

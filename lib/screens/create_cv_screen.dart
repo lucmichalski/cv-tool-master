@@ -7,6 +7,8 @@ import 'package:flutter_cv_maker/screens/viewPageCreatecv/section_one_screen.dar
 import 'package:flutter_cv_maker/screens/viewPageCreatecv/section_second_screen.dart';
 import 'package:flutter_cv_maker/screens/viewPageCreatecv/section_three_screen.dart';
 
+import '../common/common_style.dart';
+
 class CreateCV extends StatefulWidget {
   final CVModel cvModel;
 
@@ -27,31 +29,37 @@ class _CreateCVState extends State<CreateCV> {
 
   _addItemsSteps() {
     _tab.add(
-        TabModelSteps(numberPage: 1, horizontalLine: true, colorIcons: true));
+        TabModelSteps(numberPage: 0, horizontalLine: false, colorIcons: false));
+    _tab.add(
+        TabModelSteps(numberPage: 1, horizontalLine: true, colorIcons: false));
     _tab.add(
         TabModelSteps(numberPage: 2, horizontalLine: true, colorIcons: false));
     _tab.add(
         TabModelSteps(numberPage: 3, horizontalLine: true, colorIcons: false));
     _tab.add(
         TabModelSteps(numberPage: 4, horizontalLine: true, colorIcons: false));
-    _tab.add(
-        TabModelSteps(numberPage: 5, horizontalLine: false, colorIcons: false));
   }
 
   _onPageViewChange(int index) {
     print("Current Page: " + index.toString());
     setState(() {
       _pageIndex = index;
-      _tab[index].colorIcons = true;
+      _tab.forEach((element) {
+        if (element.numberPage <= index) {
+          element.colorIcons = true;
+        } else {
+          element.colorIcons = false;
+        }
+      });
     });
   }
 
   @override
   void dispose() {
-    // TODO: implement dispose
     _pageController.dispose();
     super.dispose();
   }
+
   @override
   void initState() {
     if (widget.cvModel == null) {
@@ -79,8 +87,6 @@ class _CreateCVState extends State<CreateCV> {
               height: 20,
             ),
             Container(
-                margin: EdgeInsets.only(
-                    left: MediaQuery.of(context).size.width / 7),
                 width: MediaQuery.of(context).size.width,
                 child: _buildPageSteps(context)),
             Container(
@@ -94,7 +100,7 @@ class _CreateCVState extends State<CreateCV> {
             // nó cứ vào cái giao diện call vs anh. không , ý em là nó k cho search ấy
             Expanded(
               child: PageView(
-               // physics:new NeverScrollableScrollPhysics(),
+                // physics:new NeverScrollableScrollPhysics(),
                 onPageChanged: _onPageViewChange,
                 scrollDirection: Axis.horizontal,
                 controller: _pageController,
@@ -103,10 +109,14 @@ class _CreateCVState extends State<CreateCV> {
                     cvModel: _cvModel,
                     pageController: _pageController,
                   ),
-                  SecondScreen(pageController: _pageController,cvModel: _cvModel,),
-
-                  SectionThree(cvModel: _cvModel,
-                    initialDate: DateTime.now(),),
+                  SecondScreen(
+                    pageController: _pageController,
+                    cvModel: _cvModel,
+                  ),
+                  SectionThree(
+                    cvModel: _cvModel,
+                    initialDate: DateTime.now(),
+                  ),
                   Container(
                     color: Colors.yellow.shade300,
                     child: Center(
@@ -154,6 +164,7 @@ class _CreateCVState extends State<CreateCV> {
 
   Widget _buildPageSteps(BuildContext context) {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
       children:
           _tab.map((e) => _buildStepItem(context, e, _tab.indexOf(e))).toList(),
     );
@@ -164,22 +175,43 @@ class _CreateCVState extends State<CreateCV> {
     return Container(
       child: Row(
         children: [
-          Container(
-            width: MediaQuery.of(context).size.width / 19,
-            height: MediaQuery.of(context).size.width / 19,
-            decoration: BoxDecoration(
-              color: modelSteps.colorIcons ? Colors.lightGreen : Colors.black26,
-              borderRadius: BorderRadius.circular(100),
-            ),
-            alignment: Alignment.center,
-            child: Text(modelSteps.numberPage.toString()),
-          ),
           modelSteps.horizontalLine == true
               ? Container(
                   width: MediaQuery.of(context).size.width / 9,
-                  child: Divider(color: Colors.black),
+                  child: Divider(
+                      color: modelSteps.colorIcons
+                          ? Colors.greenAccent.shade400
+                          : Colors.black26),
                 )
               : SizedBox(),
+          Container(
+            width: MediaQuery.of(context).size.width * 0.03,
+            height: MediaQuery.of(context).size.width * 0.03,
+            decoration: BoxDecoration(
+              color: _pageIndex == modelSteps.numberPage
+                  ? Colors.white
+                  : modelSteps.colorIcons
+                      ? Colors.greenAccent.shade400
+                      : Colors.black26,
+              border: Border.all(
+                  color: _pageIndex == modelSteps.numberPage
+                      ? Colors.blue
+                      : modelSteps.colorIcons
+                          ? Colors.greenAccent.shade400
+                          : Colors.black26,
+                  width: 2),
+              borderRadius: BorderRadius.circular(100),
+            ),
+            alignment: Alignment.center,
+            child: Text('${modelSteps.numberPage + 1}',
+                style: CommonStyle.main700Size18(context).copyWith(
+                  color: _pageIndex == modelSteps.numberPage
+                      ? Colors.blue
+                      : modelSteps.colorIcons
+                          ? Colors.white
+                          : Colors.black,
+                )),
+          ),
         ],
       ),
     );
