@@ -120,7 +120,7 @@ class _SectionThreeState extends State<SectionThree> {
                 child: TextFieldCommon(
                   controller: _generateControllerProfessional(
                       'company-$index', _listProfessional[index].companyNm),
-                  onChange: (val) {
+                  onChanged: (val) {
                     professional.companyNm = val;
                   },
                   label: 'Company Name',

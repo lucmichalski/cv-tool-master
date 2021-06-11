@@ -39,6 +39,7 @@ class _SecondScreenState extends State<SecondScreen> {
   Widget build(BuildContext context) {
     double marginleft = MediaQuery.of(context).size.width * 0.15;
     return Scaffold(
+      backgroundColor: Color(0xfff6f8fa),
       body: SingleChildScrollView(
         child: Container(
           margin: EdgeInsets.symmetric(horizontal: 50.0),
@@ -52,7 +53,7 @@ class _SecondScreenState extends State<SecondScreen> {
               SizedBox(
                 height: 30,
               ),
-              HorirontalLine('Skill'),
+              HorirontalLine('SKILLS'),
               SizedBox(
                 height: 10,
               ),
@@ -187,7 +188,10 @@ class _SecondScreenState extends State<SecondScreen> {
     return Container(
       padding: EdgeInsets.only(left: 10.0, right: 10.0, bottom: 10.0),
       decoration:
-          BoxDecoration(border: Border.all(width: 1.0, color: Colors.black)),
+      BoxDecoration(
+          border: Border.all(width: 1.0, color: Color(0xffc5dbff)),
+          color: Color(0xffedf4ff)
+    ),
       margin: EdgeInsets.only(
           bottom: 30, left: MediaQuery.of(context).size.width * 0.15),
       child: Column(
@@ -213,15 +217,13 @@ class _SecondScreenState extends State<SecondScreen> {
             children: [
               Expanded(
                 flex: 8,
-                child: Container(
-                  height: 30,
-                  child: TextFormField(
-                      controller: _generateController('school-$index',
-                          widget.cvModel.educationList[index].schoolNm),
-                      onChanged: (val) {
-                        widget.cvModel.educationList[index].schoolNm = val;
-                      },
-                      decoration: CommonStyle.InputFormDecoration(context)),
+                child: TextFieldCommon(
+                    controller: _generateController('school-$index',
+                        widget.cvModel.educationList[index].schoolNm),
+                    onChanged: (val) {
+                      widget.cvModel.educationList[index].schoolNm = val;
+                    },
+                  label: 'School Name'
                 ),
               ),
             ],
@@ -232,16 +234,13 @@ class _SecondScreenState extends State<SecondScreen> {
           Row(
             children: [
               Expanded(
-                child: Container(
-                  height: 30,
-                  child: TextFormField(
-                      controller: _generateController('majors-$index',
-                          widget.cvModel.educationList[index].majorMn),
-                      onChanged: (val) {
-                        widget.cvModel.educationList[index].majorMn = val;
-                      },
-                      decoration: CommonStyle.InputFormDecoration(context)),
-                ),
+                child: TextFieldCommon(
+                    controller: _generateController('majors-$index',
+                        widget.cvModel.educationList[index].majorMn),
+                    onChanged: (val) {
+                      widget.cvModel.educationList[index].majorMn = val;
+                    },
+                    label: 'Major'),
               ),
               SizedBox(
                 width: 7,

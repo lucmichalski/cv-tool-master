@@ -42,7 +42,7 @@ class _ButtonCommonState extends State<ButtonCommon> {
     var w = MediaQuery.of(context).size.width;
     return Material(
       borderRadius:
-          BorderRadius.all(Radius.circular(this.widget.borderRadius ?? 10)),
+          BorderRadius.all(Radius.circular(this.widget.borderRadius ?? w * 0.001)),
       color: widget.color ?? kmainColor,
       child: InkWell(
         customBorder: RoundedRectangleBorder(
@@ -54,7 +54,7 @@ class _ButtonCommonState extends State<ButtonCommon> {
         },
         child: Container(
           width: widget.width,
-          padding: EdgeInsets.symmetric(horizontal: w * 0.001, vertical: 12),
+          padding: EdgeInsets.symmetric(horizontal: w * 0.02, vertical: 12),
           alignment: Alignment.center,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.all(
@@ -70,7 +70,7 @@ class _ButtonCommonState extends State<ButtonCommon> {
               Visibility(
                 visible: widget.icon != null,
                 child: Padding(
-                  padding: EdgeInsets.only(left: w * 0.01),
+                  padding: EdgeInsets.only(left: w * 0.005),
                   child: widget.icon,
                 ),
               )
@@ -291,7 +291,7 @@ class TextFieldCommon extends StatelessWidget {
   final String label;
   final TextStyle hintStyle;
   final bool isObscure;
-  final Function onChange;
+  final Function onChanged;
   final Function(String value) validator;
   final BorderRadiusGeometry borderRadius;
   final TextEditingController controller;
@@ -304,7 +304,7 @@ class TextFieldCommon extends StatelessWidget {
       this.borderRadius,
       this.controller,
       this.label,
-      this.onChange(String value)});
+      this.onChanged(String value)});
 
   @override
   Widget build(BuildContext context) {
@@ -312,7 +312,7 @@ class TextFieldCommon extends StatelessWidget {
     return Container(
       // height: 35,
       child: TextFormField(
-        onChanged: onChange,
+        onChanged: onChanged,
         controller: controller,
         cursorColor: kmainColor,
         obscureText: this.isObscure,
@@ -357,9 +357,9 @@ class TextFieldCommon extends StatelessWidget {
               ),
             ),
             contentPadding: EdgeInsets.only(left: 15, right: 15),
-            floatingLabelBehavior: FloatingLabelBehavior.always,
-            hintText: this.hint ?? kEmpty,
-            hintStyle: this.hintStyle ?? CommonStyle.size22W4005c5c5c(context)),
+            // hintText: this.hint ?? kEmpty,
+            // hintStyle: this.hintStyle ?? CommonStyle.size22W4005c5c5c(context)
+        ),
       ),
     );
   }
