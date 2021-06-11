@@ -1,36 +1,33 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_cv_maker/common/common_style.dart';
 import 'package:flutter_cv_maker/common/common_ui.dart';
 import 'package:flutter_cv_maker/constants/constants.dart';
 import 'package:flutter_cv_maker/models/cv_model/cv_model.dart';
-import 'package:intl/intl.dart';
-
 class SecondScreen extends StatefulWidget {
+  final CVModel cvModel;
+  PageController pageController ;
+  SecondScreen({this.pageController, this.cvModel});
   @override
   _SecondScreenState createState() => _SecondScreenState();
 }
-
 class _SecondScreenState extends State<SecondScreen> {
-  CVModel _cvModel;
   String year;
-  List<Education> _education = [
-    Education()
-  ];
-  List<Skills> _skills = [
-    Skills(skillNm: 'Programming Language',skillData: 'Nodejs , Python ,PhP'),
-    Skills(skillNm: 'Framework/Library',skillData: 'ExpressJS, Codeigniter, Yii, Laravel, Cake, Magento'),
+  Map<String, TextEditingController> _controllerMap = {};
+  Map<String, TextEditingController> _controllerMapSkill = {};
+  Map<String, TextEditingController> _controllerMapCertificate = {};
+  @override
+  void initState() {
+    widget.cvModel.skills= [Skills(skillNm: 'Programming Language', skillData: 'Nodejs , Python ,PhP'),
+    Skills(
+    skillNm: 'Framework/Library',
+    skillData: 'ExpressJS, Codeigniter, Yii, Laravel, Cake, Magento'),
     // Skills(skillNm: 'Operating System',skillData: 'Windows'),
     // Skills(skillNm: 'Source control',skillData: 'Git '),
     // Skills(skillNm: 'Project Management tool',skillData: 'Jira, AzureDevOps '),
     // Skills(skillNm: 'Others',skillData: 'HTML/CSS, Javascript, jquery '),
     // Skills(skillNm: 'Databases',skillData: 'MySql, MSSQL, MongoDB  '),
-  ];
-  Map<String, TextEditingController> _controllerMap = {};
-  List<String> dataskill =[];
-  // TextEditingController _schoolController =TextEditingController();
-  // TextEditingController _majorsController =TextEditingController();
-  @override
-  void initState() {
+    ];
     super.initState();
   }
 
@@ -45,17 +42,44 @@ class _SecondScreenState extends State<SecondScreen> {
             children: [
               HorirontalLine('EDUCATION'),
               SizedBox(
-                height: 20,
+                height: 10,
               ),
               _buildEducation(context),
               SizedBox(
-                height: 50,
+                height: 30,
               ),
               HorirontalLine('Skill'),
               SizedBox(
-                height: 20,
+                height: 10,
               ),
               _buildSkill(context),
+              SizedBox(height: 30.0,),
+              HorirontalLine('CERTIFICATE'),
+              SizedBox(height: 10.0,),
+              _buildCertificate(context),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  ButtonCommon(buttonText: 'Previous Selection', onClick: (){
+                    if (widget.pageController.hasClients) {
+                      widget.pageController.animateToPage(
+                        0,
+                        duration: const Duration(milliseconds: 700),
+                        curve: Curves.easeInOut,
+                      );
+                    }
+                  }),
+                  ButtonCommon(buttonText: 'Next Section', onClick: (){
+                    if (widget.pageController.hasClients) {
+                      widget.pageController.animateToPage(
+                        2,
+                        duration: const Duration(milliseconds: 700),
+                        curve: Curves.easeInOut,
+                      );
+                    }
+                  })
+                ],
+              )
             ],
           ),
         ),
@@ -64,17 +88,49 @@ class _SecondScreenState extends State<SecondScreen> {
   }
 
   TextEditingController _generateController(String id, String value) {
+
     var key = id;
-    var controller = _controllerMap[key];
+    TextEditingController controller = _controllerMap[key];
     if (controller == null) {
       controller = TextEditingController();
     }
-    // Set text
-    controller.text = value;
+    // // Set text
+    controller.text = value; /// No se khong gan duoc
     // Set cursor
     controller.selection =
         TextSelection.collapsed(offset: controller.text.length);
     _controllerMap[key] = controller;
+    return controller;
+  }
+  TextEditingController _generateControllerCertificate(String id, String value) {
+
+    var key = id;
+    TextEditingController controller = _controllerMapCertificate[key];
+    if (controller == null) {
+      controller = TextEditingController();
+    }
+    // // Set text
+    controller.text = value; /// No se khong gan duoc
+    // Set cursor
+    controller.selection =
+        TextSelection.collapsed(offset: controller.text.length);
+    _controllerMapCertificate[key] = controller;
+    return controller;
+  }
+
+  TextEditingController _generateControllerSkill(String id, String value) {
+
+    var key = id;
+    TextEditingController controller = _controllerMapSkill[key];
+    if (controller == null) {
+      controller = TextEditingController();
+    }
+    // // Set text
+    controller.text = value; /// No se khong gan duoc
+    // Set cursor
+    controller.selection =
+        TextSelection.collapsed(offset: controller.text.length);
+    _controllerMapSkill[key] = controller;
     return controller;
   }
 
@@ -83,19 +139,16 @@ class _SecondScreenState extends State<SecondScreen> {
       children: [
         ListView.builder(
             shrinkWrap: true,
-            itemCount: _education.length,
+            itemCount: widget.cvModel.educationList.length,
             itemBuilder: (context, index) {
-              final schoolItem = _education[index].schoolNm;
-              final majorsItem = _education[index].majorMn;
-              final educationItem = _education[index];
+              final educationItem = widget.cvModel.educationList[index];
               return _buildEducationItem(context, educationItem, index);
             }),
         IconButton(
             onPressed: () {
-                setState(() {
-                  _education.add(new Education());
-                  print(_education.length);
-                });
+              setState(() {
+                widget.cvModel.educationList.add(Education());
+              });
             },
             icon: Icon(
               Icons.add_circle_outline,
@@ -109,7 +162,7 @@ class _SecondScreenState extends State<SecondScreen> {
   Widget _buildEducationItem(
       BuildContext context, Education education, int index) {
     return Container(
-      padding: EdgeInsets.only(left: 16.0,right: 16.0,bottom: 16.0),
+      padding: EdgeInsets.only(left: 10.0, right: 10.0, bottom: 10.0),
       decoration:
           BoxDecoration(border: Border.all(width: 1.0, color: Colors.black)),
       margin: EdgeInsets.only(
@@ -121,7 +174,7 @@ class _SecondScreenState extends State<SecondScreen> {
             child: IconButton(
                 onPressed: () {
                   setState(() {
-               _education.removeAt(index);
+                    widget.cvModel.educationList.removeAt(index);
                   });
                 },
                 icon: Icon(
@@ -130,14 +183,25 @@ class _SecondScreenState extends State<SecondScreen> {
                   color: Colors.red,
                 )),
           ),
-          SizedBox(height: 15.0,),
+          SizedBox(
+            height: 15.0,
+          ),
           Row(
             children: [
               Expanded(
                   flex: 8,
-                  child: FormInputData(
-                      _generateController(
-                          'school-$index', _education[index].schoolNm),_education[index].schoolNm)),
+                  child:
+                  Container(
+                    height: 30,
+                    child: TextFormField(
+                        controller: _generateController('school-$index', widget.cvModel.educationList[index].schoolNm),
+                        onChanged: (val) {
+                          widget.cvModel.educationList[index].schoolNm = val;
+                        },
+                        decoration:CommonStyle.InputFormDecoration(context)
+                    ),
+                  ),
+              ),
             ],
           ),
           SizedBox(
@@ -146,10 +210,17 @@ class _SecondScreenState extends State<SecondScreen> {
           Row(
             children: [
               Expanded(
-                  flex: 8,
-                  child: FormInputData(
-                      _generateController(
-                          'majors-$index', _education[index].majorMn),_education[index].majorMn)),
+                child: Container(
+                  height: 30,
+                  child: TextFormField(
+                      controller: _generateController('majors-$index', widget.cvModel.educationList[index].majorMn),
+                      onChanged: (val) {
+                        widget.cvModel.educationList[index].majorMn = val;
+                      },
+                      decoration:CommonStyle.InputFormDecoration(context)
+                  ),
+                ),
+              ),
               SizedBox(
                 width: 7,
               ),
@@ -170,7 +241,8 @@ class _SecondScreenState extends State<SecondScreen> {
                               initialDate: DateTime.now(),
                               selectedDate: DateTime.now(),
                               onChanged: (DateTime dateTime) {
-                                _education[index].classYear = dateTime.year.toString();
+                                widget.cvModel.educationList[index].classYear =
+                                    dateTime.year.toString();
                                 setState(() {
                                   print(education.classYear);
                                   Navigator.pop(context);
@@ -184,13 +256,13 @@ class _SecondScreenState extends State<SecondScreen> {
                       },
                     );
                   },
-                  child:Row(
+                  child: Row(
                     children: [
-                      Text(_education[index].classYear  ?? DateTime.now().year.toString()),
+                      Text(widget.cvModel.educationList[index].classYear ??
+                          DateTime.now().year.toString()),
                       Icon(Icons.arrow_drop_down_sharp)
                     ],
-                  )
-              )
+                  ))
             ],
           )
         ],
@@ -198,47 +270,183 @@ class _SecondScreenState extends State<SecondScreen> {
     );
   }
 
-  Widget _buildSkill(BuildContext context)
-  {
-    return
-        Column(children: [
-          Column(
-            children:_skills.map((e) => _buildSkillsItem(context, e, _skills.indexOf(e))).toList(),
+
+
+  Widget _buildSkill(BuildContext context) {
+    return Column(
+      children: [
+        Column(
+          children: widget.cvModel.skills
+              .map((e) => _buildSkillsItem(context, e, widget.cvModel.skills.indexOf(e)))
+              .toList(),
+        ),
+        IconButton(
+          icon: Icon(
+            Icons.add_circle_outline,
+            color: kmainColor,
           ),
-          IconButton(icon: Icon(Icons.add_circle_outline,color: kmainColor,), onPressed: () {
-          setState(() {
-            _skills.add(Skills());
-          });
-          },)
-        ],
+          onPressed: () {
+            setState(() {
+              widget.cvModel.skills.add(Skills());
+            });
+          },
+        )
+      ],
     );
   }
 
   Widget _buildSkillsItem(BuildContext context, Skills skill, int index) {
     return Container(
-
-      padding: EdgeInsets.only(left: 16.0,right: 16.0,bottom: 16.0),
-      margin: EdgeInsets.only(bottom: 30, left: MediaQuery.of(context).size.width * 0.15),
+      padding: EdgeInsets.only(left: 10.0, right: 10.0, bottom: 10.0),
+      margin: EdgeInsets.only(
+          bottom: 30, left: MediaQuery.of(context).size.width * 0.15),
       decoration:
           BoxDecoration(border: Border.all(width: 1.0, color: Colors.black)),
       child: Column(
-         children: [
-           Row(
-             mainAxisAlignment: MainAxisAlignment.end,
-             children: [
-               IconButton(icon: Icon(Icons.highlight_remove_outlined,color: Colors.red,size: 30,), onPressed: () {
-                 setState(() {
-                   _skills.removeAt(index);
-                 });
-               },)
-             ],
-           ),
-           SizedBox(height: 15,),
-           FormInputData( _generateController('sikll-${index}',_skills[index].skillNm),_skills[index].skillNm),
-           SizedBox(height: 10,),
-           FormInputData( _generateController('siklldata-${index}',_skills[index].skillData),_skills[index].skillData),
-         ],
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              IconButton(
+                icon: Icon(
+                  Icons.highlight_remove_outlined,
+                  color: Colors.red,
+                  size: 30,
+                ),
+                onPressed: () {
+                  setState(() {
+                    widget.cvModel.skills.removeAt(index);
+                  });
+                },
+              )
+            ],
+          ),
+          SizedBox(
+            height: 10,
+          ),
+
+          Container(
+            height: 30,
+            child: TextFormField(
+              controller: _generateControllerSkill('skill-$index', widget.cvModel.skills[index].skillNm),
+              onChanged: (val) {
+                widget.cvModel.skills[index].skillNm = val;
+              },
+              decoration:CommonStyle.InputFormDecoration(context)
+            ),
+          ),
+          SizedBox(
+            height: 10,
+          ),
+
+          Container(
+            height: 30,
+            child: TextFormField(
+              controller: _generateControllerSkill('skilldata-$index', widget.cvModel.skills[index].skillData),
+              onChanged: (val) {
+                widget.cvModel.skills[index].skillData = val;
+              },
+              decoration: CommonStyle.InputFormDecoration(context)
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+  Widget _buildCertificate(BuildContext context)
+  {
+    return Column(
+      children: [
+        Column(
+          children: widget.cvModel.certificateList.map((e) => _buildCertificationItems(context, e, widget.cvModel.certificateList.indexOf(e))).toList(),
+
+        ),
+        IconButton(icon :Icon(Icons.add_circle_outline_outlined,color: kmainColor,size: 30),
+          onPressed: (){
+          setState(() {
+            widget.cvModel.certificateList.add(Certificate());
+          });
+          },),
+      ],
+    );
+  }
+  Widget _buildCertificationItems(BuildContext context,Certificate certificate , int index )
+  {
+    return  Container(
+      margin: EdgeInsets.only(
+          bottom: 30, left: MediaQuery.of(context).size.width * 0.15),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 8,
+            child: Container(
+              height: 30,
+              child: TextFormField(
+                  controller: _generateControllerCertificate('certification-$index', widget.cvModel.certificateList[index].certificateNm),
+                  onChanged: (val) {
+                    widget.cvModel.certificateList[index].certificateNm = val;
+                  },
+                  decoration: CommonStyle.InputFormDecoration(context)
+              ),
+            ),
+          ),
+          SizedBox(width: 10,),
+          Expanded(
+            flex: 1,
+            child: TextButton(
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text("Select Year"),
+                        content: Container(
+                          width: 300,
+                          height: 300,
+                          child: YearPicker(
+                            firstDate: DateTime(DateTime.now().year - 100, 1),
+                            lastDate: DateTime(DateTime.now().year + 100, 1),
+                            initialDate: DateTime.now(),
+                            selectedDate: DateTime.now(),
+                            onChanged: (DateTime dateTime) {
+                              widget.cvModel.certificateList[index].certificateYear =
+                                  dateTime.year.toString();
+                              setState(() {
+                                Navigator.pop(context);
+                              });
+                              // Do something with the dateTime selected.
+                              // Remember that you need to use dateTime.year to get the year
+                            },
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
+                child: Row(
+                  children: [
+                    Text(widget.cvModel.certificateList[index].certificateYear ??
+                        DateTime.now().year.toString()),
+                    Icon(Icons.arrow_drop_down_sharp)
+                  ],
+                )),
+          ),
+          Expanded(
+            flex: 1,
+            child: IconButton(icon :Icon(Icons.highlight_remove,color: Colors.red,size: 30),
+            onPressed: (){
+             setState(() {
+               _controllerMapSkill.removeWhere((key, value) =>
+               (key == "skill-${_controllerMapSkill.length - 1}"));
+               widget.cvModel.certificateList.removeAt(index);
+               _controllerMapCertificate.removeWhere((key , value) => (key =="certification-${_controllerMapCertificate.length-1}"));
+             });
+            },),
+          ),
+
+        ],
       ),
     );
   }
 }
+

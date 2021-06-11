@@ -8,18 +8,23 @@ import 'package:flutter_cv_maker/common/common_style.dart';
 import 'package:flutter_cv_maker/common/common_ui.dart';
 import 'package:flutter_cv_maker/constants/constants.dart';
 import 'package:flutter_cv_maker/models/cv_model/cv_model.dart';
+import 'package:flutter_cv_maker/utils/validation.dart';
 
 class SectionOneScreen extends StatefulWidget {
   final CVModel cvModel;
   final Function onSaved;
+  PageController pageController ;
 
-  const SectionOneScreen({this.cvModel, this.onSaved});
+
+   SectionOneScreen({this.cvModel, this.onSaved,this.pageController});
 
   @override
   _SectionOneScreenState createState() => _SectionOneScreenState();
 }
 
 class _SectionOneScreenState extends State<SectionOneScreen> {
+  final _formKey = GlobalKey<FormState>();
+
   TextEditingController _fullNameController = TextEditingController();
   TextEditingController _emailController = TextEditingController();
   TextEditingController _positionController = TextEditingController();
@@ -81,42 +86,45 @@ class _SectionOneScreenState extends State<SectionOneScreen> {
     double sizeWith = MediaQuery.of(context).size.width;
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      body: SingleChildScrollView(
-        child: Container(
-          width: MediaQuery.of(context).size.width,
-          margin: EdgeInsets.symmetric(horizontal: 40),
-          child: Column(
-            children: [
-              SizedBox(
-                height: 30,
-              ),
-              HorirontalLine('INFORMATION'),
-              SizedBox(
-                height: 30,
-              ),
-              Container(
-                width: MediaQuery.of(context).size.width,
-                margin: EdgeInsets.only(right: sizeWith / 12),
-                padding: EdgeInsets.only(left: sizeWith / 6),
-                child: Form(
-                    child: Column(
-                  children: [
-                    InputTextFormfield('Full Name', _fullNameController,),
-                    _buildGender(context),
-                    InputTextFormfield('Email', _emailController,),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    InputTextFormfield('Position', _positionController),
-                  ],
-                )),
-              ),
-              SizedBox(
-                height: 40,
-              ),
-              HorirontalLine('TECHNICAL SUMMARY'),
-              _buildListSummary(context),
-            ],
+      body: Form(
+        key: _formKey,
+        child: SingleChildScrollView(
+          child: Container(
+            width: MediaQuery.of(context).size.width,
+            margin: EdgeInsets.symmetric(horizontal: 40),
+            child: Column(
+              children: [
+                SizedBox(
+                  height: 30,
+                ),
+                HorirontalLine('INFORMATION'),
+                SizedBox(
+                  height: 30,
+                ),
+                Container(
+                  width: MediaQuery.of(context).size.width,
+                  margin: EdgeInsets.only(right: sizeWith / 12),
+                  padding: EdgeInsets.only(left: sizeWith / 6),
+                  child: Column(
+                    children: [
+                  TextFieldCommon(controller:_fullNameController,label: 'Full Name' ,validator: (name) => Validation().checkValidNameField(context, name),),
+                     // InputTextFormfield('Full Name', _fullNameController,'Please enter your fullname'),
+                  _buildGender(context),
+                  InputTextFormfield('Email', _emailController,'Please check input email'),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  InputTextFormfield('Position', _positionController,'Please enter your position'),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: 40,
+                ),
+                HorirontalLine('TECHNICAL SUMMARY'),
+                _buildListSummary(context),
+              ],
+            ),
           ),
         ),
       ),
@@ -208,6 +216,39 @@ class _SectionOneScreenState extends State<SectionOneScreen> {
                   // );
                   // var requestBody = json.encoder.convert(model);
                   // print('Request Body: $requestBody');
+                        if (_formKey.currentState.validate()) {
+                          bool emailValid = RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(_emailController.text);
+                          if(_genderSelected.isNotEmpty)
+                          {
+                            if(emailValid)
+                              {
+                                if (widget.pageController.hasClients) {
+                                  widget.pageController.animateToPage(
+                                    1,
+                                    duration: const Duration(milliseconds: 700),
+                                    curve: Curves.easeInOut,
+                                  );
+                                }
+                              }
+                            else{
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(SnackBar(content: Container(
+                                  alignment: Alignment.center,
+                                  height: 70,
+                                  child: Text('Invalid email format')),backgroundColor: Colors.red,));
+                            }
+
+                          }else{
+                            ScaffoldMessenger.of(context)
+                                .showSnackBar(SnackBar(
+                              content: Container(
+                                alignment: Alignment.center,
+                                height: 70,
+                                  child: Text('Choice your gender')),backgroundColor: Colors.red,));
+                          }
+                        }
+
+
                 },
               )
             ],

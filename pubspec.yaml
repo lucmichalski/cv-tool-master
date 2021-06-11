@@ -35,7 +35,6 @@ dependencies:
   equatable: any
   google_fonts: ^2.0.0
   flutter_easyloading: ^3.0.0
-
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -106,6 +106,10 @@ class _HomeScreenState extends State<HomeScreen> {
                           position: '',
                           technicalSummaryList: [],
                           status: false,
+                          educationList:[],
+                          skills: [],
+                          professionalList: [],
+                          certificateList: [],
                           gender: 1);
 
                       navKey.currentState

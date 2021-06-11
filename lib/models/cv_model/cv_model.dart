@@ -5,10 +5,11 @@ class CVModel {
   String position;
   bool status;
   List<Role> role;
-  List<Education> education;
+  List<Education> educationList;
   List<String> technicalSummaryList;
-  List<String> skillList;
+  List<Certificate> certificateList;
   List<Skills> skills;
+  List<Professional> professionalList;
 
   CVModel(
       {this.name,
@@ -18,10 +19,10 @@ class CVModel {
       this.position,
       this.status,
       this.technicalSummaryList,
-      this.education,
-        this.skillList,
-        this.skills
-      });
+      this.educationList,
+      this.skills,
+      this.professionalList,
+      this.certificateList});
 }
 
 class Role {
@@ -31,18 +32,42 @@ class Role {
 
   Role({this.roleNm, this.level, this.technicals});
 }
-class Education{
+
+class Education {
   String schoolNm;
   String majorMn;
   String classYear;
-  Education({this.schoolNm , this.majorMn , this.classYear});
+
+  Education({this.schoolNm, this.majorMn, this.classYear});
 }
-class Skills{
+
+class Skills {
   String skillNm;
   String skillData;
-  Skills({this.skillNm,this.skillData});
+
+  Skills({this.skillNm, this.skillData});
 }
 
+class Certificate {
+  String certificateNm;
+  String certificateYear;
 
+  Certificate({this.certificateNm, this.certificateYear});
+}
 
+class Professional {
+  String companyNm;
+  String locationNm;
+  String startDate;
+  String endDate;
+  String roleNm;
+  List<String> responsibilities;
 
+  Professional(
+      {this.companyNm,
+      this.locationNm,
+      this.startDate,
+      this.endDate,
+      this.roleNm,
+      this.responsibilities});
+}

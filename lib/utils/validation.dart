@@ -25,6 +25,17 @@ class Validation {
       return null;
     }
   }
+  String checkValidNameField(BuildContext context, String name) {
+    if (name.isEmpty) {
+      return 'Name không thể để trống';
+    } else if (name.length < 2) {
+      return 'Name phải có tối thiểu 3 ký tự';
+    } else if (name.length > 30) {
+      return 'Name chỉ có tối đa 30 ký tự';
+    } else {
+      return null;
+    }
+  }
 
 // Check valid password
   String checkValidPassword(BuildContext context, String password) {

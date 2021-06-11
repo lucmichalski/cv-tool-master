@@ -17,6 +17,7 @@ class ButtonCommon extends StatefulWidget {
   final double width;
   final bool isCircle;
   final bool isLoading;
+
   ButtonCommon(
       {this.borderRadius,
       this.height,
@@ -91,6 +92,7 @@ class LinkText extends StatefulWidget {
   final TextStyle linkTextStyle;
   final Function onTapLink;
   final double textSize;
+
   LinkText(
       {@required this.text,
       this.linkTextStyle,
@@ -103,6 +105,7 @@ class LinkText extends StatefulWidget {
 
 class _LinkTextState extends State<LinkText> {
   bool _isHover = false;
+
   @override
   Widget build(BuildContext context) {
     return MouseRegion(
@@ -133,6 +136,7 @@ class ControlTypeDropDown extends StatefulWidget {
   final int initPosition;
   final bool isSpecial;
   final List<String> menuList;
+
   ControlTypeDropDown(
       {this.initPosition,
       this.onChange,
@@ -174,37 +178,49 @@ class _ControlTypeDropDownState extends State<ControlTypeDropDown> {
     );
   }
 }
-class InputTextFormfield extends StatelessWidget{
- final String labelText;
- final TextEditingController controller ;
-  const InputTextFormfield(this.labelText, this.controller);
+
+class InputTextFormfield extends StatelessWidget {
+  String labelText;
+  TextEditingController controller;
+
+  String errorText;
+
+  InputTextFormfield(this.labelText, this.controller, this.errorText);
+
   @override
   Widget build(BuildContext context) {
-   return Container(
-     height: 40,
-     child: TextFormField(
-       controller: controller,
-       decoration: InputDecoration(
-         labelText: labelText,
-         fillColor: Colors.white,
-         focusedBorder: OutlineInputBorder(
-           borderRadius: BorderRadius.circular(0.0),
-           borderSide: BorderSide(
-             color: Colors.black,
-           ),
-         ),
-         enabledBorder: OutlineInputBorder(
-           borderRadius: BorderRadius.circular(0.0),
-           borderSide: BorderSide(
-             color: Colors.black,
-             width: 1.0,
-           ),
-         ),
-       ),
-     ),
-   );
+    return Container(
+      height: 40,
+      child: TextFormField(
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return errorText;
+          }
+          return null;
+        },
+        controller: controller,
+        decoration: InputDecoration(
+          hintText: labelText,
+          fillColor: Colors.white,
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(0.0),
+            borderSide: BorderSide(
+              color: Colors.black,
+            ),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(0.0),
+            borderSide: BorderSide(
+              color: Colors.black,
+              width: 1.0,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
+
 class HorirontalLine extends StatelessWidget {
   final String title;
 
@@ -228,8 +244,8 @@ class HorirontalLine extends StatelessWidget {
             height: 3,
           ),
           Container(
-              margin: EdgeInsets.only(
-                  right: MediaQuery.of(context).size.width/ 4),
+              margin:
+                  EdgeInsets.only(right: MediaQuery.of(context).size.width / 4),
               child: Divider(color: Colors.black)),
         ],
       ),
@@ -237,17 +253,19 @@ class HorirontalLine extends StatelessWidget {
   }
 }
 
-class FormInputData extends StatelessWidget{
-  TextEditingController controller ;
+class FormInputData extends StatelessWidget {
+  TextEditingController controller;
+
   String onChangedt;
-  FormInputData(this.controller,this.onChangedt);
+
+  FormInputData(this.controller, this.onChangedt);
+
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 40,
       child: TextFormField(
-        onChanged: (val)
-        {
+        onChanged: (val) {
           onChangedt = val;
           print(onChangedt);
         },
@@ -273,4 +291,81 @@ class FormInputData extends StatelessWidget{
   }
 }
 
+class TextFieldCommon extends StatelessWidget {
+  final String hint;
+  final String label;
+  final TextStyle hintStyle;
+  final bool isObscure;
+  final Function onChange;
+  final Function(String value) validator;
+  final BorderRadiusGeometry borderRadius;
+  final TextEditingController controller;
 
+  TextFieldCommon(
+      {this.hint,
+      this.hintStyle,
+      this.isObscure = false,
+      this.validator,
+      this.borderRadius,
+      this.controller,
+      this.label,
+      this.onChange(String value)});
+
+  @override
+  Widget build(BuildContext context) {
+    var w = MediaQuery.of(context).size.width;
+    return Container(
+     // height: 35,
+      child: TextFormField(
+        onChanged: onChange,
+        controller: controller,
+        cursorColor: kmainColor,
+        obscureText: this.isObscure,
+        validator: this.validator,
+        decoration: new InputDecoration(
+            filled: true,
+            fillColor: Colors.white,
+            labelText: label ?? kEmpty,
+            border: InputBorder.none,
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(w * 0.001),
+              borderSide: BorderSide(
+                color: kmainColor,
+              ),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(w * 0.001),
+              borderSide: BorderSide(
+                color: Colors.red,
+                width: 1.0,
+              ),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(w * 0.001),
+              borderSide: BorderSide(
+                color: mainBorderColor,
+                width: 1.0,
+              ),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(w * 0.001),
+              borderSide: BorderSide(
+                color: Colors.red,
+                width: 1.0,
+              ),
+            ),
+            disabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(w * 0.001),
+              borderSide: BorderSide(
+                color: mainBorderColor.withOpacity(0.6),
+                width: 1.0,
+              ),
+            ),
+            contentPadding: EdgeInsets.only(left: 15, right: 15),
+            floatingLabelBehavior: FloatingLabelBehavior.always,
+            hintText: this.hint ?? kEmpty,
+            hintStyle: this.hintStyle ?? CommonStyle.size22W4005c5c5c(context)),
+      ),
+    );
+  }
+}

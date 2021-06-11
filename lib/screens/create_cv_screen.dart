@@ -5,6 +5,7 @@ import 'package:flutter_cv_maker/constants/constants.dart';
 import 'package:flutter_cv_maker/models/cv_model/cv_model.dart';
 import 'package:flutter_cv_maker/screens/viewPageCreatecv/section_one_screen.dart';
 import 'package:flutter_cv_maker/screens/viewPageCreatecv/section_second_screen.dart';
+import 'package:flutter_cv_maker/screens/viewPageCreatecv/section_three_screen.dart';
 
 class CreateCV extends StatefulWidget {
   final CVModel cvModel;
@@ -17,6 +18,7 @@ class CreateCV extends StatefulWidget {
 
 class _CreateCVState extends State<CreateCV> {
   final PageController controller = PageController(initialPage: 0);
+  final PageController _pageController = PageController();
   List<TabModelSteps> _tab = [];
   CVModel _cvModel;
 
@@ -45,6 +47,12 @@ class _CreateCVState extends State<CreateCV> {
   }
 
   @override
+  void dispose() {
+    // TODO: implement dispose
+    _pageController.dispose();
+    super.dispose();
+  }
+  @override
   void initState() {
     if (widget.cvModel == null) {
       _cvModel = CVModel(
@@ -68,7 +76,7 @@ class _CreateCVState extends State<CreateCV> {
         child: Column(
           children: [
             SizedBox(
-              height: 50,
+              height: 20,
             ),
             Container(
                 margin: EdgeInsets.only(
@@ -76,29 +84,29 @@ class _CreateCVState extends State<CreateCV> {
                 width: MediaQuery.of(context).size.width,
                 child: _buildPageSteps(context)),
             Container(
-              padding: EdgeInsets.symmetric(vertical: 50),
+              padding: EdgeInsets.symmetric(vertical: 20),
               child: Text(
                 _getPageName(),
                 style: CommonStyle.size48W700black(context),
                 textAlign: TextAlign.center,
               ),
             ),
+            // nó cứ vào cái giao diện call vs anh. không , ý em là nó k cho search ấy
             Expanded(
               child: PageView(
+               // physics:new NeverScrollableScrollPhysics(),
                 onPageChanged: _onPageViewChange,
                 scrollDirection: Axis.horizontal,
-                controller: controller,
+                controller: _pageController,
                 children: <Widget>[
                   SectionOneScreen(
                     cvModel: _cvModel,
+                    pageController: _pageController,
                   ),
-                  SecondScreen(),
-                  Container(
-                    color: Colors.blue.shade300,
-                    child: Center(
-                      child: Text('3rd Page'),
-                    ),
-                  ),
+                  SecondScreen(pageController: _pageController,cvModel: _cvModel,),
+
+                  SectionThree(cvModel: _cvModel,
+                    initialDate: DateTime.now(),),
                   Container(
                     color: Colors.yellow.shade300,
                     child: Center(

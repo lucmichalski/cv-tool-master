@@ -71,4 +71,24 @@ class CommonStyle {
         fontWeight: FontWeight.w600,
         color: Colors.black);
   }
+  static InputDecoration InputFormDecoration(BuildContext context)
+  {
+    return InputDecoration(
+      fillColor: Colors.white,
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(0.0),
+        borderSide: BorderSide(
+          color: Colors.black,
+        ),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(0.0),
+        borderSide: BorderSide(
+          color: Colors.black,
+          width: 1.0,
+        ),
+      ),
+    );
+  }
 }
+
