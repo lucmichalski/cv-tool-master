@@ -10,26 +10,31 @@ import '../../helper.dart';
 class SectionThree extends StatefulWidget {
   final CVModel cvModel;
   final DateTime initialDate;
-  SectionThree({this.initialDate, this.cvModel});
+  final PageController pageController;
+  SectionThree({this.initialDate, this.cvModel, this.pageController});
   @override
   _SectionThreeState createState() => _SectionThreeState();
 }
 
 class _SectionThreeState extends State<SectionThree> {
   DateTime selectDate;
-  List<Professional> _listProfessional = [];
+  // List<Professional> widget.cvModel.professionalList = [];
   Map<String, TextEditingController> _controllerProfessional = {};
 
   @override
   void initState() {
-    _listProfessional = widget.cvModel.professionalList;
-    _listProfessional.add(Professional(
-        startDate: '',
-        responsibilities: [],
-        locationNm: '',
-        endDate: '',
-        companyNm: '',
-        roleNm: ''));
+    if (widget.cvModel.professionalList == null ||
+        widget.cvModel.professionalList.isEmpty) {
+      widget.cvModel.professionalList = [
+        Professional(
+            startDate: '',
+            responsibilities: [],
+            locationNm: '',
+            endDate: '',
+            companyNm: '',
+            roleNm: '')
+      ];
+    }
     // TODO: implement initState
     selectDate = widget.initialDate; // loi moi ma anh
 
@@ -44,7 +49,7 @@ class _SectionThreeState extends State<SectionThree> {
           margin: EdgeInsets.symmetric(horizontal: 150),
           child: Column(
             children: [
-              HorirontalLine('Professional Experience'),
+              HorizontalLine('Professional Experience'),
               _buildProfessional(context)
             ],
           ),
@@ -57,15 +62,15 @@ class _SectionThreeState extends State<SectionThree> {
     return Column(
       children: [
         Column(
-          children: _listProfessional
+          children: widget.cvModel.professionalList
               .map((e) => _buildProfessionalItem(
-                  context, e, _listProfessional.indexOf(e)))
+                  context, e, widget.cvModel.professionalList.indexOf(e)))
               .toList(),
         ),
         IconButton(
             onPressed: () {
               setState(() {
-                _listProfessional.add(Professional(
+                widget.cvModel.professionalList.add(Professional(
                     startDate: '',
                     responsibilities: [],
                     locationNm: '',
@@ -103,7 +108,7 @@ class _SectionThreeState extends State<SectionThree> {
                     color: Colors.red, size: 50),
                 onPressed: () {
                   setState(() {
-                    _listProfessional.removeAt(index);
+                    widget.cvModel.professionalList.removeAt(index);
                   });
                 },
               ),
@@ -119,7 +124,7 @@ class _SectionThreeState extends State<SectionThree> {
                 flex: 1,
                 child: TextFieldCommon(
                   controller: _generateControllerProfessional(
-                      'company-$index', _listProfessional[index].companyNm),
+                      'company-$index', widget.cvModel.professionalList[index].companyNm),
                   onChanged: (val) {
                     professional.companyNm = val;
                   },
@@ -134,13 +139,13 @@ class _SectionThreeState extends State<SectionThree> {
                 child: Container(
                   height: 35,
                   alignment: Alignment.center,
-                  child: TextFormField(
+                  child: TextFieldCommon(
                     onChanged: (value) {
                       professional.locationNm = value;
                     },
                     controller: _generateControllerProfessional(
-                        'location-$index', _listProfessional[index].locationNm),
-                    decoration: CommonStyle.InputFormDecoration(context),
+                        'location-$index', widget.cvModel.professionalList[index].locationNm),
+                    label: 'Location',
                   ),
                 ),
               ),
@@ -240,12 +245,12 @@ class _SectionThreeState extends State<SectionThree> {
           Container(
             height: 35.0,
             alignment: Alignment.center,
-            child: TextFormField(
-              decoration: CommonStyle.InputFormDecoration(context),
+            child: TextFieldCommon(
+              label: 'Role',
               controller: _generateControllerProfessional(
-                  'role-$index', _listProfessional[index].roleNm),
+                  'role-$index', widget.cvModel.professionalList[index].roleNm),
               onChanged: (value) {
-                _listProfessional[index].roleNm = value;
+                widget.cvModel.professionalList[index].roleNm = value;
               },
             ),
           ),
@@ -287,17 +292,15 @@ class _SectionThreeState extends State<SectionThree> {
     );
   }
 
-  Widget _buildResponsibilityItem(BuildContext context, String value,
-      List<String> responsibilities, int index) {
+  Widget _buildResponsibilityItem(BuildContext context, String value, List<String> responsibilities, int index) {
     return Row(
       children: [
         Expanded(
           child: Container(
             height: 35.0,
-            child: TextFormField(
+            child: TextFieldCommon(
               controller: _generateControllerProfessional(
                   'responsibilities-$index', value),
-              decoration: CommonStyle.InputFormDecoration(context),
               onChanged: (val) {
                 setState(() {
                   responsibilities[index] = val;
@@ -319,8 +322,7 @@ class _SectionThreeState extends State<SectionThree> {
     );
   }
 
-  TextEditingController _generateControllerProfessional(
-      String id, String value) {
+  TextEditingController _generateControllerProfessional(String id, String value) {
     var key = id;
     TextEditingController controller = _controllerProfessional[key];
     if (controller == null) {

@@ -5,6 +5,8 @@ import 'package:flutter_cv_maker/common/common_style.dart';
 import 'package:flutter_cv_maker/models/cv_model/cv_model.dart';
 import 'package:flutter_cv_maker/routes/routes.dart';
 import 'package:flutter_cv_maker/screens/viewPageCreatecv/section_one_screen.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_cv_maker/extensions/size_extension.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key key}) : super(key: key);
@@ -20,23 +22,59 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     _cvList.addAll([
       CVModel(
-          name: 'Nguyen Van A',
-          position: 'CEO',
+          name: 'KHANH Tran Quoc',
+          position: 'Mobile Developer',
           email: 'khanhtq@yahoo.com',
+          certificateList: [
+            Certificate(certificateNm: "Certificate 1", certificateYear: '2019')
+          ],
+          role: Role(roleNm: 'BA', level: ['BA1'], technicals: ['BAa']),
+          skills: [
+            Skill(skillNm: 'Program Language', skillData: 'Java, NodeJS')
+          ],
+          professionalList: [
+            Professional(
+                roleNm: 'Mobile Developer',
+                companyNm: 'TECHVIFY',
+                startDate: 'Mar-2019',
+                endDate: 'Mar-2020',
+                locationNm: 'Hanoi Vietnam',
+                responsibilities: ['Coding', 'Testing'])
+          ],
+          educationList: [
+            Education(
+                schoolNm: 'FPT University',
+                majorNm: 'Information Technology',
+                classYear: '2019')
+          ],
+          gender: 'Male',
+          highLightProjectList: [
+            HighLightProject(
+                projectNm: 'CV-Maker',
+                teamSize: '2',
+                position: 'Frontend Developer',
+                projectDescriptionNm: 'Create tool for CV create',
+                technologies: ['Node JS', 'Flutter'],
+                responsibility: ['Coding frontend', 'Suggest something']),
+          ],
           status: true,
-          technicalSummaryList: ['hoc dot', 'ngu nhu bo', 'bo lao']),
-      CVModel(
-          name: 'Nguyen Van B',
-          position: 'CEO',
-          status: false,
-          email: 'khanhtq@yahoo.com',
-          technicalSummaryList: ['hoc ngu nhu trau', 'monster', 'bo lao']),
-      CVModel(
-          name: 'Nguyen Thi C',
-          position: 'CEO',
-          status: true,
-          email: 'khanhtq@yahoo.com',
-          technicalSummaryList: ['hoc gioi', 'dep zai', 'bo lao'])
+          technicalSummaryList: [
+            '5 years’ experiences in software development specialize in web backend development. ',
+            'Good understanding of server-side templating technical, system architectural. ',
+            'Many experiences working with API design, DB design. '
+          ]),
+      // CVModel(
+      //     name: 'Nguyen Van B',
+      //     position: 'CEO',
+      //     status: false,
+      //     email: 'khanhtq@yahoo.com',
+      //     technicalSummaryList: ['hoc ngu nhu trau', 'monster', 'bo lao']),
+      // CVModel(
+      //     name: 'Nguyen Thi C',
+      //     position: 'CEO',
+      //     status: true,
+      //     email: 'khanhtq@yahoo.com',
+      //     technicalSummaryList: ['hoc gioi', 'dep zai', 'bo lao'])
     ]);
     super.initState();
   }
@@ -106,11 +144,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           position: '',
                           technicalSummaryList: [],
                           status: false,
-                          educationList:[],
+                          educationList: [],
                           skills: [],
                           professionalList: [],
                           certificateList: [],
-                          gender: 1);
+                          gender: 'Female');
 
                       navKey.currentState
                           .pushNamed(routeCreateCV, arguments: model);

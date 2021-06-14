@@ -3,6 +3,8 @@ import 'package:flutter_cv_maker/common/TabModels.dart';
 import 'package:flutter_cv_maker/common/common_style.dart';
 import 'package:flutter_cv_maker/constants/constants.dart';
 import 'package:flutter_cv_maker/models/cv_model/cv_model.dart';
+import 'package:flutter_cv_maker/screens/viewPageCreatecv/section_%20five_screen.dart';
+import 'package:flutter_cv_maker/screens/viewPageCreatecv/section_four_screen.dart';
 import 'package:flutter_cv_maker/screens/viewPageCreatecv/section_one_screen.dart';
 import 'package:flutter_cv_maker/screens/viewPageCreatecv/section_second_screen.dart';
 import 'package:flutter_cv_maker/screens/viewPageCreatecv/section_three_screen.dart';
@@ -69,7 +71,7 @@ class _CreateCVState extends State<CreateCV> {
           position: '',
           technicalSummaryList: [],
           status: false,
-          gender: 1);
+          gender: 'Male');
     } else {
       _cvModel = widget.cvModel;
     }
@@ -97,7 +99,6 @@ class _CreateCVState extends State<CreateCV> {
                 textAlign: TextAlign.center,
               ),
             ),
-            // nó cứ vào cái giao diện call vs anh. không , ý em là nó k cho search ấy
             Expanded(
               child: PageView(
                 // physics:new NeverScrollableScrollPhysics(),
@@ -114,21 +115,14 @@ class _CreateCVState extends State<CreateCV> {
                     cvModel: _cvModel,
                   ),
                   SectionThree(
+                    pageController: _pageController,
                     cvModel: _cvModel,
                     initialDate: DateTime.now(),
                   ),
-                  Container(
-                    color: Colors.yellow.shade300,
-                    child: Center(
-                      child: Text('4th Page'),
-                    ),
-                  ),
-                  Container(
-                    color: Colors.purple.shade300,
-                    child: Center(
-                      child: Text('5th Page'),
-                    ),
-                  ),
+                  SectionFour(cvModel: _cvModel,pageController: _pageController,),
+                 SectionFive(cvModel: _cvModel,pageController: _pageController,
+
+                 )
                 ],
               ),
             ),

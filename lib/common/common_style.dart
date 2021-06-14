@@ -59,36 +59,55 @@ class CommonStyle {
         fontWeight: FontWeight.w700,
         color: Colors.black);
   }
+
   static TextStyle size20W400black(BuildContext context) {
     return GoogleFonts.roboto(
         fontSize: DoubleExt(20).textSize(context),
         fontWeight: FontWeight.w400,
         color: Colors.black);
   }
+
   static TextStyle size32W600black(BuildContext context) {
     return GoogleFonts.roboto(
         fontSize: DoubleExt(32).textSize(context),
         fontWeight: FontWeight.w600,
         color: Colors.black);
   }
-  static InputDecoration InputFormDecoration(BuildContext context)
-  {
-    return InputDecoration(
-      fillColor: Colors.white,
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(0.0),
-        borderSide: BorderSide(
-          color: Colors.black,
-        ),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(0.0),
-        borderSide: BorderSide(
-          color: Colors.black,
-          width: 1.0,
-        ),
-      ),
-    );
+
+  static TextStyle size20W700black(BuildContext context) {
+    return GoogleFonts.ptSerif(fontSize: DoubleExt(20).textSizePdf(context),
+        fontWeight: FontWeight.w700,
+        color: Colors.black);
+  }
+
+  static TextStyle size12W400black(BuildContext context) {
+    return GoogleFonts.ptSerif(fontSize: DoubleExt(12).textSizePdf(context),
+        fontWeight: FontWeight.w400,
+        color: Colors.black);
+  }
+
+  static TextStyle size12W700black(BuildContext context) {
+    return GoogleFonts.ptSerif(fontSize: DoubleExt(12).textSizePdf(context),
+        fontWeight: FontWeight.w700,
+        color: Colors.black);
+  }
+
+  static TextStyle size14W500black(BuildContext context) {
+    return GoogleFonts.ptSerif(fontSize: DoubleExt(14).textSizePdf(context),
+        fontWeight: FontWeight.w500,
+        color: Colors.black);
+  }
+
+  static TextStyle size14W400black(BuildContext context) {
+    return GoogleFonts.ptSerif(fontSize: DoubleExt(14).textSizePdf(context),
+        fontWeight: FontWeight.w400,
+        color: Colors.black);
+  }
+
+  static TextStyle size14W700black(BuildContext context) {
+    return GoogleFonts.ptSerif(fontSize: DoubleExt(14).textSizePdf(context),
+        fontWeight: FontWeight.w700,
+        color: Colors.black);
   }
 }
 

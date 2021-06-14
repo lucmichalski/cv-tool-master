@@ -1,15 +1,16 @@
 class CVModel {
   String name;
   String email;
-  int gender;
+  String gender;
   String position;
   bool status;
-  List<Role> role;
+  Role role;
   List<Education> educationList;
   List<String> technicalSummaryList;
   List<Certificate> certificateList;
-  List<Skills> skills;
+  List<Skill> skills;
   List<Professional> professionalList;
+  List<HighLightProject> highLightProjectList;
 
   CVModel(
       {this.name,
@@ -22,7 +23,8 @@ class CVModel {
       this.educationList,
       this.skills,
       this.professionalList,
-      this.certificateList});
+      this.certificateList,
+      this.highLightProjectList});
 }
 
 class Role {
@@ -35,17 +37,17 @@ class Role {
 
 class Education {
   String schoolNm;
-  String majorMn;
+  String majorNm;
   String classYear;
 
-  Education({this.schoolNm, this.majorMn, this.classYear});
+  Education({this.schoolNm, this.majorNm, this.classYear});
 }
 
-class Skills {
+class Skill {
   String skillNm;
   String skillData;
 
-  Skills({this.skillNm, this.skillData});
+  Skill({this.skillNm, this.skillData});
 }
 
 class Certificate {
@@ -70,4 +72,21 @@ class Professional {
       this.endDate,
       this.roleNm,
       this.responsibilities});
+}
+
+class HighLightProject {
+  String projectNm;
+  String projectDescriptionNm;
+  String teamSize;
+  String position;
+  List<String> responsibility;
+  List<String> technologies;
+
+  HighLightProject(
+      {this.projectDescriptionNm,
+      this.teamSize,
+      this.position,
+      this.responsibility,
+      this.technologies,
+      this.projectNm});
 }

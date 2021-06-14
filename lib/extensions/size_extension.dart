@@ -9,6 +9,11 @@ extension DoubleExt on double {
     return ratio;
   }
 
+  double textSizePdf(BuildContext context) {
+    var ratio = this * MediaQuery.of(context).size.width / standardWidth;
+    return ratio * 2;
+  }
+
   // double width() {
   //   return (this / standardWidth * 100).w;
   // }

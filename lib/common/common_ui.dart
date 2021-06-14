@@ -41,8 +41,8 @@ class _ButtonCommonState extends State<ButtonCommon> {
     var h = MediaQuery.of(context).size.height;
     var w = MediaQuery.of(context).size.width;
     return Material(
-      borderRadius:
-          BorderRadius.all(Radius.circular(this.widget.borderRadius ?? w * 0.001)),
+      borderRadius: BorderRadius.all(
+          Radius.circular(this.widget.borderRadius ?? w * 0.001)),
       color: widget.color ?? kmainColor,
       child: InkWell(
         customBorder: RoundedRectangleBorder(
@@ -216,10 +216,10 @@ class InputTextFormfield extends StatelessWidget {
   }
 }
 
-class HorirontalLine extends StatelessWidget {
+class HorizontalLine extends StatelessWidget {
   final String title;
 
-  const HorirontalLine(this.title);
+  const HorizontalLine(this.title);
 
   @override
   Widget build(BuildContext context) {
@@ -248,62 +248,30 @@ class HorirontalLine extends StatelessWidget {
   }
 }
 
-class FormInputData extends StatelessWidget {
-  TextEditingController controller;
-
-  String onChangedt;
-
-  FormInputData(this.controller, this.onChangedt);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 40,
-      child: TextFormField(
-        onChanged: (val) {
-          onChangedt = val;
-          print(onChangedt);
-        },
-        controller: controller,
-        decoration: InputDecoration(
-          fillColor: Colors.white,
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(0.0),
-            borderSide: BorderSide(
-              color: Colors.black,
-            ),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(0.0),
-            borderSide: BorderSide(
-              color: Colors.black,
-              width: 1.0,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 class TextFieldCommon extends StatelessWidget {
+  final int maxLines;
   final String hint;
   final String label;
   final TextStyle hintStyle;
   final bool isObscure;
   final Function onChanged;
+  final FocusNode focusNode;
   final Function(String value) validator;
   final BorderRadiusGeometry borderRadius;
   final TextEditingController controller;
+  final EdgeInsetsGeometry contentPadding;
 
   TextFieldCommon(
       {this.hint,
       this.hintStyle,
       this.isObscure = false,
+      this.focusNode,
       this.validator,
       this.borderRadius,
       this.controller,
       this.label,
+      this.maxLines,
+      this.contentPadding,
       this.onChanged(String value)});
 
   @override
@@ -312,55 +280,82 @@ class TextFieldCommon extends StatelessWidget {
     return Container(
       // height: 35,
       child: TextFormField(
+        maxLines: maxLines,
         onChanged: onChanged,
+        focusNode: focusNode ?? FocusNode(),
         controller: controller,
         cursorColor: kmainColor,
         obscureText: this.isObscure,
         validator: this.validator,
         decoration: new InputDecoration(
-            filled: true,
-            fillColor: Colors.white,
-            labelText: label ?? kEmpty,
-            border: InputBorder.none,
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(w * 0.001),
-              borderSide: BorderSide(
-                color: kmainColor,
-              ),
+          filled: true,
+          fillColor: Colors.white,
+          labelText: label ?? kEmpty,
+          border: InputBorder.none,
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(w * 0.001),
+            borderSide: BorderSide(
+              color: kmainColor,
             ),
-            focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(w * 0.001),
-              borderSide: BorderSide(
-                color: Colors.red,
-                width: 1.0,
-              ),
+          ),
+          focusedErrorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(w * 0.001),
+            borderSide: BorderSide(
+              color: Colors.red,
+              width: 1.0,
             ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(w * 0.001),
-              borderSide: BorderSide(
-                color: mainBorderColor,
-                width: 1.0,
-              ),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(w * 0.001),
+            borderSide: BorderSide(
+              color: mainBorderColor,
+              width: 1.0,
             ),
-            errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(w * 0.001),
-              borderSide: BorderSide(
-                color: Colors.red,
-                width: 1.0,
-              ),
+          ),
+          errorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(w * 0.001),
+            borderSide: BorderSide(
+              color: Colors.red,
+              width: 1.0,
             ),
-            disabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(w * 0.001),
-              borderSide: BorderSide(
-                color: mainBorderColor.withOpacity(0.6),
-                width: 1.0,
-              ),
+          ),
+          disabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(w * 0.001),
+            borderSide: BorderSide(
+              color: mainBorderColor.withOpacity(0.6),
+              width: 1.0,
             ),
-            contentPadding: EdgeInsets.only(left: 15, right: 15),
-            // hintText: this.hint ?? kEmpty,
-            // hintStyle: this.hintStyle ?? CommonStyle.size22W4005c5c5c(context)
+          ),
+          contentPadding:
+              contentPadding ?? EdgeInsets.symmetric(horizontal: 15),
+          // hintText: this.hint ?? kEmpty,
+          // hintStyle: this.hintStyle ?? CommonStyle.size22W4005c5c5c(context)
         ),
       ),
     );
+  }
+}
+
+class RichTextCommon extends StatelessWidget {
+  final String boldText;
+  final String regularText;
+  final double size;
+
+  const RichTextCommon({this.boldText, this.regularText, this.size});
+
+  @override
+  Widget build(BuildContext context) {
+    return Text.rich(TextSpan(children: [
+      TextSpan(
+          text: '$boldText',
+          style: size == 14
+              ? CommonStyle.size14W700black(context)
+              : CommonStyle.size12W700black(context)),
+      TextSpan(
+          text: '$regularText',
+          style: size == 14
+              ? CommonStyle.size14W400black(context)
+              : CommonStyle.size12W400black(context)),
+    ]));
   }
 }

@@ -20,18 +20,18 @@ class _SecondScreenState extends State<SecondScreen> {
   Map<String, TextEditingController> _controllerMapCertificate = {};
   @override
   void initState() {
-    widget.cvModel.skills = [
-      Skills(
-          skillNm: 'Programming Language', skillData: 'Nodejs , Python ,PhP'),
-      Skills(
-          skillNm: 'Framework/Library',
-          skillData: 'ExpressJS, Codeigniter, Yii, Laravel, Cake, Magento'),
+    // widget.cvModel.skills = [
+      // Skill(
+      //     skillNm: 'Programming Language', skillData: 'Nodejs , Python ,PhP'),
+      // Skill(
+      //     skillNm: 'Framework/Library',
+      //     skillData: 'ExpressJS, Codeigniter, Yii, Laravel, Cake, Magento'),
       // Skills(skillNm: 'Operating System',skillData: 'Windows'),
       // Skills(skillNm: 'Source control',skillData: 'Git '),
       // Skills(skillNm: 'Project Management tool',skillData: 'Jira, AzureDevOps '),
       // Skills(skillNm: 'Others',skillData: 'HTML/CSS, Javascript, jquery '),
       // Skills(skillNm: 'Databases',skillData: 'MySql, MSSQL, MongoDB  '),
-    ];
+    // ];
     super.initState();
   }
 
@@ -45,7 +45,7 @@ class _SecondScreenState extends State<SecondScreen> {
           margin: EdgeInsets.symmetric(horizontal: 50.0),
           child: Column(
             children: [
-              HorirontalLine('EDUCATION'),
+              HorizontalLine('EDUCATION'),
               SizedBox(
                 height: 10,
               ),
@@ -53,7 +53,7 @@ class _SecondScreenState extends State<SecondScreen> {
               SizedBox(
                 height: 30,
               ),
-              HorirontalLine('SKILLS'),
+              HorizontalLine('SKILLS'),
               SizedBox(
                 height: 10,
               ),
@@ -61,7 +61,7 @@ class _SecondScreenState extends State<SecondScreen> {
               SizedBox(
                 height: 30.0,
               ),
-              HorirontalLine('CERTIFICATE'),
+              HorizontalLine('CERTIFICATE'),
               SizedBox(
                 height: 10.0,
               ),
@@ -76,17 +76,6 @@ class _SecondScreenState extends State<SecondScreen> {
                         style: CommonStyle.white700Size22(context)
                             .copyWith(color: Colors.grey),
                       )),
-                  // ButtonCommon(
-                  //     buttonText: 'Previous Selection',
-                  //     onClick: () {
-                  //       if (widget.pageController.hasClients) {
-                  //         widget.pageController.animateToPage(
-                  //           0,
-                  //           duration: const Duration(milliseconds: 700),
-                  //           curve: Curves.easeInOut,
-                  //         );
-                  //       }
-                  //     }),
                   ButtonCommon(
                       buttonText: 'Next',
                       icon: Icon(
@@ -236,9 +225,9 @@ class _SecondScreenState extends State<SecondScreen> {
               Expanded(
                 child: TextFieldCommon(
                     controller: _generateController('majors-$index',
-                        widget.cvModel.educationList[index].majorMn),
+                        widget.cvModel.educationList[index].majorNm),
                     onChanged: (val) {
-                      widget.cvModel.educationList[index].majorMn = val;
+                      widget.cvModel.educationList[index].majorNm = val;
                     },
                     label: 'Major'),
               ),
@@ -307,7 +296,7 @@ class _SecondScreenState extends State<SecondScreen> {
           ),
           onPressed: () {
             setState(() {
-              widget.cvModel.skills.add(Skills());
+              widget.cvModel.skills.add(Skill());
             });
           },
         )
@@ -315,7 +304,7 @@ class _SecondScreenState extends State<SecondScreen> {
     );
   }
 
-  Widget _buildSkillsItem(BuildContext context, Skills skill, int index) {
+  Widget _buildSkillsItem(BuildContext context, Skill skill, int index) {
     return Container(
       padding: EdgeInsets.only(left: 10.0, right: 10.0, bottom: 10.0),
       margin: EdgeInsets.only(
@@ -346,26 +335,26 @@ class _SecondScreenState extends State<SecondScreen> {
           ),
           Container(
             height: 30,
-            child: TextFormField(
+            child: TextFieldCommon(
                 controller: _generateControllerSkill(
                     'skill-$index', widget.cvModel.skills[index].skillNm),
                 onChanged: (val) {
                   widget.cvModel.skills[index].skillNm = val;
                 },
-                decoration: CommonStyle.InputFormDecoration(context)),
+                ),
           ),
           SizedBox(
             height: 10,
           ),
           Container(
             height: 30,
-            child: TextFormField(
+            child: TextFieldCommon(
                 controller: _generateControllerSkill(
                     'skilldata-$index', widget.cvModel.skills[index].skillData),
                 onChanged: (val) {
                   widget.cvModel.skills[index].skillData = val;
                 },
-                decoration: CommonStyle.InputFormDecoration(context)),
+               ),
           ),
         ],
       ),
@@ -405,14 +394,14 @@ class _SecondScreenState extends State<SecondScreen> {
             flex: 8,
             child: Container(
               height: 30,
-              child: TextFormField(
+              child: TextFieldCommon(
                   controller: _generateControllerCertificate(
                       'certification-$index',
                       widget.cvModel.certificateList[index].certificateNm),
                   onChanged: (val) {
                     widget.cvModel.certificateList[index].certificateNm = val;
                   },
-                  decoration: CommonStyle.InputFormDecoration(context)),
+                  ),
             ),
           ),
           SizedBox(

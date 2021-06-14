@@ -13,10 +13,9 @@ import 'package:flutter_cv_maker/utils/validation.dart';
 class SectionOneScreen extends StatefulWidget {
   final CVModel cvModel;
   final Function onSaved;
-  PageController pageController ;
+  PageController pageController;
 
-
-   SectionOneScreen({this.cvModel, this.onSaved,this.pageController});
+  SectionOneScreen({this.cvModel, this.onSaved, this.pageController});
 
   @override
   _SectionOneScreenState createState() => _SectionOneScreenState();
@@ -97,7 +96,7 @@ class _SectionOneScreenState extends State<SectionOneScreen> {
                 SizedBox(
                   height: 30,
                 ),
-                HorirontalLine('INFORMATION'),
+                HorizontalLine('INFORMATION'),
                 SizedBox(
                   height: 30,
                 ),
@@ -107,21 +106,32 @@ class _SectionOneScreenState extends State<SectionOneScreen> {
                   padding: EdgeInsets.only(left: sizeWith / 6),
                   child: Column(
                     children: [
-                  TextFieldCommon(controller:_fullNameController,label: 'Full Name' ,validator: (name) => Validation().checkValidNameField(context, name),),
-                     // InputTextFormfield('Full Name', _fullNameController,'Please enter your fullname'),
-                  _buildGender(context),
-                  InputTextFormfield('Email', _emailController,'Please check input email'),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  InputTextFormfield('Position', _positionController,'Please enter your position'),
+                      TextFieldCommon(
+                        controller: _fullNameController,
+                        label: 'Full Name',
+                        validator: (name) =>
+                            Validation().checkValidNameField(context, name),
+                      ),
+                      // InputTextFormfield('Full Name', _fullNameController,'Please enter your fullname'),
+                      _buildGender(context),
+                      TextFieldCommon(
+                        controller: _emailController,
+                        label: 'Email',
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      TextFieldCommon(
+                        label: 'Position',
+                        controller: _positionController,
+                      ),
                     ],
                   ),
                 ),
                 SizedBox(
                   height: 40,
                 ),
-                HorirontalLine('TECHNICAL SUMMARY'),
+                HorizontalLine('TECHNICAL SUMMARY'),
                 _buildListSummary(context),
               ],
             ),
@@ -133,6 +143,7 @@ class _SectionOneScreenState extends State<SectionOneScreen> {
 
   // Create gender layout
   Widget _buildGender(BuildContext context) {
+    print('Gender: ${widget.cvModel.gender}');
     return Row(
       children: kGenders
           .map((gender) => Expanded(
@@ -140,7 +151,7 @@ class _SectionOneScreenState extends State<SectionOneScreen> {
                     value: gender,
                     activeColor: kmainColor,
                     title: Text('$gender'),
-                    groupValue: _genderSelected,
+                    groupValue: 'Male',
                     onChanged: (val) {
                       print('Gender: $val');
                       setState(() => _genderSelected = val);
@@ -216,39 +227,38 @@ class _SectionOneScreenState extends State<SectionOneScreen> {
                   // );
                   // var requestBody = json.encoder.convert(model);
                   // print('Request Body: $requestBody');
-                        if (_formKey.currentState.validate()) {
-                          bool emailValid = RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(_emailController.text);
-                          if(_genderSelected.isNotEmpty)
-                          {
-                            if(emailValid)
-                              {
-                                if (widget.pageController.hasClients) {
-                                  widget.pageController.animateToPage(
-                                    1,
-                                    duration: const Duration(milliseconds: 700),
-                                    curve: Curves.easeInOut,
-                                  );
-                                }
-                              }
-                            else{
-                              ScaffoldMessenger.of(context)
-                                  .showSnackBar(SnackBar(content: Container(
-                                  alignment: Alignment.center,
-                                  height: 70,
-                                  child: Text('Invalid email format')),backgroundColor: Colors.red,));
-                            }
-
-                          }else{
-                            ScaffoldMessenger.of(context)
-                                .showSnackBar(SnackBar(
-                              content: Container(
-                                alignment: Alignment.center,
-                                height: 70,
-                                  child: Text('Choice your gender')),backgroundColor: Colors.red,));
-                          }
+                  if (_formKey.currentState.validate()) {
+                    bool emailValid = RegExp(
+                            r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                        .hasMatch(_emailController.text);
+                    if (_genderSelected.isNotEmpty) {
+                      if (emailValid) {
+                        if (widget.pageController.hasClients) {
+                          widget.pageController.animateToPage(
+                            1,
+                            duration: const Duration(milliseconds: 700),
+                            curve: Curves.easeInOut,
+                          );
                         }
-
-
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Container(
+                              alignment: Alignment.center,
+                              height: 70,
+                              child: Text('Invalid email format')),
+                          backgroundColor: Colors.red,
+                        ));
+                      }
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Container(
+                            alignment: Alignment.center,
+                            height: 70,
+                            child: Text('Choice your gender')),
+                        backgroundColor: Colors.red,
+                      ));
+                    }
+                  }
                 },
               )
             ],
@@ -259,7 +269,8 @@ class _SectionOneScreenState extends State<SectionOneScreen> {
   }
 
   // Technical item
-  Widget _buildTechnicalSumItem(BuildContext context, String technical, int index) {
+  Widget _buildTechnicalSumItem(
+      BuildContext context, String technical, int index) {
     return Container(
       padding: EdgeInsets.only(left: MediaQuery.of(context).size.width / 6),
       margin: EdgeInsets.only(top: 20),
@@ -269,27 +280,11 @@ class _SectionOneScreenState extends State<SectionOneScreen> {
           Expanded(
               child: Container(
             height: 40,
-            child: TextFormField(
+            child: TextFieldCommon(
               controller: _generateController('technical-$index', technical),
               onChanged: (val) {
                 _listSummary[index] = val;
               },
-              decoration: InputDecoration(
-                fillColor: Colors.white,
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(0.0),
-                  borderSide: BorderSide(
-                    color: Colors.black,
-                  ),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(0.0),
-                  borderSide: BorderSide(
-                    color: Colors.black,
-                    width: 1.0,
-                  ),
-                ),
-              ),
             ),
           )),
           Container(
