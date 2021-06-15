@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_cv_maker/models/cv_model/cv_model.dart';
 import 'package:flutter_cv_maker/routes/route_data.dart';
 import 'package:flutter_cv_maker/routes/routes.dart';
+import 'package:flutter_cv_maker/screens/adminpage/admin_page.dart';
 import 'package:flutter_cv_maker/screens/auth_screen.dart';
 import 'package:flutter_cv_maker/screens/create_cv_screen.dart';
 import 'package:flutter_cv_maker/screens/home_screen.dart';
@@ -25,6 +26,8 @@ class RouteGenerator {
         return MaterialPageRoute(
             builder: (_) => HomeScreen(), settings: settings);
         break;
+      case routeAdmin:
+        return MaterialPageRoute(builder: (_) => AdminPage(),settings: settings);
       case routeCreateCV:
         // Get arguments
         var data = settings.arguments;

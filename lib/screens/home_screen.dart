@@ -102,7 +102,10 @@ class _HomeScreenState extends State<HomeScreen> {
               mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                LinkText(text: 'Admin page', color: Colors.grey, onTapLink: () {}),
+                LinkText(text: 'Admin page', color: Colors.grey, onTapLink: () {
+                  navKey.currentState
+                      .pushNamed(routeAdmin,);
+                }),
                 SizedBox(width: 20,),
                 LinkText(text: 'Logout',color: Colors.grey, onTapLink: () {})
               ],

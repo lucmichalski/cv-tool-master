@@ -342,7 +342,7 @@ class TextFieldCommon extends StatelessWidget {
       child: TextFormField(
         maxLines: maxLines,
         onChanged: onChanged,
-        focusNode: focusNode ?? FocusNode(),
+        focusNode: focusNode ?? FocusNode().context,
         controller: controller,
         cursorColor: kmainColor,
         obscureText: this.isObscure,
@@ -448,5 +448,21 @@ class Bullet extends StatelessWidget {
         )
       ],
     );
+  }
+}
+
+class AddButton extends StatefulWidget {
+  final Function onPressed;
+
+  AddButton({this.onPressed});
+
+  @override
+  _AddButtonState createState() => _AddButtonState();
+}
+
+class _AddButtonState extends State<AddButton> {
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(onPressed: widget.onPressed, icon: Icon(Icons.add));
   }
 }
