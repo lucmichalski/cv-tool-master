@@ -11,6 +11,7 @@ class CVModel {
   List<Skill> skills;
   List<Professional> professionalList;
   List<HighLightProject> highLightProjectList;
+  List<Language> languages;
 
   CVModel(
       {this.name,
@@ -24,7 +25,8 @@ class CVModel {
       this.skills,
       this.professionalList,
       this.certificateList,
-      this.highLightProjectList});
+      this.highLightProjectList,
+      this.languages});
 }
 
 class Role {
@@ -46,8 +48,9 @@ class Education {
 class Skill {
   String skillNm;
   String skillData;
+  bool isSelected;
 
-  Skill({this.skillNm, this.skillData});
+  Skill({this.skillNm, this.skillData, this.isSelected = false});
 }
 
 class Certificate {
@@ -76,17 +79,26 @@ class Professional {
 
 class HighLightProject {
   String projectNm;
-  String projectDescriptionNm;
+  String projectDescription;
   String teamSize;
   String position;
   List<String> responsibility;
   List<String> technologies;
 
-  HighLightProject(
-      {this.projectDescriptionNm,
-      this.teamSize,
-      this.position,
-      this.responsibility,
-      this.technologies,
-      this.projectNm});
+  HighLightProject({
+    this.projectDescription,
+    this.teamSize,
+    this.position,
+    this.responsibility,
+    this.technologies,
+    this.projectNm,
+  });
+}
+
+class Language {
+  String languageNm;
+  String level;
+  int positionLanguage;
+  int positionLevel;
+  Language({this.level, this.languageNm, this.positionLanguage=0,this.positionLevel=0});
 }

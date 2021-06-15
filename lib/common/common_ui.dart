@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_cv_maker/common/common_style.dart';
 import 'package:flutter_cv_maker/constants/constants.dart';
 import 'package:flutter_cv_maker/extensions/size_extension.dart';
+import 'package:flutter_cv_maker/models/cv_model/cv_model.dart';
 
 class ButtonCommon extends StatefulWidget {
   final double borderRadius;
@@ -86,13 +87,13 @@ class LinkText extends StatefulWidget {
   final String text;
   final TextStyle linkTextStyle;
   final Function onTapLink;
-  final double textSize;
+  final Color color;
 
   LinkText(
       {@required this.text,
       this.linkTextStyle,
       @required this.onTapLink,
-      this.textSize});
+      this.color});
 
   @override
   _LinkTextState createState() => _LinkTextState();
@@ -116,8 +117,7 @@ class _LinkTextState extends State<LinkText> {
             this.widget.text,
             style: widget.linkTextStyle ??
                 CommonStyle.main700Size18(context).copyWith(
-                    fontSize:
-                        DoubleExt(widget.textSize ?? 18).textSize(context),
+                    color: widget.color,
                     decoration: _isHover
                         ? TextDecoration.underline
                         : TextDecoration.none),
@@ -151,6 +151,66 @@ class _ControlTypeDropDownState extends State<ControlTypeDropDown> {
               child: Text(
                 x,
                 style: CommonStyle.black400Size22(context),
+              ),
+              value: widget.menuList.indexOf(x),
+            ))
+        .toList();
+    return Container(
+      // height: w * 0.05,
+      padding: EdgeInsets.symmetric(horizontal: w * 0.01),
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(w * 0.005),
+          color: Theme.of(context).cardColor,
+          border: Border.all(color: Colors.black)),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton(
+            value: widget.initPosition,
+            focusColor: Color(0xffDBF4FF),
+            iconEnabledColor: Theme.of(context).iconTheme.color,
+            items: widgets,
+            onChanged: (value) => this.widget.onChange(value)),
+      ),
+    );
+  }
+}
+
+class SkillDropDown extends StatefulWidget {
+  final Function onChange;
+  final int initPosition;
+  final List<Skill> menuList;
+
+  const SkillDropDown({this.onChange, this.initPosition, this.menuList});
+
+  @override
+  _SkillDropDownState createState() => _SkillDropDownState();
+}
+
+class _SkillDropDownState extends State<SkillDropDown> {
+  @override
+  Widget build(BuildContext context) {
+    var w = MediaQuery.of(context).size.width;
+    final widgets = widget.menuList
+        .map((x) => DropdownMenuItem(
+              child: Container(
+                width: w * 0.22,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    Text(
+                      x.skillNm,
+                      style: CommonStyle.black400Size12(context),
+                    ),
+                    x.isSelected ? Spacer() : Container(),
+                    x.isSelected
+                        ? Icon(
+                            Icons.check_circle,
+                            color: kmainColor,
+                            size: 16,
+                          )
+                        : Container()
+                  ],
+                ),
               ),
               value: widget.menuList.indexOf(x),
             ))
@@ -357,5 +417,36 @@ class RichTextCommon extends StatelessWidget {
               ? CommonStyle.size14W400black(context)
               : CommonStyle.size12W400black(context)),
     ]));
+  }
+}
+
+class Bullet extends StatelessWidget {
+  final String text;
+  final bool isFill;
+
+  const Bullet({this.text, this.isFill = true});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        isFill
+            ? Icon(
+                Icons.circle,
+                color: Colors.black,
+                size: 8,
+              )
+            : Icon(
+                Icons.circle_outlined,
+                color: Colors.black,
+                size: 8,
+              ),
+        SizedBox(width: 16.0),
+        Text(
+          '$text',
+          style: CommonStyle.size12W400black(context),
+        )
+      ],
+    );
   }
 }

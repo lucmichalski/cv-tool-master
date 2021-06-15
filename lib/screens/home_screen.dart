@@ -1,12 +1,9 @@
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_cv_maker/common/common_style.dart';
+import 'package:flutter_cv_maker/common/common_ui.dart';
 import 'package:flutter_cv_maker/models/cv_model/cv_model.dart';
 import 'package:flutter_cv_maker/routes/routes.dart';
-import 'package:flutter_cv_maker/screens/viewPageCreatecv/section_one_screen.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:flutter_cv_maker/extensions/size_extension.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key key}) : super(key: key);
@@ -47,15 +44,28 @@ class _HomeScreenState extends State<HomeScreen> {
                 majorNm: 'Information Technology',
                 classYear: '2019')
           ],
+          languages: [
+            Language(
+            languageNm: 'English',
+              level: 'Level intermediate'
+            )
+          ],
           gender: 'Male',
           highLightProjectList: [
             HighLightProject(
                 projectNm: 'CV-Maker',
                 teamSize: '2',
                 position: 'Frontend Developer',
-                projectDescriptionNm: 'Create tool for CV create',
+                projectDescription: 'Create tool for CV create',
                 technologies: ['Node JS', 'Flutter'],
                 responsibility: ['Coding frontend', 'Suggest something']),
+            HighLightProject(
+                projectNm: '1Invoice',
+                teamSize: '3',
+                position: 'Frontend Developer',
+                projectDescription: 'Create 1Invoice',
+                technologies: ['Node JS', 'Flutter'],
+                responsibility: ['Coding frontend', 'Suggest idea', 'Responsibility A', 'Responsibility B', 'Responsibility C']),
           ],
           status: true,
           technicalSummaryList: [
@@ -92,7 +102,9 @@ class _HomeScreenState extends State<HomeScreen> {
               mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Text('Logout'),
+                LinkText(text: 'Admin page', color: Colors.grey, onTapLink: () {}),
+                SizedBox(width: 20,),
+                LinkText(text: 'Logout',color: Colors.grey, onTapLink: () {})
               ],
             ),
             Row(

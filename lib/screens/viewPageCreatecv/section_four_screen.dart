@@ -30,6 +30,9 @@ class _SectionFourState extends State<SectionFour> {
     'Nest JS'
   ];
 
+  List<String> _languages = ['English', 'Japanese', 'Vietnamese'];
+  List<String> _levels = ['Intermediate', 'Upper-Intermediate', 'Excellent'];
+
   @override
   void initState() {
     // TODO: implement initState
@@ -40,7 +43,7 @@ class _SectionFourState extends State<SectionFour> {
       _highLightProjectList = [
         HighLightProject(
             position: '',
-            projectDescriptionNm: '',
+            projectDescription: '',
             responsibility: [],
             teamSize: '',
             technologies: [],
@@ -49,7 +52,7 @@ class _SectionFourState extends State<SectionFour> {
       widget.cvModel.highLightProjectList = [
         HighLightProject(
             position: '',
-            projectDescriptionNm: '',
+            projectDescription: '',
             responsibility: [],
             teamSize: '',
             technologies: [],
@@ -65,7 +68,23 @@ class _SectionFourState extends State<SectionFour> {
       body: SingleChildScrollView(
         child: Container(
             margin: EdgeInsets.symmetric(horizontal: 100),
-            child: _buildHighLightProject(context)),
+            child: Column(
+              children: [
+                HorizontalLine('Language'),
+                SizedBox(
+                  height: 10,
+                ),
+                _buildLanguage(context),
+                SizedBox(
+                  height: 16,
+                ),
+                HorizontalLine('Professional Experience '),
+                SizedBox(
+                  height: 10,
+                ),
+                _buildHighLightProject(context),
+              ],
+            )),
       ),
     );
   }
@@ -87,7 +106,7 @@ class _SectionFourState extends State<SectionFour> {
                       technologies: [],
                       teamSize: '',
                       responsibility: [],
-                      projectDescriptionNm: '',
+                      projectDescription: '',
                       position: ''));
                 });
               },
@@ -148,10 +167,10 @@ class _SectionFourState extends State<SectionFour> {
             label: 'Project Description',
             controller: _generateController(
               'description-$index',
-              _highLightProjectList[index].projectDescriptionNm,
+              _highLightProjectList[index].projectDescription,
             ),
             onChanged: (val) {
-              widget.cvModel.highLightProjectList[index].projectDescriptionNm =
+              widget.cvModel.highLightProjectList[index].projectDescription =
                   val;
             },
           ),
@@ -344,6 +363,91 @@ class _SectionFourState extends State<SectionFour> {
           labelPadding: EdgeInsets.symmetric(horizontal: 4),
           deleteIconColor: Colors.white,
           label: Text(listTechnologies[index].toString())),
+    );
+  }
+
+  Widget _buildLanguage(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.only(
+          bottom: 40, left: MediaQuery.of(context).size.width * 0.15),
+      padding:
+          EdgeInsets.only(left: 16.0, right: 16.0, bottom: 18.0, top: 16.0),
+      decoration: BoxDecoration(
+        border: Border.all(width: 1.0, color: Colors.black),
+      ),
+      child: Column(children: [
+        Column(
+          children: widget.cvModel.languages
+              .map((e) => _buildLanguageItem(
+                  context, e, widget.cvModel.languages.indexOf(e)))
+              .toList(),
+        ),
+        IconButton(
+            onPressed: () {
+              setState(() {
+                widget.cvModel.languages.add(
+                    Language(level: _levels[0], languageNm: _languages[0]));
+              });
+            },
+            icon: Icon(
+              Icons.add_circle_outline_rounded,
+              size: 30,
+              color: kmainColor,
+            ))
+      ]),
+    );
+  }
+
+  Widget _buildLanguageItem(
+      BuildContext context, Language language, int index) {
+    return Container(
+      margin: EdgeInsets.only(bottom: 15.0),
+      child: Row(
+        children: [
+          Expanded(
+              flex: 1,
+              child: ControlTypeDropDown(
+                menuList: _languages,
+                onChange: (value) {
+                  setState(() {
+                    print(value);
+                    language.positionLanguage = value;
+                    language.languageNm = _languages[value];
+                  });
+                },
+                initPosition: language.positionLanguage,
+              )),
+          SizedBox(
+            width: 10,
+          ),
+          Expanded(
+              flex: 3,
+              child: ControlTypeDropDown(
+                menuList: _levels,
+                onChange: (value) {
+                  setState(() {
+                    language.positionLevel = value;
+                    language.level = _levels[value];
+                  });
+                  print(value);
+                },
+                initPosition: language.positionLevel,
+              )),
+          SizedBox(
+            width: 10,
+          ),
+          IconButton(
+              onPressed: () {
+                setState(() {
+                  widget.cvModel.languages.removeAt(index);
+                });
+              },
+              icon: Icon(
+                Icons.close_rounded,
+                color: Colors.grey,
+              ))
+        ],
+      ),
     );
   }
 

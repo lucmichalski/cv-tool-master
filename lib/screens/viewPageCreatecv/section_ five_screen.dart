@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cv_maker/common/common_style.dart';
 import 'package:flutter_cv_maker/common/common_ui.dart';
@@ -9,7 +10,7 @@ class SectionFive extends StatelessWidget {
   final CVModel cvModel;
   final PageController pageController;
 
-  const SectionFive({this.cvModel, this.pageController});
+  SectionFive({this.cvModel, this.pageController});
 
   Future<html.Blob> myGetBlobPdfContent() async {
     final pdf = pw.Document();
@@ -34,14 +35,18 @@ class SectionFive extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    myGetBlobPdfContent();
+    print('language: ${cvModel.languages.length}');
+    //myGetBlobPdfContent();
     return Scaffold(
       body: Container(
-          child: Column(
-        children: [
-          _buildPdfFile(context),
-          // _buildAction(context)
-        ],
+          child: SingleChildScrollView(
+            padding: EdgeInsets.symmetric(vertical: 20),
+        child: Column(
+          children: [
+            _buildPdfFile(context),
+            // _buildAction(context)
+          ],
+        ),
       )),
     );
   }
@@ -68,30 +73,34 @@ class SectionFive extends StatelessWidget {
               padding: EdgeInsets.symmetric(horizontal: 35.0, vertical: 16.0),
               child: Text('Email: ${cvModel.email}',
                   style: CommonStyle.size12W400black(context))),
-          Padding(
-            padding: EdgeInsets.symmetric(vertical: 16.0),
-            child: Text('Professional summary',
-                style: CommonStyle.size20W700black(context)),
-          ),
+          _buildSectionTitle(context, 'Professional summary'),
           _buildProfessional(context),
-          Padding(
-            padding: EdgeInsets.symmetric(vertical: 16.0),
-            child:
-                Text('Education', style: CommonStyle.size20W700black(context)),
-          ),
+          _buildSectionTitle(context, 'Education'),
           _buildEducation(context),
-          Padding(
-            padding: EdgeInsets.symmetric(vertical: 16.0),
-            child: Text('Technical Skill',
-                style: CommonStyle.size20W700black(context)),
-          ),
+          _buildSectionTitle(context, 'Technical Skills'),
           _buildTechnicalSkills(context),
-          Padding(
-            padding: EdgeInsets.symmetric(vertical: 16.0),
-            child: Text('Professional Experience',
-                style: CommonStyle.size20W700black(context)),
-          ),
+          _buildSectionTitle(context, 'Professional Experience'),
           _buildProfessionalExperiences(context),
+          _buildHighLightProjects(context),
+          _buildSectionTitle(context, 'Languages'),
+          _buildLanguage(context)
+        ],
+      ),
+    );
+  }
+
+  // Build section title
+  Widget _buildSectionTitle(BuildContext context, String title) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title, style: CommonStyle.size16W700black(context)),
+          Divider(
+            color: Colors.black,
+            height: 1,
+          )
         ],
       ),
     );
@@ -130,6 +139,7 @@ class SectionFive extends StatelessWidget {
     );
   }
 
+  // Create Professional list
   Widget _buildProfessional(BuildContext context) {
     return Column(
       children: cvModel.technicalSummaryList
@@ -138,9 +148,10 @@ class SectionFive extends StatelessWidget {
     );
   }
 
+  // Create Professional item
   Widget _buildProfessionalItem(BuildContext context, String summaryItem) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 5),
+      padding: EdgeInsets.symmetric(vertical: 5, horizontal: 35),
       child: Row(
         children: [
           Icon(
@@ -149,7 +160,10 @@ class SectionFive extends StatelessWidget {
             size: 8,
           ),
           SizedBox(width: 16.0),
-          Text(summaryItem)
+          Text(
+            summaryItem,
+            style: CommonStyle.size12W400black(context),
+          )
         ],
       ),
     );
@@ -167,11 +181,19 @@ class SectionFive extends StatelessWidget {
   // Build Education item
   Widget _buildEducationItem(BuildContext context, Education education) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 5),
+      padding: EdgeInsets.symmetric(vertical: 4, horizontal: 35),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('${education.schoolNm} - class of ${education.classYear}'),
-          Text('Major: ${education.majorNm}')
+          Text(
+            '${education.schoolNm} - class of ${education.classYear}',
+            style: CommonStyle.size12W400black(context),
+          ),
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: 8.0),
+            child: Text('Major: ${education.majorNm}',
+                style: CommonStyle.size12W400black(context)),
+          )
         ],
       ),
     );
@@ -189,7 +211,7 @@ class SectionFive extends StatelessWidget {
   // Build Technical skill item
   Widget _buildTechnicalSkillItem(BuildContext context, Skill skill) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 5),
+      padding: EdgeInsets.symmetric(vertical: 5, horizontal: 35),
       child: Row(
         children: [
           Text.rich(TextSpan(children: [
@@ -219,7 +241,7 @@ class SectionFive extends StatelessWidget {
   Widget _buildProfessionalExperienceItem(
       BuildContext context, Professional professional) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 5),
+      padding: EdgeInsets.symmetric(vertical: 5, horizontal: 35),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -231,13 +253,18 @@ class SectionFive extends StatelessWidget {
                 size: 14,
               ),
               Spacer(),
-              Text('${professional.startDate} - ${professional.endDate}')
+              Text(
+                '${professional.startDate} - ${professional.endDate}',
+                style: CommonStyle.size12W400black(context),
+              )
             ],
           ),
+          SizedBox(height: 8.0),
           RichTextCommon(
             boldText: 'Role: ',
             regularText: professional.roleNm,
           ),
+          SizedBox(height: 8.0),
           Text(
             'Responsibilities:',
             style: CommonStyle.size12W700black(context),
@@ -256,25 +283,124 @@ class SectionFive extends StatelessWidget {
               )
             ],
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: professional.responsibilities
-                .map((responsibility) => Row(
-                      children: [
-                        Icon(
-                          Icons.circle,
-                          color: Colors.black,
-                          size: 8,
-                        ),
-                        SizedBox(width: 16.0),
-                        Text(
-                          '$responsibility',
-                          style: CommonStyle.size12W400black(context),
-                        )
-                      ],
-                    ))
-                .toList(),
+          SizedBox(
+            height: 8.0,
+          ),
+          Padding(
+            padding: EdgeInsets.only(left: 23.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: professional.responsibilities
+                  .map((responsibility) => Bullet(
+                        text: responsibility,
+                        isFill: false,
+                      ))
+                  .toList(),
+            ),
           )
+        ],
+      ),
+    );
+  }
+
+  // Build highlight project list
+  Widget _buildHighLightProjects(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _buildSectionTitle(context, 'HighLight Project'),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: cvModel.highLightProjectList
+              .map((highLightProject) =>
+                  _buildHighLightProjectItem(context, highLightProject))
+              .toList(),
+        )
+      ],
+    );
+  }
+
+  // Build highlight project item
+  Widget _buildHighLightProjectItem(
+      BuildContext context, HighLightProject highLightProject) {
+    return Container(
+      color: Colors.white,
+      padding: EdgeInsets.all(20.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+            child: Text(
+              highLightProject.projectNm ?? '',
+              style: CommonStyle.size14W700black(context)
+                  .copyWith(decoration: TextDecoration.underline),
+            ),
+          ),
+          Table(
+            columnWidths: {
+              0: FlexColumnWidth(1),
+              1: FlexColumnWidth(4),
+            },
+            border: TableBorder.all(color: Colors.black),
+            children: [
+              _buildTableRow(context, 'Project Description',
+                  highLightProject.projectDescription),
+              _buildTableRow(context, 'Team size', highLightProject.teamSize),
+              _buildTableRow(context, 'Position', highLightProject.position),
+              _buildTableRow(context, 'Responsibility',
+                  _getDataResponsibility(highLightProject.responsibility)),
+              _buildTableRow(context, 'Technology used',
+                  highLightProject.technologies.join(', ').toString()),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Get data for responsibility
+  String _getDataResponsibility(List<String> responsibilities) {
+    String a = '';
+    responsibilities.forEach((element) {
+      a = a.isEmpty ? '+ $element' : '$a' + '\n+ $element';
+    });
+    return a;
+  }
+
+  // Build table row
+  TableRow _buildTableRow(BuildContext context, String title, String content) {
+    return TableRow(children: [
+      Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Text(title, style: CommonStyle.size12W400black(context)),
+      ),
+      Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Text(content, style: CommonStyle.size12W400black(context)),
+      ),
+    ]);
+  }
+
+  // Build language project
+  Widget _buildLanguage(BuildContext context) {
+    return Column(
+      children: cvModel.languages
+          .map((language) => _buildLanguageItem(context, language))
+          .toList(),
+    );
+  }
+
+  // Build language project item
+  Widget _buildLanguageItem(BuildContext context, Language language) {
+    return Padding(
+      padding: EdgeInsets.only(left: 35),
+      child: Row(
+        children: [
+          Text('${language.languageNm}:',
+              style: CommonStyle.size12W700black(context)),
+          SizedBox(width: 10),
+          Text(language.level, style: CommonStyle.size12W400black(context)),
         ],
       ),
     );

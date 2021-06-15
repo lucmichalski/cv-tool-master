@@ -8,7 +8,9 @@ import 'package:flutter_cv_maker/models/cv_model/cv_model.dart';
 class SecondScreen extends StatefulWidget {
   final CVModel cvModel;
   final PageController pageController;
+
   SecondScreen({this.pageController, this.cvModel});
+
   @override
   _SecondScreenState createState() => _SecondScreenState();
 }
@@ -18,26 +20,34 @@ class _SecondScreenState extends State<SecondScreen> {
   Map<String, TextEditingController> _controllerMap = {};
   Map<String, TextEditingController> _controllerMapSkill = {};
   Map<String, TextEditingController> _controllerMapCertificate = {};
+
+  // Will remove when exist master data
+  List<Skill> _skills = [
+    Skill(skillNm: 'Programming Language', skillData: '', isSelected: false),
+    Skill(skillNm: 'Framework/Library', skillData: '', isSelected: false),
+    Skill(skillNm: 'Operating System', skillData: '', isSelected: false),
+    Skill(skillNm: 'Source control', skillData: '', isSelected: false),
+    Skill(skillNm: 'Project Management tool', skillData: '', isSelected: false),
+    Skill(skillNm: 'Others', skillData: '', isSelected: false),
+    Skill(skillNm: 'Databases', skillData: '', isSelected: false),
+  ];
+
+  // Selected position
+  int _skillSelected = 0;
+
+  // Skill name list
+  List<String> _skillNmList = [];
+
   @override
   void initState() {
-    // widget.cvModel.skills = [
-      // Skill(
-      //     skillNm: 'Programming Language', skillData: 'Nodejs , Python ,PhP'),
-      // Skill(
-      //     skillNm: 'Framework/Library',
-      //     skillData: 'ExpressJS, Codeigniter, Yii, Laravel, Cake, Magento'),
-      // Skills(skillNm: 'Operating System',skillData: 'Windows'),
-      // Skills(skillNm: 'Source control',skillData: 'Git '),
-      // Skills(skillNm: 'Project Management tool',skillData: 'Jira, AzureDevOps '),
-      // Skills(skillNm: 'Others',skillData: 'HTML/CSS, Javascript, jquery '),
-      // Skills(skillNm: 'Databases',skillData: 'MySql, MSSQL, MongoDB  '),
-    // ];
+    _skills.forEach((element) {
+      _skillNmList.add(element.skillNm);
+    });
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    double marginleft = MediaQuery.of(context).size.width * 0.15;
     return Scaffold(
       backgroundColor: Color(0xfff6f8fa),
       body: SingleChildScrollView(
@@ -54,12 +64,9 @@ class _SecondScreenState extends State<SecondScreen> {
                 height: 30,
               ),
               HorizontalLine('SKILLS'),
-              SizedBox(
-                height: 10,
-              ),
-              _buildSkill(context),
-              SizedBox(
-                height: 30.0,
+              Padding(
+                padding: EdgeInsets.only(top: 10.0, bottom: 30),
+                child: _buildSkill(context),
               ),
               HorizontalLine('CERTIFICATE'),
               SizedBox(
@@ -101,6 +108,7 @@ class _SecondScreenState extends State<SecondScreen> {
     );
   }
 
+  // Generating controller for textFormField
   TextEditingController _generateController(String id, String value) {
     var key = id;
     TextEditingController controller = _controllerMap[key];
@@ -172,15 +180,14 @@ class _SecondScreenState extends State<SecondScreen> {
     );
   }
 
+  // Create education item
   Widget _buildEducationItem(
       BuildContext context, Education education, int index) {
     return Container(
       padding: EdgeInsets.only(left: 10.0, right: 10.0, bottom: 10.0),
-      decoration:
-      BoxDecoration(
+      decoration: BoxDecoration(
           border: Border.all(width: 1.0, color: Color(0xffc5dbff)),
-          color: Color(0xffedf4ff)
-    ),
+          color: Color(0xffedf4ff)),
       margin: EdgeInsets.only(
           bottom: 30, left: MediaQuery.of(context).size.width * 0.15),
       child: Column(
@@ -212,8 +219,7 @@ class _SecondScreenState extends State<SecondScreen> {
                     onChanged: (val) {
                       widget.cvModel.educationList[index].schoolNm = val;
                     },
-                  label: 'School Name'
-                ),
+                    label: 'School Name'),
               ),
             ],
           ),
@@ -280,9 +286,71 @@ class _SecondScreenState extends State<SecondScreen> {
     );
   }
 
+  // Create skill layout
   Widget _buildSkill(BuildContext context) {
+    var w = MediaQuery.of(context).size.width;
+    widget.cvModel.skills.forEach((element1) {
+      var a = _skills.firstWhere(
+          (element2) => element2.skillNm == element1.skillNm,
+          orElse: () => null);
+      if (a != null) {
+        a.isSelected = true;
+      }
+    });
     return Column(
       children: [
+        Padding(
+          padding: EdgeInsets.only(left: w * 0.15),
+          child: Row(
+            children: [
+              Expanded(
+                child: Container(
+                  child: SkillDropDown(
+                      menuList: _skills,
+                      initPosition: _skillSelected,
+                      onChange: (value) =>
+                          setState(() => _skillSelected = value)),
+                ),
+              ),
+              SizedBox(
+                width: 16,
+              ),
+              Expanded(
+                child: ButtonCommon(
+                    buttonText: 'Generate',
+                    onClick: () async {
+                      setState(() {
+                        if (!_skills[_skillSelected].isSelected) {
+                          _skills[_skillSelected].isSelected = true;
+                        }
+                        widget.cvModel.skills.add(Skill(
+                            skillNm: _skillNmList[_skillSelected],
+                            skillData: ''));
+                      });
+                    }),
+              ),
+              SizedBox(
+                width: 16,
+              ),
+              Expanded(
+                child: ButtonCommon(
+                    buttonText: 'Generate All',
+                    onClick: () async {
+                      setState(() {
+                        _skills.forEach((skill) {
+                          skill.isSelected = true;
+                          widget.cvModel.skills.add(
+                              Skill(skillNm: skill.skillNm, skillData: ''));
+                        });
+                      });
+                    }),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(
+          height: 16,
+        ),
         Column(
           children: widget.cvModel.skills
               .map((e) => _buildSkillsItem(
@@ -324,6 +392,10 @@ class _SecondScreenState extends State<SecondScreen> {
                 ),
                 onPressed: () {
                   setState(() {
+                    var _skill = _skills.firstWhere(
+                        (element) => element.skillNm == skill.skillNm,
+                        orElse: () => null);
+                    if (_skill != null) _skill.isSelected = false;
                     widget.cvModel.skills.removeAt(index);
                   });
                 },
@@ -336,12 +408,12 @@ class _SecondScreenState extends State<SecondScreen> {
           Container(
             height: 30,
             child: TextFieldCommon(
-                controller: _generateControllerSkill(
-                    'skill-$index', widget.cvModel.skills[index].skillNm),
-                onChanged: (val) {
-                  widget.cvModel.skills[index].skillNm = val;
-                },
-                ),
+              controller: _generateControllerSkill(
+                  'skill-$index', widget.cvModel.skills[index].skillNm),
+              onChanged: (val) {
+                widget.cvModel.skills[index].skillNm = val;
+              },
+            ),
           ),
           SizedBox(
             height: 10,
@@ -349,12 +421,12 @@ class _SecondScreenState extends State<SecondScreen> {
           Container(
             height: 30,
             child: TextFieldCommon(
-                controller: _generateControllerSkill(
-                    'skilldata-$index', widget.cvModel.skills[index].skillData),
-                onChanged: (val) {
-                  widget.cvModel.skills[index].skillData = val;
-                },
-               ),
+              controller: _generateControllerSkill(
+                  'skilldata-$index', widget.cvModel.skills[index].skillData),
+              onChanged: (val) {
+                widget.cvModel.skills[index].skillData = val;
+              },
+            ),
           ),
         ],
       ),
@@ -395,13 +467,13 @@ class _SecondScreenState extends State<SecondScreen> {
             child: Container(
               height: 30,
               child: TextFieldCommon(
-                  controller: _generateControllerCertificate(
-                      'certification-$index',
-                      widget.cvModel.certificateList[index].certificateNm),
-                  onChanged: (val) {
-                    widget.cvModel.certificateList[index].certificateNm = val;
-                  },
-                  ),
+                controller: _generateControllerCertificate(
+                    'certification-$index',
+                    widget.cvModel.certificateList[index].certificateNm),
+                onChanged: (val) {
+                  widget.cvModel.certificateList[index].certificateNm = val;
+                },
+              ),
             ),
           ),
           SizedBox(
