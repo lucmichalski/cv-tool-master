@@ -1,8 +1,10 @@
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cv_maker/common/common_style.dart';
 import 'package:flutter_cv_maker/common/common_ui.dart';
 import 'package:flutter_cv_maker/models/cv_model/cv_model.dart';
+import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:universal_html/html.dart' as html;
 
@@ -13,16 +15,48 @@ class SectionFive extends StatelessWidget {
   SectionFive({this.cvModel, this.pageController});
 
   Future<html.Blob> myGetBlobPdfContent() async {
+    final styles20bold =pw.TextStyle(fontSize: 20,color:PdfColor.fromInt(0xFF000000),font:pw.Font.timesBold(),);
+    final styles14bold =pw.TextStyle(fontSize: 14,color:PdfColor.fromInt(0xFF000000),font:pw.Font.times(),);
+    final styles12bold =pw.TextStyle(fontSize: 12,color:PdfColor.fromInt(0xFF000000),font:pw.Font.times(),);
+    final styles16bold =pw.TextStyle(fontSize: 16,color:PdfColor.fromInt(0xFF000000),font:pw.Font.timesBold());
     final pdf = pw.Document();
     pdf.addPage(
       pw.MultiPage(
         build: (pw.Context context) => [
-          pw.Column(
-            children: List<pw.Widget>.generate(
-              150,
-              (int index) {
-                return pw.Text('index: $index');
-              },
+          pw.Container(
+            margin: pw.EdgeInsets.symmetric(horizontal:30),
+            child: pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                pw.Text(
+                  cvModel.name + '${cvModel.gender == 'Male' ? ' (Mr.)' : ' (Mrs.)'}',
+                 style: styles20bold
+                ),
+                pw.SizedBox(
+                  height: 6,
+                ),
+                pw.Text(
+                  cvModel.position,
+                  style:styles14bold
+                ),
+                pw.Padding(
+                    padding: pw.EdgeInsets.symmetric(horizontal: 35.0, vertical: 16.0),
+                    child: pw.Text('Email: ${cvModel.email}',
+                        style:styles12bold
+                    )),
+                _buildSectionTitlePdf('Professional summary',styles16bold),
+                _buildProfessionalPdf(),
+                _buildSectionTitlePdf('Education',styles16bold),
+                _buildEducationPdf(),
+                _buildSectionTitlePdf('Technical Skills',styles16bold),
+                _buildTechnicalSkillsPdf(),
+                _buildSectionTitlePdf('Professional Experience',styles16bold),
+                _buildProfessionalExperiencesPdf(),
+                _buildSectionTitlePdf('HighLight Project',styles16bold),
+                _buildHighLightProjectsPdf(),
+                _buildSectionTitlePdf('Languages',styles16bold),
+                _buildLanguagePdf()
+              ],
             ),
           )
         ],
@@ -35,7 +69,6 @@ class SectionFive extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('language: ${cvModel.languages.length}');
     //myGetBlobPdfContent();
     return Scaffold(
       body: Container(
@@ -44,7 +77,7 @@ class SectionFive extends StatelessWidget {
         child: Column(
           children: [
             _buildPdfFile(context),
-            // _buildAction(context)
+             _buildAction(context)
           ],
         ),
       )),
@@ -106,8 +139,26 @@ class SectionFive extends StatelessWidget {
     );
   }
 
+  //buidl section title Pdf
+  pw.Widget _buildSectionTitlePdf(String title, final styles16bold) {
+    return pw.Padding(
+      padding: pw.EdgeInsets.symmetric(vertical: 16),
+      child: pw.Column(
+        crossAxisAlignment: pw.CrossAxisAlignment.start,
+        children: [
+          pw.Text(title, style: styles16bold),
+          pw.Divider(
+            color: PdfColor.fromInt(0xFF000000),
+            height: 1,
+          )
+        ],
+      ),
+    );
+  }
+
   Widget _buildAction(BuildContext context) {
-    return Column(
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         TextButton(
           child: Text("Open"),
@@ -118,6 +169,7 @@ class SectionFive extends StatelessWidget {
             html.Url.revokeObjectUrl(url);
           },
         ),
+        SizedBox(width: 30.0),
         TextButton(
           child: Text("Download"),
           onPressed: () async {
@@ -135,7 +187,6 @@ class SectionFive extends StatelessWidget {
           },
         ),
       ],
-      mainAxisAlignment: MainAxisAlignment.center,
     );
   }
 
@@ -145,6 +196,14 @@ class SectionFive extends StatelessWidget {
       children: cvModel.technicalSummaryList
           .map((summary) => _buildProfessionalItem(context, summary))
           .toList(),
+    );
+  }
+
+  //create Professional list pdf
+  pw.Widget _buildProfessionalPdf() {
+    return pw.Column(
+      children: cvModel.technicalSummaryList
+          .map((summary) => _buildProfessionalItemPdf(summary)).toList(),
     );
   }
 
@@ -168,12 +227,49 @@ class SectionFive extends StatelessWidget {
       ),
     );
   }
+  // Create Professional item pdf
+  pw.Widget _buildProfessionalItemPdf(String summaryItem) {
+    return pw.Padding(
+      padding: pw.EdgeInsets.symmetric(vertical: 5, horizontal: 35),
+      child: pw.Row(
+        children: [
+          // pw.Icon(
+          //   Icons.circle,
+          //   color: PdfColor.fromInt(0xFF000000),
+          //   size: 8,
+          // ),
+          pw.Container(
+            height: 8,
+            width: 8,
+            decoration:pw.BoxDecoration(
+                color: PdfColor.fromInt(0xFF000000),
+              borderRadius: pw.BorderRadius.circular(5)
+            ),
+
+          ),
+          pw.SizedBox(width: 16.0),
+          pw.Text(
+            summaryItem,
+            style: pw.TextStyle(fontSize: 12,color:PdfColor.fromInt(0xFF000000),font:pw.Font.times(),),
+          )
+        ],
+      ),
+    );
+  }
 
   // Build Education list
   Widget _buildEducation(BuildContext context) {
     return Column(
       children: cvModel.educationList
           .map((education) => _buildEducationItem(context, education))
+          .toList(),
+    );
+  }
+  // Build Education list pdf
+  pw.Widget _buildEducationPdf() {
+    return pw.Column(
+      children: cvModel.educationList
+          .map((education) => _buildEducationItempdf(education))
           .toList(),
     );
   }
@@ -198,12 +294,41 @@ class SectionFive extends StatelessWidget {
       ),
     );
   }
+  // Build Education item pdf
+  pw.Widget _buildEducationItempdf(Education education) {
+    return pw.Padding(
+      padding: pw.EdgeInsets.symmetric(vertical: 4, horizontal: 35),
+      child: pw.Column(
+        crossAxisAlignment: pw.CrossAxisAlignment.start,
+        children: [
+          pw.Text(
+            '${education.schoolNm} - class of ${education.classYear}',
+            style:pw.TextStyle(fontSize: 12,color:PdfColor.fromInt(0xFF000000),font:pw.Font.times(),),
+          ),
+          pw.Padding(
+            padding: pw.EdgeInsets.symmetric(vertical: 8.0),
+            child: pw.Text('Major: ${education.majorNm}',
+                style:pw.TextStyle(fontSize: 12,color:PdfColor.fromInt(0xFF000000),font:pw.Font.times(),),
+          )
+          )
+        ],
+      ),
+    );
+  }
 
   // Build Technical skill list
   Widget _buildTechnicalSkills(BuildContext context) {
     return Column(
       children: cvModel.skills
           .map((skill) => _buildTechnicalSkillItem(context, skill))
+          .toList(),
+    );
+  }
+  // Build Technical skill list pdf
+  pw.Widget _buildTechnicalSkillsPdf() {
+    return pw.Column(
+      children: cvModel.skills
+          .map((skill) => _buildTechnicalSkillItemPdf(skill))
           .toList(),
     );
   }
@@ -226,6 +351,21 @@ class SectionFive extends StatelessWidget {
       ),
     );
   }
+  // Build Technical skill item pdf
+  pw.Widget _buildTechnicalSkillItemPdf(Skill skill) {
+    return  pw.Padding(
+      padding:  pw.EdgeInsets.symmetric(vertical: 5, horizontal: 35),
+      child:  pw.Row(
+      // /skill.skillData,
+     // '${skill.skillNm}: '
+     children: [
+         pw.Text('${skill.skillNm} :', style:pw.TextStyle(fontSize: 12,color:PdfColor.fromInt(0xFF000000),font:pw.Font.timesBold(),), ),
+         pw.SizedBox(width: 8.0),
+         pw.Text('${skill.skillData} ', style:pw.TextStyle(fontSize: 12,color:PdfColor.fromInt(0xFF000000),font:pw.Font.times(),), )
+          ]
+      ),
+    );
+  }
 
   // Build Professional Experience list
   Widget _buildProfessionalExperiences(BuildContext context) {
@@ -233,6 +373,15 @@ class SectionFive extends StatelessWidget {
       children: cvModel.professionalList
           .map((professional) =>
               _buildProfessionalExperienceItem(context, professional))
+          .toList(),
+    );
+  }
+  // Build Professional Experience list pdf
+  pw.Widget _buildProfessionalExperiencesPdf() {
+    return pw.Column(
+      children: cvModel.professionalList
+          .map((professional) =>
+          _buildProfessionalExperienceItemPdf(professional))
           .toList(),
     );
   }
@@ -302,6 +451,78 @@ class SectionFive extends StatelessWidget {
       ),
     );
   }
+  // Build Professional Experience item pdf
+  pw.Widget _buildProfessionalExperienceItemPdf(Professional professional) {
+    return  pw.Padding(
+      padding:  pw.EdgeInsets.symmetric(vertical: 5, horizontal: 35),
+      child:  pw.Column(
+        crossAxisAlignment:  pw.CrossAxisAlignment.start,
+        children: [
+          pw.Row(
+            children: [
+              pw.Row(
+                  children: [
+                    pw.Text('${professional.companyNm}, ', style:pw.TextStyle(fontSize: 12,color:PdfColor.fromInt(0xFF000000),font:pw.Font.timesBold(),), ),
+                    pw.SizedBox(width: 14.0),
+                    pw.Text('${ professional.locationNm} ', style:pw.TextStyle(fontSize: 12,color:PdfColor.fromInt(0xFF000000),font:pw.Font.times(),), )
+                  ]
+              ),
+              pw.Spacer(),
+              pw.Text(
+                '${professional.startDate} - ${professional.endDate}',
+                style:pw.TextStyle(fontSize: 12,color:PdfColor.fromInt(0xFF000000),font:pw.Font.times(),),
+              )
+            ],
+          ),
+          pw.SizedBox(height: 8.0),
+          pw.Row(
+              children: [
+                pw.Text('Role:  ', style:pw.TextStyle(fontSize: 12,color:PdfColor.fromInt(0xFF000000),font:pw.Font.timesBold(),), ),
+                pw.SizedBox(width: 14.0),
+                pw.Text('${professional.roleNm} ', style:pw.TextStyle(fontSize: 12,color:PdfColor.fromInt(0xFF000000),font:pw.Font.times(),), )
+              ]
+          ),
+          pw.SizedBox(height: 8.0),
+          pw.Text(
+            'Responsibilities:',
+            style:pw.TextStyle(fontSize: 12,color:PdfColor.fromInt(0xFF000000),font:pw.Font.times(),),
+          ),
+          pw.Row(
+            children: [
+              pw.Container(
+                height: 8,
+                width: 8,
+                decoration:pw.BoxDecoration(
+                    color: PdfColor.fromInt(0xFF000000),
+                    borderRadius: pw.BorderRadius.circular(5)
+                ),
+
+              ),
+              pw.SizedBox(width: 16.0),
+              pw.Text(
+                'Participate in various software development phase such as:',
+                style:pw.TextStyle(fontSize: 12,color:PdfColor.fromInt(0xFF000000),font:pw.Font.times(),),
+              )
+            ],
+          ),
+          pw.SizedBox(
+            height: 8.0,
+          ),
+          pw.Padding(
+            padding:  pw.EdgeInsets.only(left: 23.0),
+            child:pw.Column(
+              crossAxisAlignment:pw.CrossAxisAlignment.start,
+              children: professional.responsibilities
+                  .map((responsibility) =>  pw.Bullet(
+                        text: responsibility,
+                      ))
+                  .toList(),
+            ),
+          )
+        ],
+      ),
+    );
+  }
 
   // Build highlight project list
   Widget _buildHighLightProjects(BuildContext context) {
@@ -314,6 +535,21 @@ class SectionFive extends StatelessWidget {
           children: cvModel.highLightProjectList
               .map((highLightProject) =>
                   _buildHighLightProjectItem(context, highLightProject))
+              .toList(),
+        )
+      ],
+    );
+  }
+  // Build highlight project list pdf
+  pw.Widget _buildHighLightProjectsPdf() {
+    return pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.stretch,
+      children: [
+        pw.Column(
+          crossAxisAlignment: pw.CrossAxisAlignment.stretch,
+          children: cvModel.highLightProjectList
+              .map((highLightProject) =>
+              _buildHighLightProjectItemPdfT(highLightProject))
               .toList(),
         )
       ],
@@ -358,6 +594,40 @@ class SectionFive extends StatelessWidget {
       ),
     );
   }
+  // Build highlight project item
+  pw.Widget _buildHighLightProjectItemPdfT(HighLightProject highLightProject) {
+    return pw.Container(
+      color: PdfColor.fromInt(0xFFFFFFFF),
+      padding: pw.EdgeInsets.all(20.0),
+      child: pw.Column(
+        crossAxisAlignment: pw.CrossAxisAlignment.start,
+        children: [
+          pw.Padding(
+            padding: pw.EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+            child: pw.Text(
+              highLightProject.projectNm ?? '',
+              style: pw.TextStyle(fontSize: 14,color:PdfColor.fromInt(0xFF000000),font:pw.Font.timesBold(),)
+                  .copyWith(decoration: pw.TextDecoration.underline),
+            ),
+          ),
+          pw.Table(
+            columnWidths: {
+              0: pw.FlexColumnWidth(1),
+              1: pw.FlexColumnWidth(4),
+            },
+            border: pw.TableBorder.all(color:PdfColor.fromInt(0xFF000000)),
+            children: [
+              _buildTableRowPdf('Project Description',highLightProject.projectDescription),
+              _buildTableRowPdf( 'Team size', highLightProject.teamSize),
+              _buildTableRowPdf('Position', highLightProject.position),
+               _buildTableRowPdf('Responsibility',_getDataResponsibility(highLightProject.responsibility)),
+               //_buildTableRowPdf('Technology used',highLightProject.technologies.join(', ').toString()),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 
   // Get data for responsibility
   String _getDataResponsibility(List<String> responsibilities) {
@@ -381,12 +651,33 @@ class SectionFive extends StatelessWidget {
       ),
     ]);
   }
+  // Build table row
+  pw.TableRow _buildTableRowPdf(String title, String content) {
+    return pw.TableRow(children: [
+      pw.Padding(
+        padding: pw.EdgeInsets.all(16.0),
+        child: pw.Text(title, style:pw.TextStyle(fontSize: 12,color:PdfColor.fromInt(0xFF000000),font:pw.Font.times(),)),
+      ),
+      pw.Padding(
+        padding: pw.EdgeInsets.all(16.0),
+        child: pw.Text(content, style:pw.TextStyle(fontSize: 12,color:PdfColor.fromInt(0xFF000000),font:pw.Font.times(),)),
+      ),
+    ]);
+  }
 
   // Build language project
   Widget _buildLanguage(BuildContext context) {
     return Column(
       children: cvModel.languages
           .map((language) => _buildLanguageItem(context, language))
+          .toList(),
+    );
+  }
+  // Build language project pdf
+  pw.Widget _buildLanguagePdf() {
+    return pw.Column(
+      children: cvModel.languages
+          .map((language) => _buildLanguageItemPdf(language))
           .toList(),
     );
   }
@@ -401,6 +692,20 @@ class SectionFive extends StatelessWidget {
               style: CommonStyle.size12W700black(context)),
           SizedBox(width: 10),
           Text(language.level, style: CommonStyle.size12W400black(context)),
+        ],
+      ),
+    );
+  }
+  // Build language project item pdf
+  pw.Widget _buildLanguageItemPdf(Language language) {
+    return   pw.Padding(
+      padding:   pw.EdgeInsets.only(left: 35),
+      child:   pw.Row(
+        children: [
+      pw.Text('${language.languageNm}:',
+              style: pw.TextStyle(fontSize: 12,color:PdfColor.fromInt(0xFF000000),font:pw.Font.timesBold(),)),
+        pw.SizedBox(width: 10),
+          pw.Text(language.level, style:pw.TextStyle(fontSize: 12,color:PdfColor.fromInt(0xFF000000),font:pw.Font.times(),)),
         ],
       ),
     );

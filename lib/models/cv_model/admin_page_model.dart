@@ -1,14 +1,8 @@
-// class TechnicalModel{
-//   String role;
-//   List<String> level;
-//   List<String> technical;
-//   TechnicalModel({this.role,this.level,this.technical});
-// }
-
 class MasterData {
   List<RoleData> roles;
-
-  MasterData({this.roles});
+  List<String> skills;
+  List<String> technology;
+  MasterData({this.roles,this.skills,this.technology});
 }
 
 class RoleData {
@@ -21,6 +15,6 @@ class RoleData {
 class LevelData {
   String levelName;
   List<String> technicalDataList;
-
   LevelData({this.levelName, this.technicalDataList});
 }
+

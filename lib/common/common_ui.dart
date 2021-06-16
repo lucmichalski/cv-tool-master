@@ -291,7 +291,7 @@ class HorizontalLine extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: CommonStyle.size32W600black(context),
+                style: CommonStyle.size32W600black434b65(context),
               )
             ],
           ),
@@ -338,7 +338,6 @@ class TextFieldCommon extends StatelessWidget {
   Widget build(BuildContext context) {
     var w = MediaQuery.of(context).size.width;
     return Container(
-      // height: 35,
       child: TextFormField(
         maxLines: maxLines,
         onChanged: onChanged,
@@ -355,7 +354,7 @@ class TextFieldCommon extends StatelessWidget {
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(w * 0.001),
             borderSide: BorderSide(
-              color: kmainColor,
+              color: Color(0xff858a9b),
             ),
           ),
           focusedErrorBorder: OutlineInputBorder(
@@ -464,5 +463,19 @@ class _AddButtonState extends State<AddButton> {
   @override
   Widget build(BuildContext context) {
     return IconButton(onPressed: widget.onPressed, icon: Icon(Icons.add));
+  }
+}
+class DeleteButton extends StatefulWidget {
+  final Function onPressed;
+  DeleteButton({this.onPressed});
+
+  @override
+  _DeleteButtonState createState() => _DeleteButtonState();
+}
+
+class _DeleteButtonState extends State<DeleteButton> {
+  @override
+  Widget build(BuildContext context) {
+    return  IconButton(onPressed: widget.onPressed, icon: Icon(Icons.close));
   }
 }

@@ -80,6 +80,12 @@ class CommonStyle {
         fontWeight: FontWeight.w600,
         color: Colors.black);
   }
+  static TextStyle size32W600black434b65(BuildContext context) {
+    return GoogleFonts.roboto(
+        fontSize: DoubleExt(32).textSize(context),
+        fontWeight: FontWeight.w600,
+        color: Color(0xff434b65));
+  }
 
   static TextStyle size20W700black(BuildContext context) {
     return GoogleFonts.ptSerif(fontSize: DoubleExt(20).textSizePdf(context),

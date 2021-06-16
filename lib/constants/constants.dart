@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-const Color kmainColor = Color(0xff4CAA7D);
+const Color kmainColor = Colors.blue;
 const Color kSecondaryColor = Color(0xff295464);
 var dialogBackgroundColor = Color(0xff00216F);
 var dialogBackgroundOpacity = 0.6;

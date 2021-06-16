@@ -303,14 +303,12 @@ class _SecondScreenState extends State<SecondScreen> {
           padding: EdgeInsets.only(left: w * 0.15),
           child: Row(
             children: [
-              Expanded(
-                child: Container(
-                  child: SkillDropDown(
-                      menuList: _skills,
-                      initPosition: _skillSelected,
-                      onChange: (value) =>
-                          setState(() => _skillSelected = value)),
-                ),
+              Container(
+                child: SkillDropDown(
+                    menuList: _skills,
+                    initPosition: _skillSelected,
+                    onChange: (value) =>
+                        setState(() => _skillSelected = value)),
               ),
               SizedBox(
                 width: 16,

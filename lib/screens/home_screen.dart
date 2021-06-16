@@ -69,8 +69,8 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
           status: true,
           technicalSummaryList: [
-            '5 years’ experiences in software development specialize in web backend development. ',
-            'Good understanding of server-side templating technical, system architectural. ',
+            '5 years experiences in software development specialize in web backend development. ',
+            'Good understanding of server side templating technical, system architectural. ',
             'Many experiences working with API design, DB design. '
           ]),
       // CVModel(

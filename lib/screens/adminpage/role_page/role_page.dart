@@ -158,7 +158,7 @@ class _RolePageState extends State<RolePage> {
             children: [
               Divider(
                 height: 1,
-                color: Color(0xffBBDEFB),
+                color: Colors.lightBlue,
               ),
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 8.0),
@@ -169,6 +169,7 @@ class _RolePageState extends State<RolePage> {
               ),
             ],
           ),
+          SizedBox(height: 10,),
           _buildTechnical(
               context, levelData.technicalDataList, 'level-$index-$roleId')
         ],

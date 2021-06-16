@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_cv_maker/common/common_style.dart';
 import 'package:flutter_cv_maker/common/common_ui.dart';
 import 'package:flutter_cv_maker/models/cv_model/admin_page_model.dart';
-import 'package:flutter_cv_maker/models/cv_model/cv_model.dart';
 import 'package:flutter_cv_maker/screens/adminpage/role_page/highlight_page.dart';
 import 'package:flutter_cv_maker/screens/adminpage/role_page/role_page.dart';
 import 'package:flutter_cv_maker/screens/adminpage/role_page/skill_page.dart';
@@ -15,7 +14,10 @@ class AdminPage extends StatefulWidget {
 class _AdminPageState extends State<AdminPage> {
   bool showLevelView = false;
   bool showTechnicalView = false;
-  MasterData _masterData = MasterData(roles: [
+  MasterData _masterData = MasterData(
+    skills: [],
+      technology: [],
+      roles: [
     RoleData(
         roleNm: '',
         levelDataList: [LevelData(levelName: '', technicalDataList: [])])
@@ -43,7 +45,7 @@ class _AdminPageState extends State<AdminPage> {
   Widget build(BuildContext context) {
     var w = MediaQuery.of(context).size.width;
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Color(0xfff6f8fa),
       body: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
           var a = constraints.maxWidth;
@@ -52,8 +54,8 @@ class _AdminPageState extends State<AdminPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                color: Color(0xffBBDEFB),
-                width: a < 1000 ? w * 0.05 : w * 0.2,
+                color: Colors.white,
+                width: a < 1000 ? w * 0.09 : w * 0.2,
                 child: _buildMenuNav(context),
               ),
               Expanded(child: _handleSwitchPage(context, pageId))
@@ -96,9 +98,27 @@ class _AdminPageState extends State<AdminPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildMenuItem(context, ROLE_PAGE_ID, 'Role'),
-        _buildMenuItem(context, SKILL_PAGE_ID, 'Skill'),
-        _buildMenuItem(context, HIGHLIGHT_PAGE_ID, 'Highlight'),
+        InkWell(
+          onTap: (){
+            setState(() {
+              pageId = 0;
+            });
+          },
+            child: _buildMenuItem(context, ROLE_PAGE_ID, 'Role'.toUpperCase())),
+        InkWell(
+            onTap: (){
+          setState(() {
+            pageId = 1;
+          });
+        },
+            child: _buildMenuItem(context, SKILL_PAGE_ID, 'Skill'.toUpperCase())),
+        InkWell(
+            onTap: (){
+              setState(() {
+                pageId = 2;
+              });
+            },
+            child: _buildMenuItem(context, HIGHLIGHT_PAGE_ID, 'Technical'.toUpperCase())),
       ],
     );
   }
@@ -110,7 +130,7 @@ class _AdminPageState extends State<AdminPage> {
         children: [
           _buildCirclePage(context, index),
           SizedBox(
-            width: 16,
+            width: 10,
           ),
           LinkText(
             text: '$title',
