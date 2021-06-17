@@ -150,7 +150,7 @@ class _ControlTypeDropDownState extends State<ControlTypeDropDown> {
         .map((x) => DropdownMenuItem(
               child: Text(
                 x,
-                style: CommonStyle.black400Size22(context),
+                style: CommonStyle.inputStyle(context),
               ),
               value: widget.menuList.indexOf(x),
             ))
@@ -159,13 +159,27 @@ class _ControlTypeDropDownState extends State<ControlTypeDropDown> {
       // height: w * 0.05,
       padding: EdgeInsets.symmetric(horizontal: w * 0.01),
       decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(w * 0.005),
+          borderRadius: BorderRadius.circular(w * 0.001),
           color: Theme.of(context).cardColor,
-          border: Border.all(color: Colors.black)),
+          border: Border.all(color: mainBorderColor)),
       child: DropdownButtonHideUnderline(
         child: DropdownButton(
             value: widget.initPosition,
             focusColor: Color(0xffDBF4FF),
+            icon: Row(
+              children: [
+                Container(
+                  height: 20,
+                  margin: EdgeInsets.only(right: 4, left: 16),
+                  child: VerticalDivider(
+                    color: Color(0xffdfe5f0),
+                    width: 2,
+                  ),
+                ),
+                Icon(Icons.keyboard_arrow_down_rounded,
+                    color: Color(0xff858c98)),
+              ],
+            ),
             iconEnabledColor: Theme.of(context).iconTheme.color,
             items: widgets,
             onChanged: (value) => this.widget.onChange(value)),
@@ -199,7 +213,7 @@ class _SkillDropDownState extends State<SkillDropDown> {
                   children: [
                     Text(
                       x.skillNm,
-                      style: CommonStyle.black400Size12(context),
+                      style: CommonStyle.inputStyle(context),
                     ),
                     x.isSelected ? Spacer() : Container(),
                     x.isSelected
@@ -219,11 +233,25 @@ class _SkillDropDownState extends State<SkillDropDown> {
       // height: w * 0.05,
       padding: EdgeInsets.symmetric(horizontal: w * 0.01),
       decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(w * 0.005),
+          borderRadius: BorderRadius.circular(w * 0.001),
           color: Theme.of(context).cardColor,
-          border: Border.all(color: Colors.black)),
+          border: Border.all(color: mainBorderColor)),
       child: DropdownButtonHideUnderline(
         child: DropdownButton(
+            icon: Row(
+              children: [
+                Container(
+                  height: 20,
+                  margin: EdgeInsets.only(right: 4, left: 16),
+                  child: VerticalDivider(
+                    color: Color(0xffdfe5f0),
+                    width: 2,
+                  ),
+                ),
+                Icon(Icons.keyboard_arrow_down_rounded,
+                    color: Color(0xff858c98)),
+              ],
+            ),
             value: widget.initPosition,
             focusColor: Color(0xffDBF4FF),
             iconEnabledColor: Theme.of(context).iconTheme.color,
@@ -346,7 +374,9 @@ class TextFieldCommon extends StatelessWidget {
         cursorColor: kmainColor,
         obscureText: this.isObscure,
         validator: this.validator,
+        style: CommonStyle.inputStyle(context),
         decoration: new InputDecoration(
+          labelStyle: CommonStyle.hintStyle(context),
           filled: true,
           fillColor: Colors.white,
           labelText: label ?? kEmpty,
@@ -354,7 +384,7 @@ class TextFieldCommon extends StatelessWidget {
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(w * 0.001),
             borderSide: BorderSide(
-              color: Color(0xff858a9b),
+              color: Color(0xff045cfc),
             ),
           ),
           focusedErrorBorder: OutlineInputBorder(
@@ -436,7 +466,7 @@ class Bullet extends StatelessWidget {
                 size: 8,
               )
             : Icon(
-                Icons.circle_outlined,
+                Icons.circle,
                 color: Colors.black,
                 size: 8,
               ),
@@ -452,8 +482,10 @@ class Bullet extends StatelessWidget {
 
 class AddButton extends StatefulWidget {
   final Function onPressed;
+  final bool isButtonText;
+  final String textButton;
 
-  AddButton({this.onPressed});
+  AddButton({this.onPressed, this.isButtonText = false, this.textButton});
 
   @override
   _AddButtonState createState() => _AddButtonState();
@@ -462,9 +494,37 @@ class AddButton extends StatefulWidget {
 class _AddButtonState extends State<AddButton> {
   @override
   Widget build(BuildContext context) {
-    return IconButton(onPressed: widget.onPressed, icon: Icon(Icons.add));
+    if (!widget.isButtonText) {
+      return IconButton(
+        onPressed: widget.onPressed,
+        icon: Icon(
+          Icons.add_circle_outline,
+          color: Color(0xff045cfc),
+        ),
+        splashRadius: 20,
+      );
+    } else {
+      return Row(
+        children: [
+          IconButton(
+            onPressed: widget.onPressed,
+            icon: Icon(
+              Icons.add_circle_outline,
+              color: Color(0xff045cfc),
+            ),
+            splashRadius: 20,
+          ),
+          LinkText(
+            text: '${widget.textButton}',
+            onTapLink: widget.onPressed,
+            color: Color(0xff045cfc),
+          )
+        ],
+      );
+    }
   }
 }
+
 class DeleteButton extends StatefulWidget {
   final Function onPressed;
   DeleteButton({this.onPressed});
@@ -476,6 +536,10 @@ class DeleteButton extends StatefulWidget {
 class _DeleteButtonState extends State<DeleteButton> {
   @override
   Widget build(BuildContext context) {
-    return  IconButton(onPressed: widget.onPressed, icon: Icon(Icons.close));
+    return IconButton(
+      onPressed: widget.onPressed,
+      icon: Icon(Icons.close),
+      splashRadius: 20,
+    );
   }
 }

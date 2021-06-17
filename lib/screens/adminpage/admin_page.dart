@@ -14,10 +14,7 @@ class AdminPage extends StatefulWidget {
 class _AdminPageState extends State<AdminPage> {
   bool showLevelView = false;
   bool showTechnicalView = false;
-  MasterData _masterData = MasterData(
-    skills: [],
-      technology: [],
-      roles: [
+  MasterData _masterData = MasterData(skills: [], technology: [], roles: [
     RoleData(
         roleNm: '',
         levelDataList: [LevelData(levelName: '', technicalDataList: [])])
@@ -48,15 +45,15 @@ class _AdminPageState extends State<AdminPage> {
       backgroundColor: Color(0xfff6f8fa),
       body: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
-          var a = constraints.maxWidth;
-          print('Width: $a');
+          var maxW = constraints.maxWidth;
+          print('Width: $maxW');
           return Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
                 color: Colors.white,
-                width: a < 1000 ? w * 0.09 : w * 0.2,
-                child: _buildMenuNav(context),
+                width: maxW < 1000 ? w * 0.09 : w * 0.2,
+                child: _buildMenuNav(context, maxW < 1000),
               ),
               Expanded(child: _handleSwitchPage(context, pageId))
             ],
@@ -94,54 +91,58 @@ class _AdminPageState extends State<AdminPage> {
   }
 
   // Build Menu Nav
-  Widget _buildMenuNav(BuildContext context) {
+  Widget _buildMenuNav(BuildContext context, bool isNarrow) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         InkWell(
-          onTap: (){
-            setState(() {
-              pageId = 0;
-            });
-          },
-            child: _buildMenuItem(context, ROLE_PAGE_ID, 'Role'.toUpperCase())),
+            onTap: () => setState(() => pageId = ROLE_PAGE_ID),
+            child: _buildMenuItem(
+                context, ROLE_PAGE_ID, 'Role'.toUpperCase(), isNarrow)),
         InkWell(
-            onTap: (){
-          setState(() {
-            pageId = 1;
-          });
-        },
-            child: _buildMenuItem(context, SKILL_PAGE_ID, 'Skill'.toUpperCase())),
+            onTap: () => setState(() => pageId = SKILL_PAGE_ID),
+            child: _buildMenuItem(
+                context, SKILL_PAGE_ID, 'Skill'.toUpperCase(), isNarrow)),
         InkWell(
-            onTap: (){
-              setState(() {
-                pageId = 2;
-              });
-            },
-            child: _buildMenuItem(context, HIGHLIGHT_PAGE_ID, 'Technical'.toUpperCase())),
+            onTap: () => setState(() => pageId = HIGHLIGHT_PAGE_ID),
+            child: _buildMenuItem(context, HIGHLIGHT_PAGE_ID,
+                'Technical'.toUpperCase(), isNarrow)),
       ],
     );
   }
 
-  Widget _buildMenuItem(BuildContext context, int index, String title) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 16),
-      child: Row(
-        children: [
-          _buildCirclePage(context, index),
-          SizedBox(
-            width: 10,
-          ),
-          LinkText(
-            text: '$title',
-            color: index == pageId ? Colors.blue : Colors.black,
-            onTapLink: () {
-              setState(() {
-                pageId = index;
-              });
-            },
-          ),
-        ],
+  Widget _buildMenuItem(
+      BuildContext context, int index, String title, bool isNarrow) {
+    return GestureDetector(
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 16),
+        child: Row(
+          children: [
+            _buildCirclePage(context, index),
+            Visibility(
+              visible: !isNarrow,
+              child: SizedBox(
+                width: 10,
+              ),
+            ),
+            Visibility(
+              visible: !isNarrow,
+              child: LinkText(
+                text: '$title',
+                color: index == pageId
+                    ? Color(0xff045cfc)
+                    : index < pageId
+                        ? Color(0xffd3d9e1)
+                        : Color(0xff565d75),
+                onTapLink: () {
+                  setState(() {
+                    pageId = index;
+                  });
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -151,17 +152,29 @@ class _AdminPageState extends State<AdminPage> {
       width: MediaQuery.of(context).size.width * 0.03,
       height: MediaQuery.of(context).size.width * 0.03,
       decoration: BoxDecoration(
-        color: pageIndex == pageId ? Colors.white : Colors.greenAccent.shade400,
+        color: pageIndex == pageId
+            ? Colors.white
+            : pageIndex < pageId
+                ? Colors.greenAccent.shade400
+                : Colors.white,
         border: Border.all(
-            color:
-                pageIndex == pageId ? Colors.blue : Colors.greenAccent.shade400,
+            color: pageIndex == pageId
+                ? Color(0xff045cfc)
+                : pageIndex < pageId
+                    ? Colors.greenAccent.shade400
+                    : Colors.grey.shade400,
             width: 2),
         borderRadius: BorderRadius.circular(100),
       ),
       alignment: Alignment.center,
       child: Text('${pageIndex + 1}',
           style: CommonStyle.main700Size18(context).copyWith(
-              color: pageIndex == pageId ? Colors.blue : Colors.white)),
+            color: pageIndex == pageId
+                ? Color(0xff045cfc)
+                : pageIndex < pageId
+                    ? Colors.white
+                    : Colors.grey.shade400,
+          )),
     );
   }
 }

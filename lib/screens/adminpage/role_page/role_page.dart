@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_cv_maker/common/common_style.dart';
 import 'package:flutter_cv_maker/common/common_ui.dart';
 import 'package:flutter_cv_maker/models/cv_model/admin_page_model.dart';
 
@@ -21,11 +22,13 @@ class _RolePageState extends State<RolePage> {
   }
 
   Widget _buildPageForms(BuildContext context) {
+    var w = MediaQuery.of(context).size.width;
     return SingleChildScrollView(
       padding: EdgeInsets.symmetric(vertical: 30),
       child: Container(
-        margin: EdgeInsets.symmetric(horizontal: 150),
+        margin: EdgeInsets.symmetric(horizontal: w * 0.1),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             HorizontalLine('Technical summary'),
             SizedBox(
@@ -39,6 +42,8 @@ class _RolePageState extends State<RolePage> {
                       .add(RoleData(levelDataList: [], roleNm: ''));
                 });
               },
+              isButtonText: true,
+              textButton: 'ADD ROLE',
             )
           ],
         ),
@@ -65,13 +70,30 @@ class _RolePageState extends State<RolePage> {
   // Create role item
   Widget _buildRoleItem(BuildContext context, RoleData roleData, int index) {
     return Container(
-        margin: EdgeInsets.only(top: 16.0),
-        padding: EdgeInsets.all(16.0),
-        decoration: BoxDecoration(
-            color: Colors.grey.shade300,
-            border: Border.all(width: 1, color: Colors.grey)),
+        margin: EdgeInsets.only(top: 4.0),
+        padding: EdgeInsets.only(left: 16.0, right: 16, bottom: 16),
+        decoration:
+            BoxDecoration(border: Border.all(width: 1, color: Colors.grey)),
         child: Column(
           children: [
+            Row(
+              children: [
+                Spacer(),
+                IconButton(
+                  hoverColor: Colors.transparent,
+                  onPressed: () {
+                    setState(() {
+                      // Remove item
+                      widget.masterData.roles.removeAt(index);
+                    });
+                  },
+                  icon: Icon(
+                    Icons.highlight_remove,
+                    color: Colors.red,
+                  ),
+                ),
+              ],
+            ),
             TextFieldCommon(
               controller: _generateController('role-$index', roleData.roleNm),
               label: 'Role',
@@ -84,6 +106,8 @@ class _RolePageState extends State<RolePage> {
             ),
             _buildLevel(context, roleData.levelDataList, 'role-$index'),
             AddButton(
+              isButtonText: true,
+              textButton: 'ADD LEVEL',
               onPressed: () {
                 setState(() {
                   roleData.levelDataList
@@ -115,61 +139,58 @@ class _RolePageState extends State<RolePage> {
   Widget _buildLevelItem(BuildContext context, List<LevelData> levelDataList,
       LevelData levelData, int index, String roleId) {
     return Container(
-      padding: EdgeInsets.all(10.0),
-      decoration: BoxDecoration(boxShadow: [
-        BoxShadow(
-          color: Colors.black26,
-          blurRadius: 2.0,
-          offset: Offset(0.0, 2.0),
-        ),
-      ], color: Color(0xFFE3F2FD)),
-      margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20),
+      padding: EdgeInsets.only(left: 10.0, right: 10, bottom: 10),
+      decoration: BoxDecoration(
+          color: Color(0xFFedf4ff),
+          border: Border.all(color: Color(0xffccdfff), width: 1)),
+      margin: EdgeInsets.symmetric(vertical: 10.0),
       child: Column(
         children: [
           Row(
             children: [
-              Expanded(
-                child: TextFieldCommon(
-                  label: 'Level',
-                  controller: _generateController(
-                      'level-$index-$roleId', levelData.levelName),
-                  onChanged: (val) {
-                    setState(() {
-                      levelData.levelName = val;
-                    });
-                  },
-                ),
-              ),
+              Spacer(),
               IconButton(
+                  hoverColor: Colors.transparent,
                   onPressed: () {
                     setState(() {
                       levelDataList.removeAt(index);
                     });
                   },
-                  icon: Icon(Icons.close_rounded))
+                  icon: Icon(
+                    Icons.highlight_remove,
+                    color: Colors.red,
+                  ))
             ],
+          ),
+          TextFieldCommon(
+            label: 'Level',
+            controller: _generateController(
+                'level-$index-$roleId', levelData.levelName),
+            onChanged: (val) {
+              setState(() {
+                levelData.levelName = val;
+              });
+            },
           ),
           SizedBox(
             height: 16,
           ),
-          Stack(
-            alignment: Alignment.center,
-            clipBehavior: Clip.none,
+          Row(
             children: [
-              Divider(
-                height: 1,
-                color: Colors.lightBlue,
+              Icon(
+                Icons.military_tech_rounded,
+                color: Color(0xff045cfc),
               ),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 8.0),
-                color: Colors.white,
-                child: Text(
-                  'Technical',
-                ),
-              ),
+              Text(
+                'Technicals',
+                style: CommonStyle.size16W400hintTitle(context)
+                    .copyWith(fontSize: 16),
+              )
             ],
           ),
-          SizedBox(height: 10,),
+          SizedBox(
+            height: 10,
+          ),
           _buildTechnical(
               context, levelData.technicalDataList, 'level-$index-$roleId')
         ],
@@ -188,6 +209,8 @@ class _RolePageState extends State<RolePage> {
               .toList(),
         ),
         AddButton(
+          isButtonText: true,
+          textButton: 'ADD TECHNICAL',
           onPressed: () {
             setState(() {
               technicalList.add('');
@@ -200,7 +223,6 @@ class _RolePageState extends State<RolePage> {
 
   Widget _buildTechnicalItem(BuildContext context, List<String> technicalList,
       String value, int index, String levelId) {
-    print('index: $index');
     return Container(
       margin: EdgeInsets.only(bottom: 10.0),
       child: Row(

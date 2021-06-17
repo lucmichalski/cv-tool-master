@@ -35,7 +35,6 @@ class _SectionFourState extends State<SectionFour> {
 
   @override
   void initState() {
-    // TODO: implement initState
     if (widget.cvModel.highLightProjectList != null &&
         widget.cvModel.highLightProjectList.isNotEmpty) {
       _highLightProjectList = widget.cvModel.highLightProjectList;
@@ -64,10 +63,12 @@ class _SectionFourState extends State<SectionFour> {
 
   @override
   Widget build(BuildContext context) {
+    var w = MediaQuery.of(context).size.width;
     return Scaffold(
       body: SingleChildScrollView(
+        padding: EdgeInsets.only(bottom: w * 0.05),
         child: Container(
-            margin: EdgeInsets.symmetric(horizontal: 100),
+            margin: EdgeInsets.symmetric(horizontal: w * 0.05),
             child: Column(
               children: [
                 HorizontalLine('Language'),
@@ -78,7 +79,7 @@ class _SectionFourState extends State<SectionFour> {
                 SizedBox(
                   height: 16,
                 ),
-                HorizontalLine('Professional Experience '),
+                HorizontalLine('Project Highlight'),
                 SizedBox(
                   height: 10,
                 ),
@@ -90,8 +91,10 @@ class _SectionFourState extends State<SectionFour> {
   }
 
   Widget _buildHighLightProject(BuildContext context) {
-    return Container(
+    return Padding(
+      padding: EdgeInsets.only(left: MediaQuery.of(context).size.width * 0.15),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Column(
             children: widget.cvModel.highLightProjectList
@@ -99,22 +102,18 @@ class _SectionFourState extends State<SectionFour> {
                     context, e, widget.cvModel.highLightProjectList.indexOf(e)))
                 .toList(),
           ),
-          IconButton(
-              onPressed: () {
-                setState(() {
-                  widget.cvModel.highLightProjectList.add(HighLightProject(
-                      technologies: [],
-                      teamSize: '',
-                      responsibility: [],
-                      projectDescription: '',
-                      position: ''));
-                });
-              },
-              icon: Icon(
-                Icons.add_circle_outline_rounded,
-                size: 50,
-                color: kmainColor,
-              ))
+          AddButton(
+            isButtonText: true,
+            textButton: 'ADD PROJECT',
+            onPressed: () => setState(() {
+              widget.cvModel.highLightProjectList.add(HighLightProject(
+                  technologies: [],
+                  teamSize: '',
+                  responsibility: [],
+                  projectDescription: '',
+                  position: ''));
+            }),
+          )
         ],
       ),
     );
@@ -124,10 +123,11 @@ class _SectionFourState extends State<SectionFour> {
       BuildContext context, HighLightProject project, int index) {
     return Container(
       margin: EdgeInsets.only(
-          bottom: 40, left: MediaQuery.of(context).size.width * 0.15),
+        bottom: 40,
+      ),
       padding: EdgeInsets.only(left: 16.0, right: 16.0, bottom: 18.0),
       decoration: BoxDecoration(
-        border: Border.all(width: 1.0, color: Colors.black),
+        border: Border.all(width: 1.0, color: colorBorderBox),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -214,9 +214,20 @@ class _SectionFourState extends State<SectionFour> {
           SizedBox(
             height: 10,
           ),
-          Text(
-            'Responsibility ',
-            style: CommonStyle.size32W600black(context),
+          Row(
+            children: [
+              Icon(
+                Icons.work,
+                color: Color(0xff434b65),
+              ),
+              SizedBox(
+                width: 4,
+              ),
+              Text(
+                'Responsibility ',
+                style: CommonStyle.size16W400hintTitle(context),
+              ),
+            ],
           ),
           SizedBox(
             height: 10,
@@ -236,16 +247,12 @@ class _SectionFourState extends State<SectionFour> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  IconButton(
-                      onPressed: () {
-                        setState(() {
-                          project.responsibility.add('');
-                        });
-                      },
-                      icon: Icon(
-                        Icons.add_circle_outline_rounded,
-                        size: 30,
-                      )),
+                  AddButton(
+                    isButtonText: true,
+                    textButton: 'ADD RESPONSIBILITY',
+                    onPressed: () =>
+                        setState(() => project.responsibility.add('')),
+                  )
                 ],
               ),
               SizedBox(
@@ -339,10 +346,15 @@ class _SectionFourState extends State<SectionFour> {
 
   Widget _buildTechnologiesItem(
       BuildContext context, List<String> listTechnologies, int index) {
+    var w = MediaQuery.of(context).size.width;
     return Container(
       margin: EdgeInsets.only(right: 16.0),
       child: Chip(
           backgroundColor: kmainColor,
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(w * 0.005))),
+          labelStyle:
+              CommonStyle.inputStyle(context).copyWith(color: Colors.white),
           deleteIcon: Container(
             height: 20.0,
             width: 20.0,
@@ -373,7 +385,7 @@ class _SectionFourState extends State<SectionFour> {
       padding:
           EdgeInsets.only(left: 16.0, right: 16.0, bottom: 18.0, top: 16.0),
       decoration: BoxDecoration(
-        border: Border.all(width: 1.0, color: Colors.black),
+        border: Border.all(width: 1.0, color: colorBorderBox),
       ),
       child: Column(children: [
         Column(
@@ -382,18 +394,12 @@ class _SectionFourState extends State<SectionFour> {
                   context, e, widget.cvModel.languages.indexOf(e)))
               .toList(),
         ),
-        IconButton(
-            onPressed: () {
-              setState(() {
-                widget.cvModel.languages.add(
-                    Language(level: _levels[0], languageNm: _languages[0]));
-              });
-            },
-            icon: Icon(
-              Icons.add_circle_outline_rounded,
-              size: 30,
-              color: kmainColor,
-            ))
+        AddButton(
+          isButtonText: true,
+          textButton: 'ADD LANGUAGE',
+          onPressed: () => setState(() => widget.cvModel.languages
+              .add(Language(level: _levels[0], languageNm: _languages[0]))),
+        )
       ]),
     );
   }

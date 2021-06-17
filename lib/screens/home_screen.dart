@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_cv_maker/common/common_style.dart';
 import 'package:flutter_cv_maker/common/common_ui.dart';
@@ -45,10 +44,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 classYear: '2019')
           ],
           languages: [
-            Language(
-            languageNm: 'English',
-              level: 'Level intermediate'
-            )
+            Language(languageNm: 'English', level: 'Level intermediate')
           ],
           gender: 'Male',
           highLightProjectList: [
@@ -64,8 +60,17 @@ class _HomeScreenState extends State<HomeScreen> {
                 teamSize: '3',
                 position: 'Frontend Developer',
                 projectDescription: 'Create 1Invoice',
-                technologies: ['Node JS', 'Flutter'],
-                responsibility: ['Coding frontend', 'Suggest idea', 'Responsibility A', 'Responsibility B', 'Responsibility C']),
+                technologies: [
+                  'Node JS',
+                  'Flutter'
+                ],
+                responsibility: [
+                  'Coding frontend',
+                  'Suggest idea',
+                  'Responsibility A',
+                  'Responsibility B',
+                  'Responsibility C'
+                ]),
           ],
           status: true,
           technicalSummaryList: [
@@ -91,6 +96,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    var w = MediaQuery.of(context).size.width;
     return Scaffold(
       body: Container(
         padding: EdgeInsets.all(16.0),
@@ -98,29 +104,43 @@ class _HomeScreenState extends State<HomeScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                LinkText(text: 'Admin page', color: Colors.grey, onTapLink: () {
-                  navKey.currentState
-                      .pushNamed(routeAdmin,);
-                }),
-                SizedBox(width: 20,),
-                LinkText(text: 'Logout',color: Colors.grey, onTapLink: () {})
-              ],
+            Padding(
+              padding: EdgeInsets.only(right: w * 0.05),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  LinkText(
+                      text: 'Admin page',
+                      color: Color(0xff434b65),
+                      onTapLink: () {
+                        navKey.currentState.pushNamed(
+                          routeAdmin,
+                        );
+                      }),
+                  SizedBox(
+                    width: 20,
+                  ),
+                  LinkText(text: 'Logout', color: Colors.red, onTapLink: () {})
+                ],
+              ),
             ),
-            Row(
-              children: [
-                Text(
-                  'Welcome ,',
-                  style: TextStyle(fontSize: 20),
-                ),
-                Text(
-                  'Username',
-                  style: CommonStyle.size22W4005c5c5c(context),
-                ),
-              ],
+            Padding(
+              padding: EdgeInsets.only(left: w * 0.05),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Welcome, ',
+                    style: CommonStyle.size16W400hintTitle(context)
+                        .copyWith(fontSize: 18),
+                  ),
+                  Text(
+                    'Username',
+                    style: CommonStyle.size16W400hintTitle(context)
+                        .copyWith(fontSize: 18, fontWeight: FontWeight.w700),
+                  ),
+                ],
+              ),
             ),
             SizedBox(
               height: 50.0,
@@ -144,57 +164,35 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _header(BuildContext context) {
+    var w = MediaQuery.of(context).size.width;
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 40),
+      margin: EdgeInsets.symmetric(horizontal: w * 0.05),
       child: Row(
         children: [
           Expanded(
-            child: Container(
-              child: Container(
-                child: TextButton(
-                    onPressed: () {
-                      CVModel model = CVModel(
-                          name: '',
-                          email: '',
-                          position: '',
-                          technicalSummaryList: [],
-                          status: false,
-                          educationList: [],
-                          skills: [],
-                          professionalList: [],
-                          certificateList: [],
-                          gender: 'Female');
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ButtonCommon(
+                  buttonText: 'Create CV',
+                  onClick: () {
+                    CVModel model = CVModel(
+                        name: '',
+                        email: '',
+                        position: '',
+                        technicalSummaryList: [],
+                        status: false,
+                        educationList: [],
+                        skills: [],
+                        professionalList: [],
+                        certificateList: [],
+                        gender: 'Female');
 
-                      navKey.currentState
-                          .pushNamed(routeCreateCV, arguments: model);
-                    },
-                    child: Container(
-                      alignment: Alignment.center,
-                      padding: EdgeInsets.symmetric(vertical: 10),
-                      width: MediaQuery.of(context).size.width * 0.7 / 3.5,
-                      decoration: BoxDecoration(boxShadow: [
-                        BoxShadow(
-                          color: Colors.black26,
-                          offset: const Offset(
-                            2.0,
-                            2.0,
-                          ),
-                          blurRadius: 5.0,
-                          spreadRadius: 2.0,
-                        ), //BoxShadow
-                        BoxShadow(
-                          color: Colors.white,
-                          offset: const Offset(0.0, 0.0),
-                          blurRadius: 0.0,
-                          spreadRadius: 0.0,
-                        ),
-                      ], border: Border.all(width: 0.5, color: Colors.black)),
-                      child: Text(
-                        'Add new',
-                        style: TextStyle(color: Colors.black),
-                      ),
-                    )),
-              ),
+                    navKey.currentState
+                        .pushNamed(routeCreateCV, arguments: model);
+                  },
+                ),
+              ],
             ),
           ),
           Expanded(
@@ -205,13 +203,17 @@ class _HomeScreenState extends State<HomeScreen> {
                   Column(children: [
                     Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Text('Draft'),
+                      child: Text(
+                        'Draft',
+                        style: CommonStyle.size16W400hintTitle(context),
+                      ),
                     )
                   ]),
                   Column(children: [
                     Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Text('Completed'),
+                      child: Text('Completed',
+                          style: CommonStyle.size16W400hintTitle(context)),
                     )
                   ]),
                 ]),
@@ -253,88 +255,143 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // Build item CV
   Widget _buildCVItem(BuildContext context, CVModel model) {
-    return InkWell(
-      onTap: () =>
-          navKey.currentState.pushNamed(routeCreateCV, arguments: model),
-      child: Container(
-        margin: EdgeInsets.only(bottom: 50.0),
-        child: Stack(
-          clipBehavior: Clip.none,
-          children: [
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 30.0),
-              margin: EdgeInsets.symmetric(horizontal: 40),
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height / 5,
-              decoration: BoxDecoration(boxShadow: [
-                BoxShadow(
-                  color: Colors.black26,
-                  offset: const Offset(
-                    0.0,
-                    2.0,
-                  ),
-                  blurRadius: 2.0,
-                  spreadRadius: 2.0,
-                ), //BoxShadow
-                BoxShadow(
-                  color: Colors.white,
-                  offset: const Offset(0.0, 0.0),
-                  blurRadius: 0.0,
-                  spreadRadius: 0.0,
-                ),
-              ], border: Border.all(width: 1.0, color: Colors.black)),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text('Position : ${model.position}'),
-                      Text('Position : ${model.email}'),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Text(
-                        model.status == true ? 'Completed' : 'Draft',
-                        style: CommonStyle.size20W400black(context),
+    var w = MediaQuery.of(context).size.width;
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: w * 0.05),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () =>
+              navKey.currentState.pushNamed(routeCreateCV, arguments: model),
+          child: Container(
+            margin: EdgeInsets.only(bottom: 50.0),
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 30.0),
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height / 5,
+                  decoration: BoxDecoration(boxShadow: [
+                    BoxShadow(
+                      color: Colors.black26,
+                      offset: const Offset(
+                        0.0,
+                        2.0,
                       ),
-                      SizedBox(
-                        width: 15.0,
+                      blurRadius: 2.0,
+                      spreadRadius: 2.0,
+                    ), //BoxShadow
+                    BoxShadow(
+                      color: Colors.white,
+                      offset: const Offset(0.0, 0.0),
+                      blurRadius: 0.0,
+                      spreadRadius: 0.0,
+                    ),
+                  ], border: Border.all(width: 1.0, color: Colors.black)),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Row(
+                            children: [
+                              Text(
+                                'Position',
+                                style: CommonStyle.size16W400hintTitle(context)
+                                    .copyWith(fontWeight: FontWeight.w700),
+                              ),
+                              Container(
+                                alignment: Alignment.center,
+                                width: w * 0.005,
+                                child: Text(':'),
+                              ),
+                              Text(
+                                '${model.position}',
+                                style: CommonStyle.size16W400hintTitle(context),
+                              )
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Text(
+                                'Email',
+                                style: CommonStyle.size16W400hintTitle(context)
+                                    .copyWith(fontWeight: FontWeight.w700),
+                              ),
+                              Container(
+                                alignment: Alignment.center,
+                                width: w * 0.005,
+                                child: Text(':'),
+                              ),
+                              Text(
+                                '${model.email}',
+                                style: CommonStyle.size16W400hintTitle(context),
+                              )
+                            ],
+                          ),
+                        ],
                       ),
-                      Icon(
-                        Icons.circle,
-                        size: 30.0,
-                        color: model.status == true
-                            ? Colors.lightGreen
-                            : Colors.yellow,
+                      Row(
+                        children: [
+                          IconButton(
+                              tooltip: 'Preview',
+                              color: Color(0xff434b65),
+                              icon: Icon(Icons.remove_red_eye),
+                              onPressed: () {}),
+                          IconButton(
+                              tooltip: 'Download',
+                              color: Color(0xff434b65),
+                              icon: Icon(Icons.download_rounded),
+                              onPressed: () {}),
+                          IconButton(
+                              tooltip: 'Delete',
+                              color: Color(0xff434b65),
+                              icon: Icon(Icons.delete),
+                              onPressed: () {})
+                          // Text(
+                          //   model.status == true ? 'Completed' : 'Draft',
+                          //   style: CommonStyle.size20W400black(context),
+                          // ),
+                          // SizedBox(
+                          //   width: 15.0,
+                          // ),
+                          // Icon(
+                          //   Icons.circle,
+                          //   size: 30.0,
+                          //   color: model.status == true
+                          //       ? Colors.lightGreen
+                          //       : Colors.yellow,
+                          // )
+                        ],
                       )
                     ],
-                  )
-                ],
-              ),
-            ),
-            Positioned(
-                top: -20,
-                left: 30,
-                child: Container(
-                  margin: EdgeInsets.symmetric(horizontal: 40),
-                  decoration: BoxDecoration(
-                      color: Colors.white,
-                      border: Border.all(width: 1.0, color: Colors.black)),
-                  width: MediaQuery.of(context).size.width / 2.5,
-                  height: 50,
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 15),
-                    child: Text(
-                      '${model.name} (Mr.)',
-                      textAlign: TextAlign.center,
-                      style: CommonStyle.black400Size22(context),
-                    ),
                   ),
-                )),
-          ],
+                ),
+                Positioned(
+                    top: -20,
+                    left: 30,
+                    child: Container(
+                      margin: EdgeInsets.symmetric(horizontal: 40),
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          border: Border.all(width: 1.0, color: Colors.black)),
+                      width: MediaQuery.of(context).size.width / 2.5,
+                      height: 50,
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 15),
+                        child: Text(
+                          '${model.name} (Mr.)',
+                          textAlign: TextAlign.center,
+                          style: CommonStyle.black400Size22(context),
+                        ),
+                      ),
+                    )),
+              ],
+            ),
+          ),
         ),
       ),
     );

@@ -13,7 +13,7 @@ import 'package:flutter_cv_maker/utils/validation.dart';
 class SectionOneScreen extends StatefulWidget {
   final CVModel cvModel;
   final Function onSaved;
-  PageController pageController;
+  final PageController pageController;
 
   SectionOneScreen({this.cvModel, this.onSaved, this.pageController});
 
@@ -88,9 +88,10 @@ class _SectionOneScreenState extends State<SectionOneScreen> {
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
+          padding: EdgeInsets.only(bottom: sizeWith * 0.05),
           child: Container(
             width: MediaQuery.of(context).size.width,
-            margin: EdgeInsets.symmetric(horizontal: 40),
+            margin: EdgeInsets.symmetric(horizontal: sizeWith * 0.05),
             child: Column(
               children: [
                 SizedBox(
@@ -143,14 +144,16 @@ class _SectionOneScreenState extends State<SectionOneScreen> {
 
   // Create gender layout
   Widget _buildGender(BuildContext context) {
-    print('Gender: ${widget.cvModel.gender}');
     return Row(
       children: kGenders
           .map((gender) => Expanded(
                 child: RadioListTile(
                     value: gender,
                     activeColor: kmainColor,
-                    title: Text('$gender'),
+                    title: Text(
+                      '$gender',
+                      style: CommonStyle.inputStyle(context),
+                    ),
                     groupValue: 'Male',
                     onChanged: (val) {
                       print('Gender: $val');
@@ -318,7 +321,7 @@ class _SectionOneScreenState extends State<SectionOneScreen> {
                 padding: EdgeInsets.all(8.0),
                 child: Text(
                   'Role',
-                  style: CommonStyle.size20W400black(context),
+                  style: CommonStyle.size16W400hintTitle(context),
                 ),
               ),
               ControlTypeDropDown(
@@ -343,7 +346,7 @@ class _SectionOneScreenState extends State<SectionOneScreen> {
                 padding: EdgeInsets.all(8.0),
                 child: Text(
                   'Level',
-                  style: CommonStyle.size20W400black(context),
+                  style: CommonStyle.size16W400hintTitle(context),
                 ),
               ),
               ControlTypeDropDown(
@@ -368,7 +371,7 @@ class _SectionOneScreenState extends State<SectionOneScreen> {
                 padding: EdgeInsets.all(8.0),
                 child: Text(
                   'Technical',
-                  style: CommonStyle.size20W400black(context),
+                  style: CommonStyle.size16W400hintTitle(context),
                 ),
               ),
               ControlTypeDropDown(

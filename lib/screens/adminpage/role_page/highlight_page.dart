@@ -12,56 +12,88 @@ class HighlightPage extends StatefulWidget {
 
 class _HighlightPageState extends State<HighlightPage> {
   Map<String, TextEditingController> _highlightController = {};
+
+  @override
+  void initState() {
+    if (widget.masterData.technology.isEmpty)
+      widget.masterData.technology.add('');
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
+    var w = MediaQuery.of(context).size.width;
     return Scaffold(
       body: Container(
+        margin: EdgeInsets.symmetric(horizontal: w * 0.1),
         child: Column(
           children: [
-            SizedBox(height: 30.0,),
-            HorizontalLine('Technical'),
-            SizedBox(height: 15.0,),
-            _buildSkill(context),
-            AddButton(onPressed: (){
-              setState(() {
-                widget.masterData.technology.add('');
-              });
-            },)
+            Padding(
+              padding: EdgeInsets.only(top: 30, bottom: 15),
+              child: HorizontalLine('Technical'),
+            ),
+            _buildTechnicalList(context),
+            AddButton(
+              isButtonText: true,
+              textButton: 'ADD TECHNICAL USED',
+              onPressed: () {
+                setState(() {
+                  widget.masterData.technology.add('');
+                });
+              },
+            )
           ],
         ),
       ),
     );
   }
-  Widget _buildSkill(BuildContext context){
+
+  Widget _buildTechnicalList(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(10.0),
-      margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20),
+      padding: EdgeInsets.symmetric(vertical: 10.0),
+      margin: EdgeInsets.symmetric(
+        vertical: 10.0,
+      ),
       child: Column(
-        children:widget.masterData.technology.map((e) => _buildSkillItem(context, widget.masterData.technology, e, widget.masterData.technology.indexOf(e))).toList(),
+        children: widget.masterData.technology
+            .map((e) => _buildTechnicalItem(
+                context,
+                widget.masterData.technology,
+                e,
+                widget.masterData.technology.indexOf(e)))
+            .toList(),
       ),
     );
   }
-  Widget _buildSkillItem(BuildContext context , List<String> technical,String value , int index){
+
+  Widget _buildTechnicalItem(
+      BuildContext context, List<String> technical, String value, int index) {
     return Container(
       margin: EdgeInsets.only(bottom: 10.0),
       child: Row(
         children: [
           Expanded(
-            child: TextFieldCommon(label: 'Technical',controller: _generateController('highlight-$index', value),onChanged: (value){
-              setState(() {
-                widget.masterData.technology[index] = value;
-              });
-            },),
+            child: TextFieldCommon(
+              controller: _generateController('highlight-$index', value),
+              onChanged: (value) {
+                setState(() {
+                  widget.masterData.technology[index] = value;
+                });
+              },
+            ),
           ),
-          DeleteButton(onPressed: (){
-            setState(() {
-              technical.removeAt(index);
-            });
-          },)
+          DeleteButton(
+            onPressed: () {
+              setState(() {
+                technical.removeAt(index);
+              });
+            },
+          )
         ],
       ),
     );
   }
+
   TextEditingController _generateController(String id, String value) {
     var key = id;
     TextEditingController controller = _highlightController[key];
