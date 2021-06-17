@@ -199,17 +199,20 @@ class _SectionOneScreenState extends State<SectionOneScreen> {
                 final item = _listSummary[index];
                 return _buildTechnicalSumItem(context, item, index);
               }),
-          IconButton(
-              onPressed: () {
-                setState(() {
-                  _listSummary.add('');
-                });
-              },
-              icon: Icon(
-                Icons.add_circle_outline,
-                size: 30.0,
-                color: kmainColor,
-              )),
+          Container(
+            margin:
+                EdgeInsets.only(left: MediaQuery.of(context).size.width * 0.15),
+            child: AddButton(
+              isButtonText: true,
+              textButton: 'ADD SUMMARY',
+              onPressed: () => setState(() {
+                _listSummary.add('');
+              }),
+            ),
+          ),
+          SizedBox(
+            height: MediaQuery.of(context).size.width * 0.03,
+          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
@@ -275,20 +278,17 @@ class _SectionOneScreenState extends State<SectionOneScreen> {
   Widget _buildTechnicalSumItem(
       BuildContext context, String technical, int index) {
     return Container(
-      padding: EdgeInsets.only(left: MediaQuery.of(context).size.width / 6),
+      padding: EdgeInsets.only(left: MediaQuery.of(context).size.width * 0.15),
       margin: EdgeInsets.only(top: 20),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Expanded(
-              child: Container(
-            height: 40,
-            child: TextFieldCommon(
-              controller: _generateController('technical-$index', technical),
-              onChanged: (val) {
-                _listSummary[index] = val;
-              },
-            ),
+              child: TextFieldCommon(
+            controller: _generateController('technical-$index', technical),
+            onChanged: (val) {
+              _listSummary[index] = val;
+            },
           )),
           Container(
             alignment: Alignment.center,
@@ -299,10 +299,10 @@ class _SectionOneScreenState extends State<SectionOneScreen> {
                   _listSummary.removeAt(index);
                 });
               },
+              splashRadius: 16,
               icon: Icon(
-                Icons.highlight_remove,
-                size: 30,
-                color: Colors.red,
+                Icons.close_outlined,
+                color: Colors.grey,
               ),
             ),
           )
