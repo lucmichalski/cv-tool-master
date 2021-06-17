@@ -284,11 +284,19 @@ class _SectionThreeState extends State<SectionThree> {
           SizedBox(
             height: 10,
           ),
-          Text(
-            'Participate in various software development phase such as:',
-            textAlign: TextAlign.start,
-            style: CommonStyle.size16W400hintTitle(context),
-          ),
+     Row(
+       children: [
+         Icon(Icons.label,color: Color(0xff434b65)),
+         SizedBox(width: 5,),
+         Expanded(
+           child: Text(
+             'Participate in various software development phase such as:',
+             textAlign: TextAlign.start,
+             style: CommonStyle.size20W400black(context),
+           ),
+         ),
+       ],
+     ),
           SizedBox(
             height: 10,
           ),

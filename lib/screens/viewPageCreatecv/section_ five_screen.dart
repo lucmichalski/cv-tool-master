@@ -23,9 +23,7 @@ class SectionFive extends StatelessWidget {
     pdf.addPage(
       pw.MultiPage(
         build: (pw.Context context) => [
-          pw.Container(
-            margin: pw.EdgeInsets.symmetric(horizontal:30),
-            child: pw.Column(
+          pw.Column(
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
                 pw.Text(
@@ -58,7 +56,7 @@ class SectionFive extends StatelessWidget {
                 _buildLanguagePdf()
               ],
             ),
-          )
+
         ],
       ),
     );
@@ -612,8 +610,8 @@ class SectionFive extends StatelessWidget {
           ),
           pw.Table(
             columnWidths: {
-              0: pw.FlexColumnWidth(1),
-              1: pw.FlexColumnWidth(4),
+              0: pw.FlexColumnWidth(2),
+              1: pw.FlexColumnWidth(5),
             },
             border: pw.TableBorder.all(color:PdfColor.fromInt(0xFF000000)),
             children: [
@@ -621,7 +619,7 @@ class SectionFive extends StatelessWidget {
               _buildTableRowPdf( 'Team size', highLightProject.teamSize),
               _buildTableRowPdf('Position', highLightProject.position),
                _buildTableRowPdf('Responsibility',_getDataResponsibility(highLightProject.responsibility)),
-               //_buildTableRowPdf('Technology used',highLightProject.technologies.join(', ').toString()),
+               _buildTableRowPdf('Technology used',highLightProject.technologies.join(',').toString()),
             ],
           ),
         ],
@@ -664,6 +662,7 @@ class SectionFive extends StatelessWidget {
       ),
     ]);
   }
+  //Build custom table
 
   // Build language project
   Widget _buildLanguage(BuildContext context) {

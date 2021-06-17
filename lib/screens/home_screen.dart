@@ -44,7 +44,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 classYear: '2019')
           ],
           languages: [
-            Language(languageNm: 'English', level: 'Level intermediate')
+            Language(languageNm: 'English', level: 'Level intermediate',positionLanguage: 0,positionLevel: 0)
           ],
           gender: 'Male',
           highLightProjectList: [

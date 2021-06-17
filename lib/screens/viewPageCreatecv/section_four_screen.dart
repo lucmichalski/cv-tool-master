@@ -58,6 +58,11 @@ class _SectionFourState extends State<SectionFour> {
             projectNm: '')
       ];
     }
+    if(widget.cvModel.languages != null && widget.cvModel.languages.isNotEmpty){
+
+    }else{
+      widget.cvModel.languages=[Language(level: '',languageNm: '',positionLevel: 0,positionLanguage: 0)];
+    }
     super.initState();
   }
 
@@ -225,7 +230,7 @@ class _SectionFourState extends State<SectionFour> {
               ),
               Text(
                 'Responsibility ',
-                style: CommonStyle.size16W400hintTitle(context),
+                style: CommonStyle.size20W400black(context),
               ),
             ],
           ),

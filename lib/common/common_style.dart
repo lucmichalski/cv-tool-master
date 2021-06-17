@@ -99,7 +99,7 @@ class CommonStyle {
     return GoogleFonts.roboto(
         fontSize: DoubleExt(16).textSize(context),
         fontWeight: FontWeight.w400,
-        color: Color(0xffcacaca));
+        color: Color(0xff333333));
   }
 
   static TextStyle inputStyle(BuildContext context) {
