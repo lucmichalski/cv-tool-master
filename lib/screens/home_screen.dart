@@ -180,6 +180,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         name: '',
                         email: '',
                         position: '',
+                        highLightProjectList: [HighLightProject(projectNm: '',responsibility: [],technologies: [],position: '',teamSize: '',projectDescription: '')],
                         technicalSummaryList: [],
                         status: false,
                         educationList: [],

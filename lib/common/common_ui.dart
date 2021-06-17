@@ -5,7 +5,6 @@ import 'package:flutter_cv_maker/common/common_style.dart';
 import 'package:flutter_cv_maker/constants/constants.dart';
 import 'package:flutter_cv_maker/extensions/size_extension.dart';
 import 'package:flutter_cv_maker/models/cv_model/cv_model.dart';
-
 class ButtonCommon extends StatefulWidget {
   final double borderRadius;
   final double height;
@@ -18,7 +17,6 @@ class ButtonCommon extends StatefulWidget {
   final Gradient gradient;
   final double width;
   final bool isCircle;
-
   ButtonCommon(
       {this.borderRadius,
       this.height,
@@ -329,7 +327,7 @@ class HorizontalLine extends StatelessWidget {
           Container(
               margin:
                   EdgeInsets.only(right: MediaQuery.of(context).size.width / 4),
-              child: Divider(color: Colors.black)),
+              child: Divider(color: Color(0xff434b65))),
         ],
       ),
     );

@@ -217,56 +217,21 @@ class _SectionOneScreenState extends State<SectionOneScreen> {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               ButtonCommon(
-                buttonText: 'Next Section',
-                onClick: () {
-                  //:TODO - Add function next section
-                  // CVModel model = CVModel(
-                  //   name: _fullNameController.text,
-                  //   email: _emailController.text,
-                  //   position: _positionController.text,
-                  //   gender: kGenders.indexOf(_genderSelected ?? 0),
-                  //   status: false,
-                  //   role: Role(roleNm: _listRoleNm[_roleNmSelected],
-                  //       technicals: [_roles[_roleNmSelected].level[_levelSelected]],
-                  //   level: [_roles[_roleNmSelected].technicals[_technicalSelected]]),
-                  //   technicalSummaryList: _listSummary
-                  // );
-                  // var requestBody = json.encoder.convert(model);
-                  // print('Request Body: $requestBody');
-                  if (_formKey.currentState.validate()) {
-                    bool emailValid = RegExp(
-                            r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-                        .hasMatch(_emailController.text);
-                    if (_genderSelected.isNotEmpty) {
-                      if (emailValid) {
-                        if (widget.pageController.hasClients) {
-                          widget.pageController.animateToPage(
-                            1,
-                            duration: const Duration(milliseconds: 700),
-                            curve: Curves.easeInOut,
-                          );
-                        }
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          content: Container(
-                              alignment: Alignment.center,
-                              height: 70,
-                              child: Text('Invalid email format')),
-                          backgroundColor: Colors.red,
-                        ));
-                      }
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content: Container(
-                            alignment: Alignment.center,
-                            height: 70,
-                            child: Text('Choice your gender')),
-                        backgroundColor: Colors.red,
-                      ));
+                  buttonText: 'NEXT',
+                  icon: Icon(
+                    Icons.arrow_right_alt_outlined,
+                    size: 16,
+                    color: Colors.white,
+                  ),
+                  onClick: () {
+                    if (widget.pageController.hasClients) {
+                      widget.pageController.animateToPage(
+                        1,
+                        duration: const Duration(milliseconds: 700),
+                        curve: Curves.easeInOut,
+                      );
                     }
-                  }
-                },
-              )
+                  }),
             ],
           )
         ],

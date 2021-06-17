@@ -30,7 +30,7 @@ class _AdminPageState extends State<AdminPage> {
   static const int HIGHLIGHT_PAGE_ID = 2;
 
   // page selected
-  int pageId = 0;
+  int _pageId = 0;
 
   @override
   void initState() {
@@ -55,7 +55,7 @@ class _AdminPageState extends State<AdminPage> {
                 width: maxW < 1000 ? w * 0.09 : w * 0.2,
                 child: _buildMenuNav(context, maxW < 1000),
               ),
-              Expanded(child: _handleSwitchPage(context, pageId))
+              Expanded(child: _handleSwitchPage(context, _pageId))
             ],
           );
         },
@@ -69,16 +69,38 @@ class _AdminPageState extends State<AdminPage> {
       case ROLE_PAGE_ID:
         return RolePage(
           masterData: _masterData,
+          onPress: () {
+            setState(() {
+              _pageId = SKILL_PAGE_ID;
+            });
+          },
         );
         break;
       case SKILL_PAGE_ID:
         return SkillPage(
+          onNext: () {
+            setState(() {
+              _pageId = HIGHLIGHT_PAGE_ID;
+            });
+          },
+          onPrevious: () {
+            {
+              setState(() {
+                _pageId = ROLE_PAGE_ID;
+              });
+            }
+          },
           masterData: _masterData,
         );
         break;
       case HIGHLIGHT_PAGE_ID:
         return HighlightPage(
           masterData: _masterData,
+          onPrevious: () {
+            setState(() {
+              _pageId = SKILL_PAGE_ID;
+            });
+          },
         );
         break;
 
@@ -96,15 +118,15 @@ class _AdminPageState extends State<AdminPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         InkWell(
-            onTap: () => setState(() => pageId = ROLE_PAGE_ID),
+            onTap: () => setState(() => _pageId = ROLE_PAGE_ID),
             child: _buildMenuItem(
                 context, ROLE_PAGE_ID, 'Role'.toUpperCase(), isNarrow)),
         InkWell(
-            onTap: () => setState(() => pageId = SKILL_PAGE_ID),
+            onTap: () => setState(() => _pageId = SKILL_PAGE_ID),
             child: _buildMenuItem(
                 context, SKILL_PAGE_ID, 'Skill'.toUpperCase(), isNarrow)),
         InkWell(
-            onTap: () => setState(() => pageId = HIGHLIGHT_PAGE_ID),
+            onTap: () => setState(() => _pageId = HIGHLIGHT_PAGE_ID),
             child: _buildMenuItem(context, HIGHLIGHT_PAGE_ID,
                 'Technical'.toUpperCase(), isNarrow)),
       ],
@@ -129,14 +151,14 @@ class _AdminPageState extends State<AdminPage> {
               visible: !isNarrow,
               child: LinkText(
                 text: '$title',
-                color: index == pageId
+                color: index == _pageId
                     ? Color(0xff045cfc)
-                    : index < pageId
+                    : index < _pageId
                         ? Color(0xffd3d9e1)
                         : Color(0xff565d75),
                 onTapLink: () {
                   setState(() {
-                    pageId = index;
+                    _pageId = index;
                   });
                 },
               ),
@@ -152,15 +174,15 @@ class _AdminPageState extends State<AdminPage> {
       width: MediaQuery.of(context).size.width * 0.03,
       height: MediaQuery.of(context).size.width * 0.03,
       decoration: BoxDecoration(
-        color: pageIndex == pageId
+        color: pageIndex == _pageId
             ? Colors.white
-            : pageIndex < pageId
+            : pageIndex < _pageId
                 ? Colors.greenAccent.shade400
                 : Colors.white,
         border: Border.all(
-            color: pageIndex == pageId
+            color: pageIndex == _pageId
                 ? Color(0xff045cfc)
-                : pageIndex < pageId
+                : pageIndex < _pageId
                     ? Colors.greenAccent.shade400
                     : Colors.grey.shade400,
             width: 2),
@@ -169,9 +191,9 @@ class _AdminPageState extends State<AdminPage> {
       alignment: Alignment.center,
       child: Text('${pageIndex + 1}',
           style: CommonStyle.main700Size18(context).copyWith(
-            color: pageIndex == pageId
+            color: pageIndex == _pageId
                 ? Color(0xff045cfc)
-                : pageIndex < pageId
+                : pageIndex < _pageId
                     ? Colors.white
                     : Colors.grey.shade400,
           )),

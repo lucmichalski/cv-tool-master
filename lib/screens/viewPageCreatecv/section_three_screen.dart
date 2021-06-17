@@ -49,7 +49,44 @@ class _SectionThreeState extends State<SectionThree> {
           child: Column(
             children: [
               HorizontalLine('Professional Experience'),
-              _buildProfessional(context)
+              _buildProfessional(context),
+              SizedBox(height: 10,),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  TextButton(
+                      onPressed: () {
+                        if (widget.pageController.hasClients) {
+                          widget.pageController.animateToPage(
+                            1,
+                            duration: const Duration(milliseconds: 700),
+                            curve: Curves.easeInOut,
+                          );
+                        }
+                      },
+                      child: Text(
+                        'PREVIOUS',
+                        style: CommonStyle.white700Size22(context)
+                            .copyWith(color: Colors.grey),
+                      )),
+                  ButtonCommon(
+                      buttonText: 'NEXT',
+                      icon: Icon(
+                        Icons.arrow_right_alt_outlined,
+                        size: 16,
+                        color: Colors.white,
+                      ),
+                      onClick: () {
+                        if (widget.pageController.hasClients) {
+                          widget.pageController.animateToPage(
+                            3,
+                            duration: const Duration(milliseconds: 700),
+                            curve: Curves.easeInOut,
+                          );
+                        }
+                      }),
+                ],
+              )
             ],
           ),
         ),
@@ -306,6 +343,7 @@ class _SectionThreeState extends State<SectionThree> {
                     context,
                     responsibility,
                     professional.responsibilities,
+                    '$index',
                     professional.responsibilities.indexOf(responsibility)))
                 .toList(),
           ),
@@ -325,7 +363,7 @@ class _SectionThreeState extends State<SectionThree> {
   }
 
   Widget _buildResponsibilityItem(BuildContext context, String value,
-      List<String> responsibilities, int index) {
+      List<String> responsibilities,String idProfessional, int index) {
     return Padding(
       padding: EdgeInsets.only(top: 8.0),
       child: Row(
@@ -333,7 +371,7 @@ class _SectionThreeState extends State<SectionThree> {
           Expanded(
             child: TextFieldCommon(
               controller: _generateControllerProfessional(
-                  'responsibilities-$index', value),
+                  '$idProfessional-responsibilities-$index', value),
               onChanged: (val) {
                 setState(() {
                   responsibilities[index] = val;

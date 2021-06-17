@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_cv_maker/common/common_style.dart';
 import 'package:flutter_cv_maker/common/common_ui.dart';
 import 'package:flutter_cv_maker/models/cv_model/admin_page_model.dart';
 
 class SkillPage extends StatefulWidget {
   final MasterData masterData;
-  SkillPage({this.masterData});
+  final Function onPrevious;
+  final Function onNext;
+
+  SkillPage({this.masterData, this.onPrevious, this.onNext});
 
   @override
   _SkillPageState createState() => _SkillPageState();
@@ -22,8 +26,7 @@ class _SkillPageState extends State<SkillPage> {
   @override
   Widget build(BuildContext context) {
     var w = MediaQuery.of(context).size.width;
-    return Scaffold(
-      body: Container(
+    return Container(
         margin: EdgeInsets.symmetric(horizontal: w * 0.1),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -41,21 +44,45 @@ class _SkillPageState extends State<SkillPage> {
                   widget.masterData.skills.add('');
                 });
               },
+            ),
+            SizedBox(
+              height: 50,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                TextButton(
+                    onPressed: () => widget.onPrevious(),
+                    child: Text(
+                      'PREVIOUS',
+                      style: CommonStyle.white700Size22(context)
+                          .copyWith(color: Colors.grey),
+                    )),
+                ButtonCommon(
+                    buttonText: 'NEXT',
+                    icon: Icon(
+                      Icons.arrow_right_alt_outlined,
+                      size: 16,
+                      color: Colors.white,
+                    ),
+                    onClick: () => widget.onNext()),
+              ],
             )
           ],
         ),
-      ),
-    );
+      );
+
   }
 
   Widget _buildSkill(BuildContext context) {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 10.0),
       child: Column(
-        children: widget.masterData.skills
-            .map((e) => _buildSkillItem(context, widget.masterData.skills, e,
-                widget.masterData.skills.indexOf(e)))
-            .toList(),
+        children: List.generate(widget.masterData.skills.length, (index) => _buildSkillItem(
+            context,
+            widget.masterData.skills,
+            widget.masterData.skills[index],
+            index))
       ),
     );
   }

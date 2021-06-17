@@ -89,6 +89,42 @@ class _SectionFourState extends State<SectionFour> {
                   height: 10,
                 ),
                 _buildHighLightProject(context),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    TextButton(
+                        onPressed: () {
+                          if (widget.pageController.hasClients) {
+                            widget.pageController.animateToPage(
+                              2,
+                              duration: const Duration(milliseconds: 700),
+                              curve: Curves.easeInOut,
+                            );
+                          }
+                        },
+                        child: Text(
+                          'PREVIOUS',
+                          style: CommonStyle.white700Size22(context)
+                              .copyWith(color: Colors.grey),
+                        )),
+                    ButtonCommon(
+                        buttonText: 'NEXT',
+                        icon: Icon(
+                          Icons.arrow_right_alt_outlined,
+                          size: 16,
+                          color: Colors.white,
+                        ),
+                        onClick: () {
+                          if (widget.pageController.hasClients) {
+                            widget.pageController.animateToPage(
+                              4,
+                              duration: const Duration(milliseconds: 700),
+                              curve: Curves.easeInOut,
+                            );
+                          }
+                        }),
+                  ],
+                )
               ],
             )),
       ),
@@ -113,6 +149,7 @@ class _SectionFourState extends State<SectionFour> {
             onPressed: () => setState(() {
               widget.cvModel.highLightProjectList.add(HighLightProject(
                   technologies: [],
+                  projectNm: '',
                   teamSize: '',
                   responsibility: [],
                   projectDescription: '',
@@ -230,7 +267,7 @@ class _SectionFourState extends State<SectionFour> {
               ),
               Text(
                 'Responsibility ',
-                style: CommonStyle.size20W400black(context),
+                style: CommonStyle.size16W400hintTitle(context),
               ),
             ],
           ),
@@ -245,6 +282,7 @@ class _SectionFourState extends State<SectionFour> {
                         context,
                         responsibility,
                         project.responsibility,
+                        '$index',
                         project.responsibility.indexOf(responsibility)))
                     .toList(),
               ),
@@ -318,7 +356,7 @@ class _SectionFourState extends State<SectionFour> {
   }
 
   Widget _buildResponsibility(BuildContext context, String value,
-      List<String> responsibilities, int index) {
+      List<String> responsibilities,String idResponsibility, int index) {
     return Container(
       padding: EdgeInsets.only(bottom: 10),
       child: Row(
@@ -326,7 +364,7 @@ class _SectionFourState extends State<SectionFour> {
           Expanded(
             flex: 8,
             child: TextFieldCommon(
-              controller: _generateController('responsibility-$index', value),
+              controller: _generateController('responsibility-$index-$idResponsibility', value),
               onChanged: (val) {
                 setState(() {
                   responsibilities[index] = val;

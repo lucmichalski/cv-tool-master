@@ -79,14 +79,22 @@ class _SecondScreenState extends State<SecondScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   TextButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        if (widget.pageController.hasClients) {
+                          widget.pageController.animateToPage(
+                            0,
+                            duration: const Duration(milliseconds: 700),
+                            curve: Curves.easeInOut,
+                          );
+                        }
+                      },
                       child: Text(
-                        'Previous Section',
+                        'PREVIOUS',
                         style: CommonStyle.white700Size22(context)
                             .copyWith(color: Colors.grey),
                       )),
                   ButtonCommon(
-                      buttonText: 'Next',
+                      buttonText: 'NEXT',
                       icon: Icon(
                         Icons.arrow_right_alt_outlined,
                         size: 16,
@@ -100,7 +108,7 @@ class _SecondScreenState extends State<SecondScreen> {
                             curve: Curves.easeInOut,
                           );
                         }
-                      })
+                      }),
                 ],
               )
             ],
@@ -158,7 +166,6 @@ class _SecondScreenState extends State<SecondScreen> {
 
   Widget _buildEducation(BuildContext context) {
     var w = MediaQuery.of(context).size.width;
-    if (widget.cvModel.educationList == null) return Container();
     return Padding(
       padding: EdgeInsets.only(left: w * 0.15),
       child: Column(
@@ -175,7 +182,7 @@ class _SecondScreenState extends State<SecondScreen> {
             isButtonText: true,
             textButton: 'ADD EDUCATION',
             onPressed: () => setState(() {
-              widget.cvModel.educationList.add(Education());
+              widget.cvModel.educationList.add(Education(classYear: '',schoolNm: '',majorNm: ''));
             }),
           )
         ],

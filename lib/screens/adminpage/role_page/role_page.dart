@@ -5,8 +5,9 @@ import 'package:flutter_cv_maker/models/cv_model/admin_page_model.dart';
 
 class RolePage extends StatefulWidget {
   final MasterData masterData;
+  final Function onPress;
 
-  const RolePage({this.masterData});
+  RolePage({this.masterData, this.onPress});
 
   @override
   _RolePageState createState() => _RolePageState();
@@ -15,6 +16,14 @@ class RolePage extends StatefulWidget {
 class _RolePageState extends State<RolePage> {
   // Map controllerEditText id
   Map<String, TextEditingController> _technicalController = {};
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    if (widget.masterData.roles.isEmpty)
+      widget.masterData.roles.add(RoleData(levelDataList: [], roleNm: ''));
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +53,17 @@ class _RolePageState extends State<RolePage> {
               },
               isButtonText: true,
               textButton: 'ADD ROLE',
-            )
+            ),
+            ButtonCommon(
+                buttonText: 'NEXT',
+                icon: Icon(
+                  Icons.arrow_right_alt_outlined,
+                  size: 16,
+                  color: Colors.white,
+                ),
+                onClick: () {
+                  widget.onPress();
+                }),
           ],
         ),
       ),

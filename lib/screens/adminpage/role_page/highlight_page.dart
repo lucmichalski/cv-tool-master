@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_cv_maker/common/common_style.dart';
 import 'package:flutter_cv_maker/common/common_ui.dart';
 import 'package:flutter_cv_maker/models/cv_model/admin_page_model.dart';
 
 class HighlightPage extends StatefulWidget {
   final MasterData masterData;
-  const HighlightPage({this.masterData});
+  final Function onPrevious;
+
+  const HighlightPage({this.masterData, this.onPrevious});
 
   @override
   _HighlightPageState createState() => _HighlightPageState();
@@ -23,27 +26,41 @@ class _HighlightPageState extends State<HighlightPage> {
   @override
   Widget build(BuildContext context) {
     var w = MediaQuery.of(context).size.width;
-    return Scaffold(
-      body: Container(
-        margin: EdgeInsets.symmetric(horizontal: w * 0.1),
-        child: Column(
-          children: [
-            Padding(
-              padding: EdgeInsets.only(top: 30, bottom: 15),
-              child: HorizontalLine('Technical'),
-            ),
-            _buildTechnicalList(context),
-            AddButton(
-              isButtonText: true,
-              textButton: 'ADD TECHNICAL USED',
-              onPressed: () {
-                setState(() {
-                  widget.masterData.technology.add('');
-                });
-              },
-            )
-          ],
-        ),
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: w * 0.1),
+      child: Column(
+        children: [
+          Padding(
+            padding: EdgeInsets.only(top: 30, bottom: 15),
+            child: HorizontalLine('Technical'),
+          ),
+          _buildTechnicalList(context),
+          AddButton(
+            isButtonText: true,
+            textButton: 'ADD TECHNICAL USED',
+            onPressed: () {
+              setState(() {
+                widget.masterData.technology.add('');
+              });
+            },
+          ),
+          SizedBox(
+            height: 50.0,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              TextButton(
+                  onPressed: () => widget.onPrevious(),
+                  child: Text(
+                    'PREVIOUS',
+                    style: CommonStyle.white700Size22(context)
+                        .copyWith(color: Colors.grey),
+                  )),
+              ButtonCommon(buttonText: 'SAVE', onClick: () {}),
+            ],
+          )
+        ],
       ),
     );
   }
@@ -55,14 +72,13 @@ class _HighlightPageState extends State<HighlightPage> {
         vertical: 10.0,
       ),
       child: Column(
-        children: widget.masterData.technology
-            .map((e) => _buildTechnicalItem(
-                context,
-                widget.masterData.technology,
-                e,
-                widget.masterData.technology.indexOf(e)))
-            .toList(),
-      ),
+          children: List.generate(
+              widget.masterData.technology.length,
+              (index) => _buildTechnicalItem(
+                  context,
+                  widget.masterData.technology,
+                  widget.masterData.technology[index],
+                  index))),
     );
   }
 
@@ -75,9 +91,9 @@ class _HighlightPageState extends State<HighlightPage> {
           Expanded(
             child: TextFieldCommon(
               controller: _generateController('highlight-$index', value),
-              onChanged: (value) {
+              onChanged: (values) {
                 setState(() {
-                  widget.masterData.technology[index] = value;
+                  widget.masterData.technology[index] = values;
                 });
               },
             ),
@@ -100,10 +116,12 @@ class _HighlightPageState extends State<HighlightPage> {
     if (controller == null) {
       controller = TextEditingController();
     }
+    // // Set text
     controller.text = value;
-    _highlightController[key] = controller;
+    // Set cursor
     controller.selection =
         TextSelection.collapsed(offset: controller.text.length);
+    _highlightController[key] = controller;
     return controller;
   }
 }
