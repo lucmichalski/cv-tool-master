@@ -179,7 +179,7 @@ class _RolePageState extends State<RolePage> {
             children: [
               Icon(
                 Icons.military_tech_rounded,
-                color: Color(0xff045cfc),
+                color: Color(0xff434b65),
               ),
               Text(
                 'Technicals',
