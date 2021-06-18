@@ -17,8 +17,8 @@ class RouteGenerator {
       route: uriData.path,
     );
     switch (routingData.route) {
-      case routeAuth:
-      // case '/':
+      case routeLogin:
+       case '/':
         return MaterialPageRoute(
             builder: (_) => LoginScreen(), settings: settings);
         break;

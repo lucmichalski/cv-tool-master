@@ -3,6 +3,7 @@ import 'package:flutter_cv_maker/common/common_style.dart';
 import 'package:flutter_cv_maker/common/common_ui.dart';
 import 'package:flutter_cv_maker/models/cv_model/cv_model.dart';
 import 'package:flutter_cv_maker/routes/routes.dart';
+import 'package:flutter_cv_maker/utils/shared_preferences_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key key}) : super(key: key);
@@ -120,7 +121,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   SizedBox(
                     width: 20,
                   ),
-                  LinkText(text: 'Logout', color: Colors.red, onTapLink: () {})
+                  LinkText(text: 'Logout', color: Colors.red, onTapLink: () async {
+                    final pref = await SharedPreferencesService.instance;
+                    pref.removeAccessToken();
+                    navKey.currentState.pushNamedAndRemoveUntil(routeLogin, (route) => false);
+                  })
                 ],
               ),
             ),

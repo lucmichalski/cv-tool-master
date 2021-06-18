@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_cv_maker/blocs/authen_bloc/bloc/master_bloc/master_bloc.dart';
+import 'package:flutter_cv_maker/common/alert_dialog_custom.dart';
 import 'package:flutter_cv_maker/common/common_style.dart';
 import 'package:flutter_cv_maker/common/common_ui.dart';
+import 'package:flutter_cv_maker/common/progress_bar_dialog.dart';
 import 'package:flutter_cv_maker/models/cv_model/admin_page_model.dart';
 import 'package:flutter_cv_maker/screens/adminpage/role_page/highlight_page.dart';
 import 'package:flutter_cv_maker/screens/adminpage/role_page/role_page.dart';
@@ -14,10 +18,8 @@ class AdminPage extends StatefulWidget {
 class _AdminPageState extends State<AdminPage> {
   bool showLevelView = false;
   bool showTechnicalView = false;
-  MasterData _masterData = MasterData(skills: [], technology: [], roles: [
-    RoleData(
-        roleNm: '',
-        levelDataList: [LevelData(levelName: '', technicalDataList: [])])
+  MasterData _masterData = MasterData(skills: [], technicalUsed: [], summary: [
+    Summary(role: '', levels: [Levels(levelName: '', technicals: [])])
   ]);
 
   // Role page ID
@@ -41,6 +43,24 @@ class _AdminPageState extends State<AdminPage> {
   @override
   Widget build(BuildContext context) {
     var w = MediaQuery.of(context).size.width;
+    return BlocConsumer<MasterBloc,MasterState>(
+        builder: (context, state) => _buildMasterData(context, w),
+        listener: (context, state) {
+          if(state is MasterLoading){
+           showProgressBar(context, true);
+          }else if(state is MasterSuccess){
+            showProgressBar(context, false);
+            print('success');
+          }else if(state is MasterError){
+            showProgressBar(context, false);
+            showAlertDialog(
+                context, 'Error', state.message, () => Navigator.pop(context));
+            print('have errors');
+          }
+        });
+  }
+
+  Widget _buildMasterData(BuildContext context, var w) {
     return Scaffold(
       backgroundColor: Color(0xfff6f8fa),
       body: LayoutBuilder(

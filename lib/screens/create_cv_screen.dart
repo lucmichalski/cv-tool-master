@@ -3,11 +3,11 @@ import 'package:flutter_cv_maker/common/TabModels.dart';
 import 'package:flutter_cv_maker/common/common_style.dart';
 import 'package:flutter_cv_maker/constants/constants.dart';
 import 'package:flutter_cv_maker/models/cv_model/cv_model.dart';
-import 'package:flutter_cv_maker/screens/viewPageCreatecv/section_%20five_screen.dart';
-import 'package:flutter_cv_maker/screens/viewPageCreatecv/section_four_screen.dart';
-import 'package:flutter_cv_maker/screens/viewPageCreatecv/section_one_screen.dart';
-import 'package:flutter_cv_maker/screens/viewPageCreatecv/section_second_screen.dart';
-import 'package:flutter_cv_maker/screens/viewPageCreatecv/section_three_screen.dart';
+import 'package:flutter_cv_maker/screens/viewPageCreateCv/section_%20five_screen.dart';
+import 'package:flutter_cv_maker/screens/viewPageCreateCv/section_four_screen.dart';
+import 'package:flutter_cv_maker/screens/viewPageCreateCv/section_one_screen.dart';
+import 'package:flutter_cv_maker/screens/viewPageCreateCv/section_second_screen.dart';
+import 'package:flutter_cv_maker/screens/viewPageCreateCv/section_three_screen.dart';
 
 import '../common/common_style.dart';
 
@@ -43,7 +43,6 @@ class _CreateCVState extends State<CreateCV> {
   }
 
   _onPageViewChange(int index) {
-    print("Current Page: " + index.toString());
     setState(() {
       _pageIndex = index;
       _tab.forEach((element) {

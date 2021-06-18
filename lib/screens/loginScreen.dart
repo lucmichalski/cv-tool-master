@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_cv_maker/blocs/authen_bloc/bloc/authen_bloc.dart';
+import 'package:flutter_cv_maker/common/alert_dialog_custom.dart';
 import 'package:flutter_cv_maker/common/common_style.dart';
+import 'package:flutter_cv_maker/common/common_ui.dart';
+import 'package:flutter_cv_maker/common/progress_bar_dialog.dart';
 import 'package:flutter_cv_maker/routes/routes.dart';
+import 'package:universal_html/html.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key key}) : super(key: key);
@@ -14,8 +20,32 @@ class _LoginScreenState extends State<LoginScreen> {
   TextEditingController passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
+  // login request
+  Future<void> _requestLogin() async {
+    BlocProvider.of<AuthBloc>(context)
+        .add(RequestAuthenEvent(emailController.text, passwordController.text));
+  }
+
   @override
   Widget build(BuildContext context) {
+    return BlocConsumer<AuthBloc,AuthenState>(
+        builder: (context, state) => _buildUI(context),
+        listener: (context, state) {
+          if (state is AuthLoading) {
+            showProgressBar(context, true);
+          } else if (state is AuthenSuccess) {
+            showProgressBar(context, false);
+            navKey.currentState.pushNamedAndRemoveUntil(routeHome, (route) => false);
+            print('Success');
+          } else if (state is AuthenError) {
+            showProgressBar(context, false);
+            showAlertDialog(
+                context, 'Error', state.message, () => Navigator.pop(context));
+          }
+        });
+  }
+
+  Widget _buildUI(BuildContext context) {
     return Scaffold(
       body: Container(
         color: Colors.white,
@@ -66,20 +96,27 @@ class _LoginScreenState extends State<LoginScreen> {
                       key: _formKey,
                       child: Column(
                         children: [
-                          _InputFormLogin('Email:', emailController,
-                              'Please enter your email'),
+                          TextFieldCommon(
+                            maxLines: 1,
+                            controller: emailController,
+                            label: 'Email',
+                          ),
                           SizedBox(
                             height: 20,
                           ),
-                          _InputFormLogin('Password:', passwordController,
-                              'Please enter your password'),
+                          TextFieldCommon(
+                            isObscure: true,
+                            maxLines: 1,
+                            controller: passwordController,
+                            label: 'Password',
+                          ),
                           SizedBox(
                             height: 20.0,
                           ),
                           TextButton(
                               onPressed: () async {
                                 if (_formKey.currentState.validate()) {
-                                  navKey.currentState.pushNamed(routeHome);
+                                  _requestLogin();
                                 }
                               },
                               child: Container(
@@ -129,45 +166,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 )),
           ],
         )),
-      ),
-    );
-  }
-}
-
-class _InputFormLogin extends StatelessWidget {
-  final String title;
-  final TextEditingController controller;
-  final String errorText;
-
-  const _InputFormLogin(this.title, this.controller, this.errorText);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: TextStyle(fontSize: 17.0, color: Colors.black),
-          ),
-          TextFormField(
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return errorText;
-              }
-              return null;
-            },
-            decoration: new InputDecoration(
-              border: new OutlineInputBorder(
-                borderRadius: const BorderRadius.all(
-                  const Radius.circular(10.0),
-                ),
-              ),
-            ),
-            controller: controller,
-          )
-        ],
       ),
     );
   }

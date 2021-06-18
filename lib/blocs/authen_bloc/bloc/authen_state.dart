@@ -7,10 +7,10 @@ abstract class AuthenState extends Equatable {
   List<Object> get props => [];
 }
 
-class AuthenInitial extends AuthenState {}
+class AuthInitial extends AuthenState {}
 
 // Loading state
-class AuthenLoading extends AuthenState {}
+class AuthLoading extends AuthenState {}
 
 // Success state
 class AuthenSuccess extends AuthenState {

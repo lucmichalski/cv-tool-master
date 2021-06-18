@@ -20,8 +20,8 @@ class _RolePageState extends State<RolePage> {
   @override
   void initState() {
     // TODO: implement initState
-    if (widget.masterData.roles.isEmpty)
-      widget.masterData.roles.add(RoleData(levelDataList: [], roleNm: ''));
+    if (widget.masterData.summary.isEmpty)
+      widget.masterData.summary.add(Summary(levels: [], role: ''));
     super.initState();
   }
 
@@ -47,8 +47,8 @@ class _RolePageState extends State<RolePage> {
             AddButton(
               onPressed: () {
                 setState(() {
-                  widget.masterData.roles
-                      .add(RoleData(levelDataList: [], roleNm: ''));
+                  widget.masterData.summary
+                      .add(Summary(levels: [], role: ''));
                 });
               },
               isButtonText: true,
@@ -76,9 +76,9 @@ class _RolePageState extends State<RolePage> {
       child: Column(
         children: [
           Column(
-            children: widget.masterData.roles
+            children: widget.masterData.summary
                 .map((role) => _buildRoleItem(
-                    context, role, widget.masterData.roles.indexOf(role)))
+                    context, role, widget.masterData.summary.indexOf(role)))
                 .toList(),
           ),
         ],
@@ -87,7 +87,7 @@ class _RolePageState extends State<RolePage> {
   }
 
   // Create role item
-  Widget _buildRoleItem(BuildContext context, RoleData roleData, int index) {
+  Widget _buildRoleItem(BuildContext context, Summary summary, int index) {
     return Container(
         margin: EdgeInsets.only(top: 4.0),
         padding: EdgeInsets.only(left: 16.0, right: 16, bottom: 16),
@@ -103,7 +103,7 @@ class _RolePageState extends State<RolePage> {
                   onPressed: () {
                     setState(() {
                       // Remove item
-                      widget.masterData.roles.removeAt(index);
+                      widget.masterData.summary.removeAt(index);
                     });
                   },
                   icon: Icon(
@@ -114,23 +114,23 @@ class _RolePageState extends State<RolePage> {
               ],
             ),
             TextFieldCommon(
-              controller: _generateController('role-$index', roleData.roleNm),
+              controller: _generateController('role-$index', summary.role),
               label: 'Role',
               hint: 'Role',
               onChanged: (value) {
                 setState(() {
-                  roleData.roleNm = value;
+                  summary.role = value;
                 });
               },
             ),
-            _buildLevel(context, roleData.levelDataList, 'role-$index'),
+            _buildLevel(context, summary.levels, 'role-$index'),
             AddButton(
               isButtonText: true,
               textButton: 'ADD LEVEL',
               onPressed: () {
                 setState(() {
-                  roleData.levelDataList
-                      .add(LevelData(levelName: '', technicalDataList: []));
+                  summary.levels
+                      .add(Levels(levelName: '', technicals: []));
                 });
               },
             ),
@@ -139,7 +139,7 @@ class _RolePageState extends State<RolePage> {
   }
 
   Widget _buildLevel(
-      BuildContext context, List<LevelData> levelDataList, String roleId) {
+      BuildContext context, List<Levels> levelDataList, String roleId) {
     return Container(
       margin: EdgeInsets.only(top: 8),
       child: Column(
@@ -155,8 +155,8 @@ class _RolePageState extends State<RolePage> {
     );
   }
 
-  Widget _buildLevelItem(BuildContext context, List<LevelData> levelDataList,
-      LevelData levelData, int index, String roleId) {
+  Widget _buildLevelItem(BuildContext context, List<Levels> levelDataList,
+      Levels levelData, int index, String roleId) {
     return Container(
       padding: EdgeInsets.only(left: 10.0, right: 10, bottom: 10),
       decoration: BoxDecoration(
@@ -211,14 +211,14 @@ class _RolePageState extends State<RolePage> {
             height: 10,
           ),
           _buildTechnical(
-              context, levelData.technicalDataList, 'level-$index-$roleId')
+              context, levelData.technicals, 'level-$index-$roleId')
         ],
       ),
     );
   }
 
   Widget _buildTechnical(
-      BuildContext context, List<String> technicalList, String levelId) {
+      BuildContext context, List<Technicals> technicalList, String levelId) {
     return Column(
       children: [
         Column(
@@ -232,7 +232,7 @@ class _RolePageState extends State<RolePage> {
           textButton: 'ADD TECHNICAL',
           onPressed: () {
             setState(() {
-              technicalList.add('');
+              technicalList.add(Technicals(summaryList: [],technicalName: ''));
             });
           },
         )
@@ -240,8 +240,8 @@ class _RolePageState extends State<RolePage> {
     );
   }
 
-  Widget _buildTechnicalItem(BuildContext context, List<String> technicalList,
-      String value, int index, String levelId) {
+  Widget _buildTechnicalItem(BuildContext context, List<Technicals> technicalList,
+      Technicals technicals, int index, String levelId) {
     return Container(
       margin: EdgeInsets.only(bottom: 10.0),
       child: Row(
@@ -250,10 +250,10 @@ class _RolePageState extends State<RolePage> {
             child: TextFieldCommon(
               label: 'Technical',
               controller:
-                  _generateController('technical-$index-$levelId', value),
+                  _generateController('technical-$index-$levelId', technicals.technicalName),
               onChanged: (val) {
                 setState(() {
-                  technicalList[index] = val;
+                  technicalList[index].technicalName = val;
                 });
               },
             ),

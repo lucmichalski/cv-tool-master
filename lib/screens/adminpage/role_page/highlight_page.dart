@@ -1,7 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_cv_maker/blocs/authen_bloc/bloc/master_bloc/master_bloc.dart';
 import 'package:flutter_cv_maker/common/common_style.dart';
 import 'package:flutter_cv_maker/common/common_ui.dart';
 import 'package:flutter_cv_maker/models/cv_model/admin_page_model.dart';
+import 'package:flutter_cv_maker/utils/shared_preferences_service.dart';
 
 class HighlightPage extends StatefulWidget {
   final MasterData masterData;
@@ -18,8 +23,8 @@ class _HighlightPageState extends State<HighlightPage> {
 
   @override
   void initState() {
-    if (widget.masterData.technology.isEmpty)
-      widget.masterData.technology.add('');
+    if (widget.masterData.technicalUsed.isEmpty)
+      widget.masterData.technicalUsed.add('');
     super.initState();
   }
 
@@ -40,7 +45,7 @@ class _HighlightPageState extends State<HighlightPage> {
             textButton: 'ADD TECHNICAL USED',
             onPressed: () {
               setState(() {
-                widget.masterData.technology.add('');
+                widget.masterData.technicalUsed.add('');
               });
             },
           ),
@@ -57,7 +62,12 @@ class _HighlightPageState extends State<HighlightPage> {
                     style: CommonStyle.white700Size22(context)
                         .copyWith(color: Colors.grey),
                   )),
-              ButtonCommon(buttonText: 'SAVE', onClick: () {}),
+              ButtonCommon(buttonText: 'SAVE', onClick: () async {
+                final String requestBody = json.encoder.convert(widget.masterData);
+                final pref = await SharedPreferencesService.instance;
+                BlocProvider.of<MasterBloc>(context).add(RequestAddMasterEvent(pref.getAccessToken,requestBody));
+                print(requestBody);
+              }),
             ],
           )
         ],
@@ -73,11 +83,11 @@ class _HighlightPageState extends State<HighlightPage> {
       ),
       child: Column(
           children: List.generate(
-              widget.masterData.technology.length,
+              widget.masterData.technicalUsed.length,
               (index) => _buildTechnicalItem(
                   context,
-                  widget.masterData.technology,
-                  widget.masterData.technology[index],
+                  widget.masterData.technicalUsed,
+                  widget.masterData.technicalUsed[index],
                   index))),
     );
   }
@@ -93,7 +103,7 @@ class _HighlightPageState extends State<HighlightPage> {
               controller: _generateController('highlight-$index', value),
               onChanged: (values) {
                 setState(() {
-                  widget.masterData.technology[index] = values;
+                  widget.masterData.technicalUsed[index] = values;
                 });
               },
             ),

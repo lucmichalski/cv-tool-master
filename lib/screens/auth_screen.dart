@@ -14,10 +14,10 @@ class AuthenScreen extends StatefulWidget {
 class _AuthenScreenState extends State<AuthenScreen> {
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<AuthenBloc, AuthenState>(
+    return BlocConsumer<AuthBloc, AuthenState>(
         builder: (ctx, state) => _buildUI(context),
         listener: (ctx, state) {
-          if (state is AuthenLoading) {
+          if (state is AuthLoading) {
             showProgressBar(context, true);
           } else if (state is AuthenSuccess) {
             showProgressBar(context, false);
