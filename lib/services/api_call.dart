@@ -9,7 +9,7 @@ class Repository {
   getHeader(String accessToken) {
     return <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
-      'Authorization': 'Bearer '+ accessToken
+      'Authorization': accessToken
     };
   }
 
@@ -31,10 +31,12 @@ class Repository {
   }
 
   // Request add master data
-  Future<MasterData> addMasterData(String accessToken , String requestBody) async {
-    final response = await http.post(Uri.tryParse(BaseUrl + RequestAddMasterUrl),
+  Future<MasterData> addMasterData(
+      String accessToken, String requestBody) async {
+    final response = await http.post(
+        Uri.tryParse(BaseUrl + RequestAddMasterUrl),
         headers: getHeader(accessToken),
-        body: jsonEncode(requestBody));
+        body: requestBody);
     if (response.statusCode == 200) {
       return MasterData.fromJson(json.decode(response.body));
     } else {
@@ -42,5 +44,4 @@ class Repository {
       throw Exception('$message');
     }
   }
-
 }

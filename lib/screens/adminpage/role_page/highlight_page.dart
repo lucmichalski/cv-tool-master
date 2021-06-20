@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_cv_maker/blocs/authen_bloc/bloc/master_bloc/master_bloc.dart';
 import 'package:flutter_cv_maker/common/common_style.dart';
 import 'package:flutter_cv_maker/common/common_ui.dart';
+import 'package:flutter_cv_maker/constants/constants.dart';
 import 'package:flutter_cv_maker/models/cv_model/admin_page_model.dart';
 import 'package:flutter_cv_maker/utils/shared_preferences_service.dart';
 
@@ -39,6 +40,27 @@ class _HighlightPageState extends State<HighlightPage> {
             padding: EdgeInsets.only(top: 30, bottom: 15),
             child: HorizontalLine('Technical'),
           ),
+          Container(
+            margin: EdgeInsets.symmetric(vertical: 16),
+            padding: EdgeInsets.all(16),
+            decoration: BoxDecoration(
+                color: Color(0xFFedf4ff),
+                border: Border.all(color: Color(0xffccdfff), width: 1)),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.text_snippet_outlined,
+                  color: kmainColor,
+                ),
+                SizedBox(
+                  width: 8,
+                ),
+                Text('Example: NodeJS, Java, C#,...',
+                    style: CommonStyle.size16W400hintTitle(context)
+                        .copyWith(color: Color(0xff5869a2)))
+              ],
+            ),
+          ),
           _buildTechnicalList(context),
           AddButton(
             isButtonText: true,
@@ -62,12 +84,17 @@ class _HighlightPageState extends State<HighlightPage> {
                     style: CommonStyle.white700Size22(context)
                         .copyWith(color: Colors.grey),
                   )),
-              ButtonCommon(buttonText: 'SAVE', onClick: () async {
-                final String requestBody = json.encoder.convert(widget.masterData);
-                final pref = await SharedPreferencesService.instance;
-                BlocProvider.of<MasterBloc>(context).add(RequestAddMasterEvent(pref.getAccessToken,requestBody));
-                print(requestBody);
-              }),
+              ButtonCommon(
+                  buttonText: 'SAVE',
+                  onClick: () async {
+                    final String requestBody =
+                        json.encoder.convert(widget.masterData);
+                    final pref = await SharedPreferencesService.instance;
+                    BlocProvider.of<MasterBloc>(context).add(
+                        RequestAddMasterEvent(
+                            pref.getAccessToken, requestBody));
+                    print(requestBody);
+                  }),
             ],
           )
         ],

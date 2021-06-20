@@ -47,23 +47,30 @@ class _RolePageState extends State<RolePage> {
             AddButton(
               onPressed: () {
                 setState(() {
-                  widget.masterData.summary
-                      .add(Summary(levels: [], role: ''));
+                  widget.masterData.summary.add(Summary(levels: [], role: ''));
                 });
               },
               isButtonText: true,
               textButton: 'ADD ROLE',
             ),
-            ButtonCommon(
-                buttonText: 'NEXT',
-                icon: Icon(
-                  Icons.arrow_right_alt_outlined,
-                  size: 16,
-                  color: Colors.white,
-                ),
-                onClick: () {
-                  widget.onPress();
-                }),
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: w * 0.03),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  ButtonCommon(
+                      buttonText: 'NEXT',
+                      icon: Icon(
+                        Icons.arrow_right_alt_outlined,
+                        size: 16,
+                        color: Colors.white,
+                      ),
+                      onClick: () {
+                        widget.onPress();
+                      }),
+                ],
+              ),
+            ),
           ],
         ),
       ),
@@ -129,8 +136,7 @@ class _RolePageState extends State<RolePage> {
               textButton: 'ADD LEVEL',
               onPressed: () {
                 setState(() {
-                  summary.levels
-                      .add(Levels(levelName: '', technicals: []));
+                  summary.levels.add(Levels(levelName: '', technicals: []));
                 });
               },
             ),
@@ -194,31 +200,15 @@ class _RolePageState extends State<RolePage> {
           SizedBox(
             height: 16,
           ),
-          Row(
-            children: [
-              Icon(
-                Icons.military_tech_rounded,
-                color: Color(0xff434b65),
-              ),
-              Text(
-                'Technicals',
-                style: CommonStyle.size16W400hintTitle(context)
-                    .copyWith(fontSize: 16),
-              )
-            ],
-          ),
-          SizedBox(
-            height: 10,
-          ),
           _buildTechnical(
-              context, levelData.technicals, 'level-$index-$roleId')
+              context, levelData.technicals, 'level-$index-$roleId', index)
         ],
       ),
     );
   }
 
-  Widget _buildTechnical(
-      BuildContext context, List<Technicals> technicalList, String levelId) {
+  Widget _buildTechnical(BuildContext context, List<Technicals> technicalList,
+      String levelId, int index) {
     return Column(
       children: [
         Column(
@@ -232,7 +222,7 @@ class _RolePageState extends State<RolePage> {
           textButton: 'ADD TECHNICAL',
           onPressed: () {
             setState(() {
-              technicalList.add(Technicals(summaryList: [],technicalName: ''));
+              technicalList.add(Technicals(summaryList: [], technicalName: ''));
             });
           },
         )
@@ -240,31 +230,140 @@ class _RolePageState extends State<RolePage> {
     );
   }
 
-  Widget _buildTechnicalItem(BuildContext context, List<Technicals> technicalList,
-      Technicals technicals, int index, String levelId) {
+  Widget _buildTechnicalItem(
+      BuildContext context,
+      List<Technicals> technicalList,
+      Technicals technicals,
+      int index,
+      String levelId) {
     return Container(
       margin: EdgeInsets.only(bottom: 10.0),
-      child: Row(
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(color: Colors.blueGrey.shade100),
+      child: Column(
         children: [
-          Expanded(
-            child: TextFieldCommon(
-              label: 'Technical',
-              controller:
-                  _generateController('technical-$index-$levelId', technicals.technicalName),
-              onChanged: (val) {
-                setState(() {
-                  technicalList[index].technicalName = val;
-                });
-              },
-            ),
+          Row(
+            children: [
+              Row(
+                children: [
+                  Icon(
+                    Icons.military_tech_rounded,
+                    color: Color(0xff434b65),
+                  ),
+                  Text(
+                    'Technicals',
+                    style: CommonStyle.size16W400hintTitle(context)
+                        .copyWith(fontSize: 16),
+                  )
+                ],
+              ),
+              Spacer(),
+              IconButton(
+                  hoverColor: Colors.transparent,
+                  onPressed: () {
+                    setState(() {
+                      technicalList.removeAt(index);
+                    });
+                  },
+                  icon: Icon(
+                    Icons.highlight_remove,
+                    color: Colors.red,
+                  ))
+            ],
           ),
-          IconButton(
-              onPressed: () {
-                setState(() {
-                  technicalList.removeAt(index);
-                });
-              },
-              icon: Icon(Icons.close))
+          Row(
+            children: [
+              Expanded(
+                child: TextFieldCommon(
+                  label: 'Technical',
+                  controller: _generateController(
+                      'technical-$index-$levelId', technicals.technicalName),
+                  onChanged: (val) {
+                    setState(() {
+                      technicalList[index].technicalName = val;
+                    });
+                  },
+                ),
+              ),
+            ],
+          ),
+          _buildListSummary(
+            context,
+            technicals.summaryList,
+            'technical-$index-$levelId',
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget _buildListSummary(
+      BuildContext context, List<String> summaryList, String technicalId) {
+    return Column(
+      children: [
+        Padding(
+          padding: EdgeInsets.only(top: 8.0),
+          child: Row(
+            children: [
+              Icon(
+                Icons.post_add_rounded,
+                color: Color(0xff434b65),
+              ),
+              Text(
+                'Summary',
+                style: CommonStyle.size16W400hintTitle(context)
+                    .copyWith(fontSize: 16),
+              )
+            ],
+          ),
+        ),
+        Column(
+            children: List.generate(
+                summaryList.length,
+                (index) => _buildSummaryItem(context, technicalId,
+                    summaryList[index], index, summaryList))),
+        AddButton(
+          isButtonText: true,
+          textButton: 'ADD SUMMARY',
+          onPressed: () {
+            setState(() {
+              summaryList.add('');
+            });
+          },
+        )
+      ],
+    );
+  }
+
+  Widget _buildSummaryItem(BuildContext context, String summaryId, String value,
+      int index, List<String> summaryList) {
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 5.0),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: TextFieldCommon(
+                  label: 'Summary item',
+                  controller:
+                      _generateController('summary-$index-$summaryId', value),
+                  onChanged: (val) {
+                    setState(() {
+                      summaryList[index] = val;
+                    });
+                  },
+                ),
+              ),
+              IconButton(
+                  onPressed: () {
+                    setState(() {
+                      summaryList.removeAt(index);
+                    });
+                  },
+                  icon: Icon(Icons.close))
+            ],
+          ),
         ],
       ),
     );
