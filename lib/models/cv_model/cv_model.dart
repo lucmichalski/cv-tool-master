@@ -4,63 +4,204 @@ class CVModel {
   String gender;
   String position;
   bool status;
-  Role role;
-  List<Education> educationList;
+  List<Role> role;
   List<String> technicalSummaryList;
-  List<Certificate> certificateList;
-  List<Skill> skills;
-  List<Professional> professionalList;
-  List<HighLightProject> highLightProjectList;
-  List<Language> languages;
+  List<EducationList> educationList;
+  List<CertificateList> certificateList;
+  List<Skills> skills;
+  List<ProfessionalList> professionalList;
+  List<HighLightProjectList> highLightProjectList;
+  List<Languages> languages;
 
   CVModel(
       {this.name,
-      this.role,
-      this.email,
-      this.gender,
-      this.position,
-      this.status,
-      this.technicalSummaryList,
-      this.educationList,
-      this.skills,
-      this.professionalList,
-      this.certificateList,
-      this.highLightProjectList,
-      this.languages});
+        this.email,
+        this.gender,
+        this.position,
+        this.status,
+        this.role,
+        this.technicalSummaryList,
+        this.educationList,
+        this.certificateList,
+        this.skills,
+        this.professionalList,
+        this.highLightProjectList,
+        this.languages});
+
+  CVModel.fromJson(Map<String, dynamic> json) {
+    name = json['name'];
+    email = json['email'];
+    gender = json['gender'];
+    position = json['position'];
+    status = json['status'];
+    if (json['role'] != null) {
+      role = new List<Role>();
+      json['role'].forEach((v) {
+        role.add(new Role.fromJson(v));
+      });
+    }
+    technicalSummaryList = json['technicalSummaryList'].cast<String>();
+    if (json['educationList'] != null) {
+      educationList = new List<EducationList>();
+      json['educationList'].forEach((v) {
+        educationList.add(new EducationList.fromJson(v));
+      });
+    }
+    if (json['certificateList'] != null) {
+      certificateList = new List<CertificateList>();
+      json['certificateList'].forEach((v) {
+        certificateList.add(new CertificateList.fromJson(v));
+      });
+    }
+    if (json['skills'] != null) {
+      skills = new List<Skills>();
+      json['skills'].forEach((v) {
+        skills.add(new Skills.fromJson(v));
+      });
+    }
+    if (json['professionalList'] != null) {
+      professionalList = new List<ProfessionalList>();
+      json['professionalList'].forEach((v) {
+        professionalList.add(new ProfessionalList.fromJson(v));
+      });
+    }
+    if (json['highLightProjectList'] != null) {
+      highLightProjectList = new List<HighLightProjectList>();
+      json['highLightProjectList'].forEach((v) {
+        highLightProjectList.add(new HighLightProjectList.fromJson(v));
+      });
+    }
+    if (json['languages'] != null) {
+      languages = new List<Languages>();
+      json['languages'].forEach((v) {
+        languages.add(new Languages.fromJson(v));
+      });
+    }
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['name'] = this.name;
+    data['email'] = this.email;
+    data['gender'] = this.gender;
+    data['position'] = this.position;
+    data['status'] = this.status;
+    if (this.role != null) {
+      data['role'] = this.role.map((v) => v.toJson()).toList();
+    }
+    data['technicalSummaryList'] = this.technicalSummaryList;
+    if (this.educationList != null) {
+      data['educationList'] =
+          this.educationList.map((v) => v.toJson()).toList();
+    }
+    if (this.certificateList != null) {
+      data['certificateList'] =
+          this.certificateList.map((v) => v.toJson()).toList();
+    }
+    if (this.skills != null) {
+      data['skills'] = this.skills.map((v) => v.toJson()).toList();
+    }
+    if (this.professionalList != null) {
+      data['professionalList'] =
+          this.professionalList.map((v) => v.toJson()).toList();
+    }
+    if (this.highLightProjectList != null) {
+      data['highLightProjectList'] =
+          this.highLightProjectList.map((v) => v.toJson()).toList();
+    }
+    if (this.languages != null) {
+      data['languages'] = this.languages.map((v) => v.toJson()).toList();
+    }
+    return data;
+  }
 }
 
 class Role {
   String roleNm;
-  List<String> level;
-  List<String> technicals;
+  String level;
+  String technicals;
 
   Role({this.roleNm, this.level, this.technicals});
+
+  Role.fromJson(Map<String, dynamic> json) {
+    roleNm = json['roleNm'];
+    level = json['level'];
+    technicals = json['technicals'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['roleNm'] = this.roleNm;
+    data['level'] = this.level;
+    data['technicals'] = this.technicals;
+    return data;
+  }
 }
 
-class Education {
+class EducationList {
   String schoolNm;
   String majorNm;
   String classYear;
 
-  Education({this.schoolNm, this.majorNm, this.classYear});
+  EducationList({this.schoolNm, this.majorNm, this.classYear});
+
+  EducationList.fromJson(Map<String, dynamic> json) {
+    schoolNm = json['schoolNm'];
+    majorNm = json['majorNm'];
+    classYear = json['classYear'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['schoolNm'] = this.schoolNm;
+    data['majorNm'] = this.majorNm;
+    data['classYear'] = this.classYear;
+    return data;
+  }
 }
 
-class Skill {
+class CertificateList {
+  String certificateNm;
+  String certificateYear;
+
+  CertificateList({this.certificateNm, this.certificateYear});
+
+  CertificateList.fromJson(Map<String, dynamic> json) {
+    certificateNm = json['certificateNm'];
+    certificateYear = json['certificateYear'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['certificateNm'] = this.certificateNm;
+    data['certificateYear'] = this.certificateYear;
+    return data;
+  }
+}
+
+class Skills {
   String skillNm;
   String skillData;
   bool isSelected;
 
-  Skill({this.skillNm, this.skillData, this.isSelected = false});
+  Skills({this.skillNm, this.skillData, this.isSelected});
+
+  Skills.fromJson(Map<String, dynamic> json) {
+    skillNm = json['skillNm'];
+    skillData = json['skillData'];
+    isSelected = json['isSelected'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['skillNm'] = this.skillNm;
+    data['skillData'] = this.skillData;
+    data['isSelected'] = this.isSelected;
+    return data;
+  }
 }
 
-class Certificate {
-  String certificateNm;
-  String certificateYear;
-
-  Certificate({this.certificateNm, this.certificateYear});
-}
-
-class Professional {
+class ProfessionalList {
   String companyNm;
   String locationNm;
   String startDate;
@@ -68,16 +209,36 @@ class Professional {
   String roleNm;
   List<String> responsibilities;
 
-  Professional(
+  ProfessionalList(
       {this.companyNm,
-      this.locationNm,
-      this.startDate,
-      this.endDate,
-      this.roleNm,
-      this.responsibilities});
+        this.locationNm,
+        this.startDate,
+        this.endDate,
+        this.roleNm,
+        this.responsibilities});
+
+  ProfessionalList.fromJson(Map<String, dynamic> json) {
+    companyNm = json['companyNm'];
+    locationNm = json['locationNm'];
+    startDate = json['startDate'];
+    endDate = json['endDate'];
+    roleNm = json['roleNm'];
+    responsibilities = json['responsibilities'].cast<String>();
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['companyNm'] = this.companyNm;
+    data['locationNm'] = this.locationNm;
+    data['startDate'] = this.startDate;
+    data['endDate'] = this.endDate;
+    data['roleNm'] = this.roleNm;
+    data['responsibilities'] = this.responsibilities;
+    return data;
+  }
 }
 
-class HighLightProject {
+class HighLightProjectList {
   String projectNm;
   String projectDescription;
   String teamSize;
@@ -85,20 +246,57 @@ class HighLightProject {
   List<String> responsibility;
   List<String> technologies;
 
-  HighLightProject({
-    this.projectDescription,
-    this.teamSize,
-    this.position,
-    this.responsibility,
-    this.technologies,
-    this.projectNm,
-  });
+  HighLightProjectList(
+      {this.projectNm,
+        this.projectDescription,
+        this.teamSize,
+        this.position,
+        this.responsibility,
+        this.technologies});
+
+  HighLightProjectList.fromJson(Map<String, dynamic> json) {
+    projectNm = json['projectNm'];
+    projectDescription = json['projectDescription'];
+    teamSize = json['teamSize'];
+    position = json['position'];
+    responsibility = json['responsibility'].cast<String>();
+    technologies = json['technologies'].cast<String>();
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['projectNm'] = this.projectNm;
+    data['projectDescription'] = this.projectDescription;
+    data['teamSize'] = this.teamSize;
+    data['position'] = this.position;
+    data['responsibility'] = this.responsibility;
+    data['technologies'] = this.technologies;
+    return data;
+  }
 }
 
-class Language {
+class Languages {
   String languageNm;
   String level;
   int positionLanguage;
   int positionLevel;
-  Language({this.level, this.languageNm, this.positionLanguage=0,this.positionLevel=0});
+
+  Languages(
+      {this.languageNm, this.level, this.positionLanguage, this.positionLevel});
+
+  Languages.fromJson(Map<String, dynamic> json) {
+    languageNm = json['languageNm'];
+    level = json['level'];
+    positionLanguage = json['positionLanguage'];
+    positionLevel = json['positionLevel'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['languageNm'] = this.languageNm;
+    data['level'] = this.level;
+    data['positionLanguage'] = this.positionLanguage;
+    data['positionLevel'] = this.positionLevel;
+    return data;
+  }
 }

@@ -1,7 +1,7 @@
 import 'package:intl/intl.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
-String hhmm(DateTime date) {
+String monthYear(DateTime date) {
   if (date != null) {
     String formattedDate = DateFormat('MMM-yyyy').format(date);
     return formattedDate;

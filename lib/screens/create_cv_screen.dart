@@ -1,13 +1,22 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_cv_maker/blocs/authen_bloc/bloc/master_bloc/get_master_data_bloc/cv_bloc.dart';
+import 'package:flutter_cv_maker/blocs/authen_bloc/bloc/master_bloc/master_bloc.dart';
 import 'package:flutter_cv_maker/common/TabModels.dart';
+import 'package:flutter_cv_maker/common/alert_dialog_custom.dart';
 import 'package:flutter_cv_maker/common/common_style.dart';
+import 'package:flutter_cv_maker/common/progress_bar_dialog.dart';
 import 'package:flutter_cv_maker/constants/constants.dart';
+import 'package:flutter_cv_maker/models/cv_model/admin_page_model.dart';
 import 'package:flutter_cv_maker/models/cv_model/cv_model.dart';
 import 'package:flutter_cv_maker/screens/viewPageCreateCv/section_%20five_screen.dart';
 import 'package:flutter_cv_maker/screens/viewPageCreateCv/section_four_screen.dart';
 import 'package:flutter_cv_maker/screens/viewPageCreateCv/section_one_screen.dart';
 import 'package:flutter_cv_maker/screens/viewPageCreateCv/section_second_screen.dart';
 import 'package:flutter_cv_maker/screens/viewPageCreateCv/section_three_screen.dart';
+import 'package:flutter_cv_maker/utils/shared_preferences_service.dart';
 
 import '../common/common_style.dart';
 
@@ -25,21 +34,42 @@ class _CreateCVState extends State<CreateCV> {
   final PageController _pageController = PageController();
   List<TabModelSteps> _tab = [];
   CVModel _cvModel;
+  MasterData masterData;
 
   // Page index
   int _pageIndex = 0;
 
   _addItemsSteps() {
-    _tab.add(
-        TabModelSteps(numberPage: 0, horizontalLine: false, colorIcons: false));
-    _tab.add(
-        TabModelSteps(numberPage: 1, horizontalLine: true, colorIcons: false));
-    _tab.add(
-        TabModelSteps(numberPage: 2, horizontalLine: true, colorIcons: false));
-    _tab.add(
-        TabModelSteps(numberPage: 3, horizontalLine: true, colorIcons: false));
-    _tab.add(
-        TabModelSteps(numberPage: 4, horizontalLine: true, colorIcons: false));
+    _tab.add(TabModelSteps(
+        numberPage: 0,
+        horizontalLine: true,
+        colorIcons: false,
+        title: SECTION_I,
+        step: 'Step 1'));
+    _tab.add(TabModelSteps(
+        numberPage: 1,
+        horizontalLine: true,
+        colorIcons: false,
+        title: SECTION_II,
+        step: 'Step 2'));
+    _tab.add(TabModelSteps(
+        numberPage: 2,
+        horizontalLine: true,
+        colorIcons: false,
+        title: SECTION_III,
+        step: 'Step 3'));
+    _tab.add(TabModelSteps(
+        numberPage: 3,
+        horizontalLine: true,
+        colorIcons: false,
+        title: SECTION_IV,
+        step: 'Step 4'));
+    _tab.add(TabModelSteps(
+        numberPage: 4,
+        horizontalLine: true,
+        colorIcons: false,
+        title: SECTION_V,
+        step: 'Step 5'));
   }
 
   _onPageViewChange(int index) {
@@ -63,6 +93,7 @@ class _CreateCVState extends State<CreateCV> {
 
   @override
   void initState() {
+    _fetchMasterData();
     if (widget.cvModel == null) {
       _cvModel = CVModel(
           name: '',
@@ -78,8 +109,42 @@ class _CreateCVState extends State<CreateCV> {
     super.initState();
   }
 
+  // Fetch master data to create/edit cv
+  _fetchMasterData() async {
+    BlocProvider.of<CVBloc>(context).add(RequestGetCVListEvent());
+  }
+
   @override
   Widget build(BuildContext context) {
+    return BlocConsumer<CVBloc, CVState>(
+      builder: (context, state) => _buildUI(context),
+      listener: (context, state) {
+        if (state is CVListLoading) {
+          showProgressBar(context, true);
+        } else if (state is GetCVListSuccess) {
+          showProgressBar(context, false);
+          setState(() {
+            masterData = state.masterData;
+          });
+          print('MasterData: ${masterData.summary.first.role}');
+        } else if (state is GetCVListError) {
+          showProgressBar(context, false);
+          showAlertDialog(
+              context, 'Error', state.message, () => Navigator.pop(context));
+        } else if (state is CreateCvSuccess) {
+          showProgressBar(context, false);
+          print('create cv success');
+        } else if (state is CreateCvError) {
+          showProgressBar(context, false);
+          showAlertDialog(
+              context, 'Error', state.message, () => Navigator.pop(context));
+        }
+      },
+      buildWhen: (context, state) => state is GetCVListSuccess,
+    );
+  }
+
+  Widget _buildUI(BuildContext context) {
     return Scaffold(
       body: Center(
         child: Column(
@@ -87,16 +152,9 @@ class _CreateCVState extends State<CreateCV> {
             SizedBox(
               height: 20,
             ),
-            Container(
-                width: MediaQuery.of(context).size.width,
-                child: _buildPageSteps(context)),
-            Container(
-              padding: EdgeInsets.symmetric(vertical: 20),
-              child: Text(
-                _getPageName(),
-                style: CommonStyle.size48W700black(context),
-                textAlign: TextAlign.center,
-              ),
+            Container(child: _buildPageSteps(context)),
+            SizedBox(
+              height: 50.0,
             ),
             Expanded(
               child: PageView(
@@ -108,20 +166,34 @@ class _CreateCVState extends State<CreateCV> {
                   SectionOneScreen(
                     cvModel: _cvModel,
                     pageController: _pageController,
+                    masterData: masterData,
                   ),
                   SecondScreen(
                     pageController: _pageController,
                     cvModel: _cvModel,
+                    masterData: masterData,
                   ),
                   SectionThree(
                     pageController: _pageController,
                     cvModel: _cvModel,
                     initialDate: DateTime.now(),
                   ),
-                  SectionFour(cvModel: _cvModel,pageController: _pageController,),
-                 SectionFive(cvModel: _cvModel,pageController: _pageController,
-
-                 )
+                  SectionFour(
+                    cvModel: _cvModel,
+                    pageController: _pageController,
+                    masterData: masterData,
+                  ),
+                  SectionFive(
+                    cvModel: _cvModel,
+                    saveSv: () async {
+                      final pref = await SharedPreferencesService.instance;
+                      String requestBody = json.encoder.convert(_cvModel);
+                      print(requestBody);
+                      BlocProvider.of<CVBloc>(context).add(RequestCreateCvEvent(
+                          pref.getAccessToken, requestBody));
+                    },
+                    pageController: _pageController,
+                  )
                 ],
               ),
             ),
@@ -129,30 +201,6 @@ class _CreateCVState extends State<CreateCV> {
         ),
       ),
     );
-  }
-
-  // Handle page name
-  String _getPageName() {
-    switch (_pageIndex) {
-      case 0:
-        return SECTION_I;
-        break;
-      case 1:
-        return SECTION_II;
-        break;
-      case 2:
-        return SECTION_III;
-        break;
-      case 3:
-        return SECTION_IV;
-        break;
-      case 4:
-        return SECTION_V;
-        break;
-      default:
-        return SECTION_I;
-        break;
-    }
   }
 
   Widget _buildPageSteps(BuildContext context) {
@@ -168,15 +216,6 @@ class _CreateCVState extends State<CreateCV> {
     return Container(
       child: Row(
         children: [
-          modelSteps.horizontalLine == true
-              ? Container(
-                  width: MediaQuery.of(context).size.width / 9,
-                  child: Divider(
-                      color: modelSteps.colorIcons
-                          ? Colors.greenAccent.shade400
-                          : Colors.black26),
-                )
-              : SizedBox(),
           Container(
             width: MediaQuery.of(context).size.width * 0.03,
             height: MediaQuery.of(context).size.width * 0.03,
@@ -205,6 +244,47 @@ class _CreateCVState extends State<CreateCV> {
                           : Colors.black,
                 )),
           ),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  modelSteps.step,
+                  style: TextStyle(
+                      color: index == _pageIndex
+                          ? kmainColor
+                          : Colors.grey,
+                      fontWeight: FontWeight.w700),
+                ),
+                SizedBox(
+                  height: 6,
+                ),
+                Text(
+                  modelSteps.title,
+                  style: TextStyle(
+                      color:Colors.grey,
+                      fontWeight: FontWeight.w400),
+                )
+              ],
+            ),
+          ),
+          modelSteps.horizontalLine == true
+              ? Container(
+                  width: MediaQuery.of(context).size.width / 12,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _tab[index].title != SECTION_V
+                          ? Divider(
+                              color: modelSteps.colorIcons
+                                  ? Colors.greenAccent.shade400
+                                  : Colors.black26)
+                          : Container(),
+                    ],
+                  ),
+                )
+              : SizedBox(),
         ],
       ),
     );

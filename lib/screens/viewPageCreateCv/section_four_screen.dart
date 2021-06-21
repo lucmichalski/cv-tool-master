@@ -1,16 +1,17 @@
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cv_maker/common/common_style.dart';
 import 'package:flutter_cv_maker/common/common_ui.dart';
 import 'package:flutter_cv_maker/constants/constants.dart';
+import 'package:flutter_cv_maker/models/cv_model/admin_page_model.dart';
 import 'package:flutter_cv_maker/models/cv_model/cv_model.dart';
 
 class SectionFour extends StatefulWidget {
   final CVModel cvModel;
   final PageController pageController;
+  final MasterData masterData;
 
-  SectionFour({this.cvModel, this.pageController});
+  SectionFour({this.cvModel, this.pageController, this.masterData});
 
   @override
   _SectionFourState createState() => _SectionFourState();
@@ -18,16 +19,9 @@ class SectionFour extends StatefulWidget {
 
 class _SectionFourState extends State<SectionFour> {
   Map<String, TextEditingController> _controllerHighlightProject = {};
-  List<HighLightProject> _highLightProjectList = [];
-  HighLightProject highLightProject;
-  List<String> _technologiesList = [
-    'Node JS',
-    'MongoDB',
-    'React JS',
-    'Redis',
-    'Elasticsearch',
-    'Nest JS'
-  ];
+  List<HighLightProjectList> _highLightProjectList = [];
+  HighLightProjectList highLightProject;
+  List<String> _technologiesList = [];
 
   List<String> _languages = ['English', 'Japanese', 'Vietnamese'];
   List<String> _levels = ['Intermediate', 'Upper-Intermediate', 'Excellent'];
@@ -39,7 +33,7 @@ class _SectionFourState extends State<SectionFour> {
       _highLightProjectList = widget.cvModel.highLightProjectList;
     } else {
       _highLightProjectList = [
-        HighLightProject(
+        HighLightProjectList(
             position: '',
             projectDescription: '',
             responsibility: [],
@@ -48,7 +42,7 @@ class _SectionFourState extends State<SectionFour> {
             projectNm: '')
       ];
       widget.cvModel.highLightProjectList = [
-        HighLightProject(
+        HighLightProjectList(
             position: '',
             projectDescription: '',
             responsibility: [],
@@ -57,11 +51,13 @@ class _SectionFourState extends State<SectionFour> {
             projectNm: '')
       ];
     }
-    if(widget.cvModel.languages != null && widget.cvModel.languages.isNotEmpty){
-
-    }else{
-      widget.cvModel.languages=[Language(level: '',languageNm: '',positionLevel: 0,positionLanguage: 0)];
-    }
+    // Get master data technology
+    _technologiesList = widget.masterData.technicalUsed;
+    if (widget.cvModel.languages == null || widget.cvModel.languages.isEmpty)
+      widget.cvModel.languages = [
+        Languages(
+            level: '', languageNm: '', positionLevel: 0, positionLanguage: 0)
+      ];
     super.initState();
   }
 
@@ -69,12 +65,16 @@ class _SectionFourState extends State<SectionFour> {
   Widget build(BuildContext context) {
     var w = MediaQuery.of(context).size.width;
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SingleChildScrollView(
         padding: EdgeInsets.only(bottom: w * 0.05),
         child: Container(
-            margin: EdgeInsets.symmetric(horizontal: w * 0.05),
+            margin: EdgeInsets.symmetric(horizontal: w * 0.2),
             child: Column(
               children: [
+                SizedBox(
+                  height: 50,
+                ),
                 HorizontalLine('Language'),
                 SizedBox(
                   height: 10,
@@ -146,7 +146,7 @@ class _SectionFourState extends State<SectionFour> {
             isButtonText: true,
             textButton: 'ADD PROJECT',
             onPressed: () => setState(() {
-              widget.cvModel.highLightProjectList.add(HighLightProject(
+              widget.cvModel.highLightProjectList.add(HighLightProjectList(
                   technologies: [],
                   projectNm: '',
                   teamSize: '',
@@ -161,7 +161,7 @@ class _SectionFourState extends State<SectionFour> {
   }
 
   Widget _buildHighLightProjectItem(
-      BuildContext context, HighLightProject project, int index) {
+      BuildContext context, HighLightProjectList project, int index) {
     return Container(
       margin: EdgeInsets.only(
         bottom: 40,
@@ -331,9 +331,19 @@ class _SectionFourState extends State<SectionFour> {
       fieldViewBuilder: (context, controller, focus, func) {
         controller.text = '';
         return TextFieldCommon(
+          maxLines: 1,
+          textInputAction: TextInputAction.go,
+          onFieldSubmitted: (val) {
+            setState(() {
+              controller.text = '';
+              widget.cvModel.highLightProjectList[index].technologies
+                  .add(val);
+            });
+          },
           controller: controller,
           focusNode: focus,
           label: 'Technology',
+
         );
       },
       optionsBuilder: (TextEditingValue textEditingValue) {
@@ -355,7 +365,7 @@ class _SectionFourState extends State<SectionFour> {
   }
 
   Widget _buildResponsibility(BuildContext context, String value,
-      List<String> responsibilities,String idResponsibility, int index) {
+      List<String> responsibilities, String idResponsibility, int index) {
     return Container(
       padding: EdgeInsets.only(bottom: 10),
       child: Row(
@@ -363,7 +373,8 @@ class _SectionFourState extends State<SectionFour> {
           Expanded(
             flex: 8,
             child: TextFieldCommon(
-              controller: _generateController('responsibility-$index-$idResponsibility', value),
+              controller: _generateController(
+                  'responsibility-$index-$idResponsibility', value),
               onChanged: (val) {
                 setState(() {
                   responsibilities[index] = val;
@@ -440,14 +451,14 @@ class _SectionFourState extends State<SectionFour> {
           isButtonText: true,
           textButton: 'ADD LANGUAGE',
           onPressed: () => setState(() => widget.cvModel.languages
-              .add(Language(level: _levels[0], languageNm: _languages[0]))),
+              .add(Languages(level: _levels[0], languageNm: _languages[0]))),
         )
       ]),
     );
   }
 
   Widget _buildLanguageItem(
-      BuildContext context, Language language, int index) {
+      BuildContext context, Languages language, int index) {
     return Container(
       margin: EdgeInsets.only(bottom: 15.0),
       child: Row(

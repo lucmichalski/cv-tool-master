@@ -1,10 +1,10 @@
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_cv_maker/common/common_style.dart';
 import 'package:flutter_cv_maker/common/common_ui.dart';
 import 'package:flutter_cv_maker/constants/constants.dart';
+import 'package:flutter_cv_maker/models/cv_model/admin_page_model.dart';
 import 'package:flutter_cv_maker/models/cv_model/cv_model.dart';
 import 'package:flutter_cv_maker/utils/validation.dart';
 
@@ -12,8 +12,10 @@ class SectionOneScreen extends StatefulWidget {
   final CVModel cvModel;
   final Function onSaved;
   final PageController pageController;
+  final MasterData masterData;
 
-  SectionOneScreen({this.cvModel, this.onSaved, this.pageController});
+  SectionOneScreen(
+      {this.cvModel, this.onSaved, this.pageController, this.masterData});
 
   @override
   _SectionOneScreenState createState() => _SectionOneScreenState();
@@ -28,43 +30,26 @@ class _SectionOneScreenState extends State<SectionOneScreen> {
   Map<String, TextEditingController> _controllerMap = {};
 
   // List display summary
-  List<String> _listSummary = [];
   CVModel _cvModel;
   List<String> _listRoleNm = [];
 
   // role name selected
-  int _roleNmSelected = 0;
+  int _roleNmSelected;
   int _levelSelected;
   int _technicalSelected;
 
   // Gender selected
   var _genderSelected = '';
 
-  List<Role> _roles = [
-    Role(
-        roleNm: 'BA',
-        level: ['BA1', 'BA2', 'BA3'],
-        technicals: ['BAa', 'BAb', 'BAc']),
-    Role(
-        roleNm: 'DEV',
-        level: ['Dev4', 'Dev5', 'Dev6'],
-        technicals: ['Deva', 'Devb', 'Devc']),
-  ];
-
-  List<String> _technicalSumData = [
-    '5 years’ experiences in software development specialize in web backend development. ',
-    'Good understanding of server-side templating technical, system architectural. ',
-    'Many experiences working with API design, DB design. '
-  ];
-
   @override
   void initState() {
     // Get CV Model
     _cvModel = widget.cvModel;
-    _roles.forEach((role) {
-      _listRoleNm.add(role.roleNm);
-    });
-
+    if (widget.masterData != null && _roleNmSelected == null) {
+      widget.masterData.summary.forEach((role) {
+        _listRoleNm.add(role.role);
+      });
+    }
     _initializationData();
     super.initState();
   }
@@ -75,13 +60,19 @@ class _SectionOneScreenState extends State<SectionOneScreen> {
     _emailController.text = _cvModel.email ?? kEmpty;
     _positionController.text = _cvModel.position ?? kEmpty;
     // Get data for Technical Summary
-    _listSummary = _cvModel.technicalSummaryList;
   }
 
   @override
   Widget build(BuildContext context) {
+    if (widget.masterData != null && _roleNmSelected == null) {
+      _listRoleNm.clear();
+      widget.masterData.summary.forEach((role) {
+        _listRoleNm.add(role.role);
+      });
+    }
     double sizeWith = MediaQuery.of(context).size.width;
     return Scaffold(
+      backgroundColor: Colors.white,
       resizeToAvoidBottomInset: true,
       body: Form(
         key: _formKey,
@@ -89,7 +80,7 @@ class _SectionOneScreenState extends State<SectionOneScreen> {
           padding: EdgeInsets.only(bottom: sizeWith * 0.05),
           child: Container(
             width: MediaQuery.of(context).size.width,
-            margin: EdgeInsets.symmetric(horizontal: sizeWith * 0.05),
+            margin: EdgeInsets.symmetric(horizontal: sizeWith * 0.2),
             child: Column(
               children: [
                 SizedBox(
@@ -106,6 +97,10 @@ class _SectionOneScreenState extends State<SectionOneScreen> {
                   child: Column(
                     children: [
                       TextFieldCommon(
+                        icon: Icon(Icons.person,size: 16,),
+                        onChanged: (value){
+                          _cvModel.name= value;
+                        },
                         controller: _fullNameController,
                         label: 'Full Name',
                         validator: (name) =>
@@ -114,13 +109,21 @@ class _SectionOneScreenState extends State<SectionOneScreen> {
                       // InputTextFormfield('Full Name', _fullNameController,'Please enter your fullname'),
                       _buildGender(context),
                       TextFieldCommon(
+                        icon: Icon(Icons.email,size: 16,),
                         controller: _emailController,
                         label: 'Email',
+                        onChanged: (val){
+                          _cvModel.email= val;
+                        },
                       ),
                       SizedBox(
                         height: 20,
                       ),
                       TextFieldCommon(
+                        icon: Icon(Icons.work,size: 16,),
+                        onChanged: (val){
+                          _cvModel.position= val;
+                        },
                         label: 'Position',
                         controller: _positionController,
                       ),
@@ -152,9 +155,8 @@ class _SectionOneScreenState extends State<SectionOneScreen> {
                       '$gender',
                       style: CommonStyle.inputStyle(context),
                     ),
-                    groupValue: 'Male',
+                    groupValue:_genderSelected,
                     onChanged: (val) {
-                      print('Gender: $val');
                       setState(() => _genderSelected = val);
                     }),
               ))
@@ -181,30 +183,30 @@ class _SectionOneScreenState extends State<SectionOneScreen> {
                     ? () => null
                     : () {
                         setState(() {
-                          if (_listRoleNm[_roleNmSelected] == 'BA') {
-                            _listSummary = _technicalSumData;
-                          } else {
-                            // _technicalSumData.
-                            _listSummary = _technicalSumData.take(2).toList();
-                          }
+                          widget.cvModel.technicalSummaryList = widget
+                              .masterData
+                              .summary[_roleNmSelected]
+                              .levels[_levelSelected]
+                              .technicals[_technicalSelected]
+                              .summaryList;
                         });
                       }),
           ),
           ListView.builder(
               shrinkWrap: true,
-              itemCount: _listSummary.length,
+              itemCount: widget.cvModel.technicalSummaryList.length,
               itemBuilder: (context, index) {
-                final item = _listSummary[index];
+                final item = widget.cvModel.technicalSummaryList[index];
                 return _buildTechnicalSumItem(context, item, index);
               }),
           Container(
             margin:
-                EdgeInsets.only(left: MediaQuery.of(context).size.width * 0.15),
+                EdgeInsets.only(left: MediaQuery.of(context).size.width * 0.05),
             child: AddButton(
               isButtonText: true,
               textButton: 'ADD SUMMARY',
               onPressed: () => setState(() {
-                _listSummary.add('');
+                widget.cvModel.technicalSummaryList.add('');
               }),
             ),
           ),
@@ -241,7 +243,7 @@ class _SectionOneScreenState extends State<SectionOneScreen> {
   Widget _buildTechnicalSumItem(
       BuildContext context, String technical, int index) {
     return Container(
-      padding: EdgeInsets.only(left: MediaQuery.of(context).size.width * 0.15),
+       padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width * 0.05),
       margin: EdgeInsets.only(top: 20),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -250,7 +252,9 @@ class _SectionOneScreenState extends State<SectionOneScreen> {
               child: TextFieldCommon(
             controller: _generateController('technical-$index', technical),
             onChanged: (val) {
-              _listSummary[index] = val;
+           setState(() {
+             _cvModel.technicalSummaryList[index] = val;
+           });
             },
           )),
           Container(
@@ -259,7 +263,7 @@ class _SectionOneScreenState extends State<SectionOneScreen> {
               onPressed: () {
                 setState(() {
                   // Remove item
-                  _listSummary.removeAt(index);
+                  widget.cvModel.technicalSummaryList.removeAt(index);
                 });
               },
               splashRadius: 16,
@@ -274,20 +278,47 @@ class _SectionOneScreenState extends State<SectionOneScreen> {
     );
   }
 
-  Widget _buildConditionsUI(BuildContext context, double width) => Row(
-        children: [
-          Expanded(
-              child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Text(
-                  'Role',
-                  style: CommonStyle.size16W400hintTitle(context),
-                ),
+  Widget _buildConditionsUI(BuildContext context, double width) {
+    List<String> _levelNmList = [];
+    List<Levels> _levels = [];
+    List<Technicals> _technicals = [];
+    List<String> _technicalNmList = [];
+    if (widget.masterData != null && _roleNmSelected != null) {
+      _levelSelected = 0;
+      // Get list menu for level and list object for level dropdown
+      widget.masterData.summary[_roleNmSelected].levels.forEach((element) {
+        // List object level
+        _levels.add(element);
+        // list menu level dropdown
+        _levelNmList.add(element.levelName);
+      });
+      // Get list technical depend on level selected
+      if (_levelSelected != null) {
+        _technicals = _levels[_levelSelected].technicals;
+        _technicalSelected = 0;
+        // Get list menu for technical dropdown
+        _technicals.forEach((element) {
+          _technicalNmList.add(element.technicalName);
+        });
+      }
+    }
+
+    return Row(
+      children: [
+        Expanded(
+            child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Text(
+                'Role',
+                style: CommonStyle.size16W400hintTitle(context),
               ),
-              ControlTypeDropDown(
+            ),
+            Container(
+              height: 40,
+              child: ControlTypeDropDown(
                 menuList: _listRoleNm,
                 initPosition: _roleNmSelected,
                 onChange: (val) {
@@ -296,24 +327,27 @@ class _SectionOneScreenState extends State<SectionOneScreen> {
                   });
                 },
               ),
-            ],
-          )),
-          SizedBox(
-            width: width * 0.03,
-          ),
-          Expanded(
-              child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Text(
-                  'Level',
-                  style: CommonStyle.size16W400hintTitle(context),
-                ),
+            ),
+          ],
+        )),
+        SizedBox(
+          width: width * 0.03,
+        ),
+        Expanded(
+            child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Text(
+                'Level',
+                style: CommonStyle.size16W400hintTitle(context),
               ),
-              ControlTypeDropDown(
-                menuList: _roles[_roleNmSelected].level,
+            ),
+            Container(
+              height: 40,
+              child: ControlTypeDropDown(
+                menuList: _levelNmList,
                 initPosition: _levelSelected,
                 onChange: (val) {
                   setState(() {
@@ -321,34 +355,39 @@ class _SectionOneScreenState extends State<SectionOneScreen> {
                   });
                 },
               ),
-            ],
-          )),
-          SizedBox(
-            width: width * 0.03,
-          ),
-          Expanded(
-              child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Text(
-                  'Technical',
-                  style: CommonStyle.size16W400hintTitle(context),
-                ),
+            ),
+          ],
+        )),
+        SizedBox(
+          width: width * 0.03,
+        ),
+        Expanded(
+            child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Text(
+                'Technical',
+                style: CommonStyle.size16W400hintTitle(context),
               ),
-              ControlTypeDropDown(
-                  menuList: _roles[_roleNmSelected].technicals,
+            ),
+            Container(
+              height: 40,
+              child: ControlTypeDropDown(
+                  menuList: _technicalNmList,
                   initPosition: _technicalSelected,
                   onChange: (val) {
                     setState(() {
                       _technicalSelected = val;
                     });
                   }),
-            ],
-          )),
-        ],
-      );
+            ),
+          ],
+        )),
+      ],
+    );
+  }
 
   // Generate controller by id
   TextEditingController _generateController(String id, String value) {

@@ -335,8 +335,7 @@ class _RolePageState extends State<RolePage> {
     );
   }
 
-  Widget _buildSummaryItem(BuildContext context, String summaryId, String value,
-      int index, List<String> summaryList) {
+  Widget _buildSummaryItem(BuildContext context, String summaryId, String value, int index, List<String> summaryList) {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 5.0),
       child: Column(

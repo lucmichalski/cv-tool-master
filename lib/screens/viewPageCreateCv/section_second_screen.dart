@@ -3,13 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_cv_maker/common/common_style.dart';
 import 'package:flutter_cv_maker/common/common_ui.dart';
 import 'package:flutter_cv_maker/constants/constants.dart';
+import 'package:flutter_cv_maker/models/cv_model/admin_page_model.dart';
 import 'package:flutter_cv_maker/models/cv_model/cv_model.dart';
 
 class SecondScreen extends StatefulWidget {
   final CVModel cvModel;
   final PageController pageController;
+  final MasterData masterData;
 
-  SecondScreen({this.pageController, this.cvModel});
+  SecondScreen({this.pageController, this.cvModel, this.masterData});
 
   @override
   _SecondScreenState createState() => _SecondScreenState();
@@ -22,15 +24,7 @@ class _SecondScreenState extends State<SecondScreen> {
   Map<String, TextEditingController> _controllerMapCertificate = {};
 
   // Will remove when exist master data
-  List<Skill> _skills = [
-    Skill(skillNm: 'Programming Language', skillData: '', isSelected: false),
-    Skill(skillNm: 'Framework/Library', skillData: '', isSelected: false),
-    Skill(skillNm: 'Operating System', skillData: '', isSelected: false),
-    Skill(skillNm: 'Source control', skillData: '', isSelected: false),
-    Skill(skillNm: 'Project Management tool', skillData: '', isSelected: false),
-    Skill(skillNm: 'Others', skillData: '', isSelected: false),
-    Skill(skillNm: 'Databases', skillData: '', isSelected: false),
-  ];
+  List<Skills> _skills = [];
 
   // Selected position
   int _skillSelected = 0;
@@ -40,9 +34,14 @@ class _SecondScreenState extends State<SecondScreen> {
 
   @override
   void initState() {
-    _skills.forEach((element) {
-      _skillNmList.add(element.skillNm);
-    });
+    if (widget.masterData != null &&
+        widget.masterData.skills != null &&
+        widget.masterData.skills.isNotEmpty) {
+      widget.masterData.skills.forEach((skill) {
+        _skills.add(Skills(skillNm: skill, skillData: '', isSelected: false));
+      });
+      _skillNmList = widget.masterData.skills ?? [];
+    }
     super.initState();
   }
 
@@ -50,13 +49,14 @@ class _SecondScreenState extends State<SecondScreen> {
   Widget build(BuildContext context) {
     var w = MediaQuery.of(context).size.width;
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SingleChildScrollView(
-        padding:
-            EdgeInsets.only(bottom: w * 0.05),
+        padding: EdgeInsets.only(bottom: w * 0.05),
         child: Container(
-          margin: EdgeInsets.symmetric(horizontal: w * 0.05),
+          margin: EdgeInsets.symmetric(horizontal: w * 0.2),
           child: Column(
             children: [
+              SizedBox(height: 50,),
               HorizontalLine('EDUCATION'),
               SizedBox(
                 height: 10,
@@ -182,7 +182,8 @@ class _SecondScreenState extends State<SecondScreen> {
             isButtonText: true,
             textButton: 'ADD EDUCATION',
             onPressed: () => setState(() {
-              widget.cvModel.educationList.add(Education(classYear: '',schoolNm: '',majorNm: ''));
+              widget.cvModel.educationList
+                  .add(EducationList(classYear: '', schoolNm: '', majorNm: ''));
             }),
           )
         ],
@@ -192,7 +193,7 @@ class _SecondScreenState extends State<SecondScreen> {
 
   // Create education item
   Widget _buildEducationItem(
-      BuildContext context, Education education, int index) {
+      BuildContext context, EducationList education, int index) {
     var w = MediaQuery.of(context).size.width;
     return Container(
       padding: EdgeInsets.only(left: 10.0, right: 10.0, bottom: 8.0),
@@ -328,7 +329,7 @@ class _SecondScreenState extends State<SecondScreen> {
       });
     }
     return Padding(
-      padding: EdgeInsets.only(left: w * 0.15),
+      padding: EdgeInsets.only(left: w * 0.05),
       child: Column(
         children: [
           Row(
@@ -341,7 +342,7 @@ class _SecondScreenState extends State<SecondScreen> {
                         setState(() => _skillSelected = value)),
               ),
               SizedBox(
-                width: 16,
+                width: 5,
               ),
               Expanded(
                 child: ButtonCommon(
@@ -351,14 +352,14 @@ class _SecondScreenState extends State<SecondScreen> {
                         if (!_skills[_skillSelected].isSelected) {
                           _skills[_skillSelected].isSelected = true;
                         }
-                        widget.cvModel.skills.add(Skill(
+                        widget.cvModel.skills.add(Skills(
                             skillNm: _skillNmList[_skillSelected],
                             skillData: ''));
                       });
                     }),
               ),
               SizedBox(
-                width: 16,
+                width: 5,
               ),
               Expanded(
                 child: ButtonCommon(
@@ -368,7 +369,7 @@ class _SecondScreenState extends State<SecondScreen> {
                         _skills.forEach((skill) {
                           skill.isSelected = true;
                           widget.cvModel.skills.add(
-                              Skill(skillNm: skill.skillNm, skillData: ''));
+                              Skills(skillNm: skill.skillNm, skillData: ''));
                         });
                       });
                     }),
@@ -388,7 +389,7 @@ class _SecondScreenState extends State<SecondScreen> {
             isButtonText: true,
             textButton: 'ADD SKILL',
             onPressed: () => setState(() {
-              widget.cvModel.skills.add(Skill());
+              widget.cvModel.skills.add(Skills());
             }),
           )
         ],
@@ -396,7 +397,7 @@ class _SecondScreenState extends State<SecondScreen> {
     );
   }
 
-  Widget _buildSkillsItem(BuildContext context, Skill skill, int index) {
+  Widget _buildSkillsItem(BuildContext context, Skills skill, int index) {
     return Container(
       padding: EdgeInsets.only(left: 10.0, right: 10.0, bottom: 8.0),
       margin: EdgeInsets.only(
@@ -467,7 +468,7 @@ class _SecondScreenState extends State<SecondScreen> {
             isButtonText: true,
             textButton: 'ADD CERTIFICATE',
             onPressed: () => setState(() {
-              widget.cvModel.certificateList.add(Certificate());
+              widget.cvModel.certificateList.add(CertificateList());
             }),
           )
         ],
@@ -476,7 +477,7 @@ class _SecondScreenState extends State<SecondScreen> {
   }
 
   Widget _buildCertificationItems(
-      BuildContext context, Certificate certificate, int index) {
+      BuildContext context, CertificateList certificate, int index) {
     var w = MediaQuery.of(context).size.width;
     return Container(
       margin: EdgeInsets.only(

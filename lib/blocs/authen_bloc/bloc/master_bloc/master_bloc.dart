@@ -16,14 +16,28 @@ class MasterBloc extends Bloc<MasterEvent, MasterState> {
   Stream<MasterState> mapEventToState(
     MasterEvent event,
   ) async* {
+    // Loading state
+    yield MasterLoading();
     if (event is RequestAddMasterEvent) {
-      // Loading state
-      yield MasterLoading();
       try {
         final response = await repository.addMasterData(event.accessToken, event.requestBody);
         yield MasterSuccess(response);
       } catch (e) {
         yield MasterError(message: e.toString());
+      }
+    } else if (event is RequestUpdateMasterEvent) {
+      try {
+        final response = await repository.updateMasterData(event.accessToken, event.requestBody);
+        yield UpdateMasterSuccess(response);
+      } catch (e) {
+        yield UpdateMasterError(message: e.toString());
+      }
+    } else if (event is RequestGetMasterEvent) {
+      try {
+        final response = await repository.fetchMasterData(event.accessToken);
+        yield GetMasterSuccess(response);
+      } catch (e) {
+        yield GetMasterError(message: e.toString());
       }
     }
   }

@@ -9,6 +9,7 @@ import 'package:flutter_cv_maker/models/cv_model/admin_page_model.dart';
 import 'package:flutter_cv_maker/screens/adminpage/role_page/highlight_page.dart';
 import 'package:flutter_cv_maker/screens/adminpage/role_page/role_page.dart';
 import 'package:flutter_cv_maker/screens/adminpage/role_page/skill_page.dart';
+import 'package:flutter_cv_maker/utils/shared_preferences_service.dart';
 
 class AdminPage extends StatefulWidget {
   @override
@@ -36,26 +37,48 @@ class _AdminPageState extends State<AdminPage> {
 
   @override
   void initState() {
-    // TODO: implement initState
+    _fetchMasterData();
     super.initState();
+  }
+
+  // Get master data API
+  _fetchMasterData() async {
+    final pref = await SharedPreferencesService.instance;
+    BlocProvider.of<MasterBloc>(context).add(RequestGetMasterEvent(pref.getAccessToken));
   }
 
   @override
   Widget build(BuildContext context) {
     var w = MediaQuery.of(context).size.width;
-    return BlocConsumer<MasterBloc,MasterState>(
+    return BlocConsumer<MasterBloc, MasterState>(
         builder: (context, state) => _buildMasterData(context, w),
         listener: (context, state) {
-          if(state is MasterLoading){
-           showProgressBar(context, true);
-          }else if(state is MasterSuccess){
+          if (state is MasterLoading) {
+            showProgressBar(context, true);
+          } else if (state is MasterSuccess) {
             showProgressBar(context, false);
             print('success');
-          }else if(state is MasterError){
+          } else if (state is MasterError) {
             showProgressBar(context, false);
             showAlertDialog(
                 context, 'Error', state.message, () => Navigator.pop(context));
-            print('have errors');
+          } else if (state is UpdateMasterSuccess) {
+            showProgressBar(context, false);
+            showAlertDialog(
+                context, 'Success', 'Update master data success!', () => Navigator.pop(context));
+          } else if (state is UpdateMasterError) {
+            showProgressBar(context, false);
+            showAlertDialog(
+                context, 'Error', state.message, () => Navigator.pop(context));
+          } else if (state is GetMasterSuccess) {
+            showProgressBar(context, false);
+            if (state.masterData != null) {
+              _masterData = state.masterData;
+            }
+          } else if (state is GetMasterError) {
+            showProgressBar(context, false);
+            showAlertDialog(
+                context, 'Error', state.message, () => Navigator.pop(context));
           }
         });
   }

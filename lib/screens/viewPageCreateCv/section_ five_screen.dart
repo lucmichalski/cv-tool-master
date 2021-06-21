@@ -11,8 +11,9 @@ import 'package:universal_html/html.dart' as html;
 class SectionFive extends StatelessWidget {
   final CVModel cvModel;
   final PageController pageController;
+  final Function saveSv;
 
-  SectionFive({this.cvModel, this.pageController});
+  SectionFive({this.cvModel, this.pageController,this.saveSv});
 
   Future<html.Blob> myGetBlobPdfContent() async {
     final styles20bold =pw.TextStyle(fontSize: 20,color:PdfColor.fromInt(0xFF000000),font:pw.Font.timesBold(),);
@@ -85,14 +86,28 @@ class SectionFive extends StatelessWidget {
   Widget _buildPdfFile(BuildContext context) {
     var w = MediaQuery.of(context).size.width;
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: w * 0.1),
+      margin: EdgeInsets.symmetric(horizontal: w * 0.2),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            cvModel.name + '${cvModel.gender == 'Male' ? ' (Mr.)' : ' (Mrs.)'}',
-            style: CommonStyle.size20W700black(context),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              ButtonCommon(
+                  buttonText: 'SAVE CV',
+                  icon: Icon(
+                    Icons.arrow_right_alt_outlined,
+                    size: 16,
+                    color: Colors.white,
+                  ),
+                  onClick: () =>saveSv()),
+            ],
           ),
+        SizedBox(height: 20,),
+        Text(
+          cvModel.name + '${cvModel.gender == 'Male' ? ' (Mr.)' : ' (Mrs.)'}',
+          style: CommonStyle.size20W700black(context),
+        ),
           SizedBox(
             height: 6,
           ),
@@ -273,7 +288,7 @@ class SectionFive extends StatelessWidget {
   }
 
   // Build Education item
-  Widget _buildEducationItem(BuildContext context, Education education) {
+  Widget _buildEducationItem(BuildContext context, EducationList education) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 4, horizontal: 35),
       child: Column(
@@ -293,7 +308,7 @@ class SectionFive extends StatelessWidget {
     );
   }
   // Build Education item pdf
-  pw.Widget _buildEducationItempdf(Education education) {
+  pw.Widget _buildEducationItempdf(EducationList education) {
     return pw.Padding(
       padding: pw.EdgeInsets.symmetric(vertical: 4, horizontal: 35),
       child: pw.Column(
@@ -332,7 +347,7 @@ class SectionFive extends StatelessWidget {
   }
 
   // Build Technical skill item
-  Widget _buildTechnicalSkillItem(BuildContext context, Skill skill) {
+  Widget _buildTechnicalSkillItem(BuildContext context, Skills skill) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 5, horizontal: 35),
       child: Row(
@@ -350,7 +365,7 @@ class SectionFive extends StatelessWidget {
     );
   }
   // Build Technical skill item pdf
-  pw.Widget _buildTechnicalSkillItemPdf(Skill skill) {
+  pw.Widget _buildTechnicalSkillItemPdf(Skills skill) {
     return  pw.Padding(
       padding:  pw.EdgeInsets.symmetric(vertical: 5, horizontal: 35),
       child:  pw.Row(
@@ -386,7 +401,7 @@ class SectionFive extends StatelessWidget {
 
   // Build Professional Experience item
   Widget _buildProfessionalExperienceItem(
-      BuildContext context, Professional professional) {
+      BuildContext context, ProfessionalList professional) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 5, horizontal: 35),
       child: Column(
@@ -450,7 +465,7 @@ class SectionFive extends StatelessWidget {
     );
   }
   // Build Professional Experience item pdf
-  pw.Widget _buildProfessionalExperienceItemPdf(Professional professional) {
+  pw.Widget _buildProfessionalExperienceItemPdf(ProfessionalList professional) {
     return  pw.Padding(
       padding:  pw.EdgeInsets.symmetric(vertical: 5, horizontal: 35),
       child:  pw.Column(
@@ -556,9 +571,9 @@ class SectionFive extends StatelessWidget {
 
   // Build highlight project item
   Widget _buildHighLightProjectItem(
-      BuildContext context, HighLightProject highLightProject) {
+      BuildContext context, HighLightProjectList highLightProject) {
     return Container(
-      color: Colors.white,
+
       padding: EdgeInsets.all(20.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -593,7 +608,7 @@ class SectionFive extends StatelessWidget {
     );
   }
   // Build highlight project item
-  pw.Widget _buildHighLightProjectItemPdfT(HighLightProject highLightProject) {
+  pw.Widget _buildHighLightProjectItemPdfT(HighLightProjectList highLightProject) {
     return pw.Container(
       color: PdfColor.fromInt(0xFFFFFFFF),
       padding: pw.EdgeInsets.all(20.0),
@@ -682,7 +697,7 @@ class SectionFive extends StatelessWidget {
   }
 
   // Build language project item
-  Widget _buildLanguageItem(BuildContext context, Language language) {
+  Widget _buildLanguageItem(BuildContext context, Languages language) {
     return Padding(
       padding: EdgeInsets.only(left: 35),
       child: Row(
@@ -696,7 +711,7 @@ class SectionFive extends StatelessWidget {
     );
   }
   // Build language project item pdf
-  pw.Widget _buildLanguageItemPdf(Language language) {
+  pw.Widget _buildLanguageItemPdf(Languages language) {
     return   pw.Padding(
       padding:   pw.EdgeInsets.only(left: 35),
       child:   pw.Row(

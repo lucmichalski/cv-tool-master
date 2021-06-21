@@ -90,9 +90,13 @@ class _HighlightPageState extends State<HighlightPage> {
                     final String requestBody =
                         json.encoder.convert(widget.masterData);
                     final pref = await SharedPreferencesService.instance;
-                    BlocProvider.of<MasterBloc>(context).add(
-                        RequestAddMasterEvent(
-                            pref.getAccessToken, requestBody));
+                    if (widget.masterData.id == null) {
+                      // Create mode
+                      BlocProvider.of<MasterBloc>(context).add(RequestAddMasterEvent(pref.getAccessToken, requestBody));
+                    } else {
+                      // Update mode
+                      BlocProvider.of<MasterBloc>(context).add(RequestUpdateMasterEvent(pref.getAccessToken, requestBody));
+                    }
                     print(requestBody);
                   }),
             ],

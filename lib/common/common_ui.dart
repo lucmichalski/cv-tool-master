@@ -5,6 +5,7 @@ import 'package:flutter_cv_maker/common/common_style.dart';
 import 'package:flutter_cv_maker/constants/constants.dart';
 import 'package:flutter_cv_maker/extensions/size_extension.dart';
 import 'package:flutter_cv_maker/models/cv_model/cv_model.dart';
+
 class ButtonCommon extends StatefulWidget {
   final double borderRadius;
   final double height;
@@ -17,6 +18,7 @@ class ButtonCommon extends StatefulWidget {
   final Gradient gradient;
   final double width;
   final bool isCircle;
+
   ButtonCommon(
       {this.borderRadius,
       this.height,
@@ -189,7 +191,7 @@ class _ControlTypeDropDownState extends State<ControlTypeDropDown> {
 class SkillDropDown extends StatefulWidget {
   final Function onChange;
   final int initPosition;
-  final List<Skill> menuList;
+  final List<Skills> menuList;
 
   const SkillDropDown({this.onChange, this.initPosition, this.menuList});
 
@@ -342,6 +344,9 @@ class TextFieldCommon extends StatelessWidget {
   final bool isObscure;
   final Function onChanged;
   final FocusNode focusNode;
+  final Icon icon;
+  final TextInputAction textInputAction;
+  final Function onFieldSubmitted;
   final Function(String value) validator;
   final BorderRadiusGeometry borderRadius;
   final TextEditingController controller;
@@ -352,12 +357,14 @@ class TextFieldCommon extends StatelessWidget {
       this.hintStyle,
       this.isObscure = false,
       this.focusNode,
+      this.textInputAction,
       this.validator,
       this.borderRadius,
       this.controller,
       this.label,
       this.maxLines,
       this.contentPadding,
+      this.onFieldSubmitted,this.icon,
       this.onChanged(String value)});
 
   @override
@@ -365,15 +372,18 @@ class TextFieldCommon extends StatelessWidget {
     var w = MediaQuery.of(context).size.width;
     return Container(
       child: TextFormField(
+        onFieldSubmitted: onFieldSubmitted,
         maxLines: maxLines,
         onChanged: onChanged,
         focusNode: focusNode ?? FocusNode().context,
         controller: controller,
         cursorColor: kmainColor,
+        textInputAction: textInputAction,
         obscureText: this.isObscure,
         validator: this.validator,
         style: CommonStyle.inputStyle(context),
         decoration: new InputDecoration(
+          prefixIcon: icon,
           labelStyle: CommonStyle.hintStyle(context),
           filled: true,
           fillColor: Colors.white,
@@ -525,6 +535,7 @@ class _AddButtonState extends State<AddButton> {
 
 class DeleteButton extends StatefulWidget {
   final Function onPressed;
+
   DeleteButton({this.onPressed});
 
   @override

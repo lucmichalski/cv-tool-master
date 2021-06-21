@@ -1,11 +1,13 @@
 class MasterData {
+  String id;
   List<String> technicalUsed;
   List<String> skills;
   List<Summary> summary;
 
-  MasterData({this.technicalUsed, this.skills, this.summary});
+  MasterData({this.id, this.technicalUsed, this.skills, this.summary});
 
   MasterData.fromJson(Map<String, dynamic> json) {
+    id = json['_id'] as String;
     technicalUsed = json['technical_used'].cast<String>();
     skills = json['skills'].cast<String>();
     if (json['summary'] != null) {

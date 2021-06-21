@@ -10,26 +10,30 @@ class SectionThree extends StatefulWidget {
   final CVModel cvModel;
   final DateTime initialDate;
   final PageController pageController;
+
   SectionThree({this.initialDate, this.cvModel, this.pageController});
+
   @override
   _SectionThreeState createState() => _SectionThreeState();
 }
 
 class _SectionThreeState extends State<SectionThree> {
   DateTime selectDate;
+
   // List<Professional> widget.cvModel.professionalList = [];
   Map<String, TextEditingController> _controllerProfessional = {};
 
   @override
   void initState() {
+    // Create mode
     if (widget.cvModel.professionalList == null ||
         widget.cvModel.professionalList.isEmpty) {
       widget.cvModel.professionalList = [
-        Professional(
-            startDate: '',
+        ProfessionalList(
+            startDate: monthYear(DateTime.now()),
             responsibilities: [],
             locationNm: '',
-            endDate: '',
+            endDate: monthYear(DateTime.now()),
             companyNm: '',
             roleNm: '')
       ];
@@ -42,14 +46,18 @@ class _SectionThreeState extends State<SectionThree> {
   Widget build(BuildContext context) {
     var w = MediaQuery.of(context).size.width;
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Container(
-          margin: EdgeInsets.symmetric(horizontal: w * 0.05),
+          margin: EdgeInsets.symmetric(horizontal: w * 0.2),
           child: Column(
             children: [
+              SizedBox(height: 50,),
               HorizontalLine('Professional Experience'),
               _buildProfessional(context),
-              SizedBox(height: 10,),
+              SizedBox(
+                height: 10,
+              ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -108,11 +116,11 @@ class _SectionThreeState extends State<SectionThree> {
             isButtonText: true,
             textButton: 'ADD EXPERIENCE',
             onPressed: () => setState(() {
-              widget.cvModel.professionalList.add(Professional(
-                  startDate: '',
+              widget.cvModel.professionalList.add(ProfessionalList(
+                  startDate: monthYear(DateTime.now()),
                   responsibilities: [],
                   locationNm: '',
-                  endDate: '',
+                  endDate: monthYear(DateTime.now()),
                   companyNm: '',
                   roleNm: ''));
             }),
@@ -123,7 +131,7 @@ class _SectionThreeState extends State<SectionThree> {
   }
 
   Widget _buildProfessionalItem(
-      BuildContext context, Professional professional, int index) {
+      BuildContext context, ProfessionalList professional, int index) {
     var w = MediaQuery.of(context).size.width;
     return Container(
       padding: EdgeInsets.only(bottom: 16.0, left: 16.0, right: 16.0),
@@ -143,6 +151,7 @@ class _SectionThreeState extends State<SectionThree> {
               children: [
                 IconButton(
                   icon: Icon(Icons.highlight_remove_sharp, color: Colors.red),
+                  hoverColor: Colors.transparent,
                   onPressed: () {
                     setState(() {
                       widget.cvModel.professionalList.removeAt(index);
@@ -210,7 +219,7 @@ class _SectionThreeState extends State<SectionThree> {
                               initialDate: selectDate ?? widget.initialDate)
                           .then((date) => setState(() {
                                 selectDate = date;
-                                professional.startDate = hhmm(selectDate);
+                                professional.startDate = monthYear(selectDate);
                                 print(professional.startDate);
                               }));
                     },
@@ -226,7 +235,7 @@ class _SectionThreeState extends State<SectionThree> {
                       child: Row(
                         children: [
                           Text(
-                            '${professional.startDate ?? hhmm(DateTime.now())}',
+                            '${professional.startDate ?? monthYear(DateTime.now())}',
                             style: CommonStyle.inputStyle(context),
                           ),
                           Container(
@@ -268,7 +277,7 @@ class _SectionThreeState extends State<SectionThree> {
                                 initialDate: selectDate ?? widget.initialDate)
                             .then((date) => setState(() {
                                   selectDate = date;
-                                  professional.endDate = hhmm(selectDate);
+                                  professional.endDate = monthYear(selectDate);
                                   print(professional.startDate);
                                 }));
                       },
@@ -284,7 +293,7 @@ class _SectionThreeState extends State<SectionThree> {
                         child: Row(
                           children: [
                             Text(
-                              '${professional.endDate ?? hhmm(DateTime.now())}',
+                              '${professional.endDate ?? monthYear(DateTime.now())}',
                               style: CommonStyle.inputStyle(context),
                             ),
                             Container(
@@ -320,19 +329,21 @@ class _SectionThreeState extends State<SectionThree> {
           SizedBox(
             height: 10,
           ),
-     Row(
-       children: [
-         Icon(Icons.label,color: Color(0xff434b65)),
-         SizedBox(width: 5,),
-         Expanded(
-           child: Text(
-             'Participate in various software development phase such as:',
-             textAlign: TextAlign.start,
-             style: CommonStyle.size20W400black(context),
-           ),
-         ),
-       ],
-     ),
+          Row(
+            children: [
+              Icon(Icons.label, color: Color(0xff434b65)),
+              SizedBox(
+                width: 5,
+              ),
+              Expanded(
+                child: Text(
+                  'Participate in various software development phase such as:',
+                  textAlign: TextAlign.start,
+                  style: CommonStyle.size20W400black(context),
+                ),
+              ),
+            ],
+          ),
           SizedBox(
             height: 10,
           ),
@@ -362,7 +373,7 @@ class _SectionThreeState extends State<SectionThree> {
   }
 
   Widget _buildResponsibilityItem(BuildContext context, String value,
-      List<String> responsibilities,String idProfessional, int index) {
+      List<String> responsibilities, String idProfessional, int index) {
     return Padding(
       padding: EdgeInsets.only(top: 8.0),
       child: Row(
