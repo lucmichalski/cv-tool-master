@@ -23,21 +23,21 @@ class _LoginScreenState extends State<LoginScreen> {
   // login request
   Future<void> _requestLogin() async {
     BlocProvider.of<AuthBloc>(context)
-        .add(RequestAuthenEvent(emailController.text, passwordController.text));
+        .add(RequestAuthEvent(emailController.text, passwordController.text));
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<AuthBloc,AuthenState>(
+    return BlocConsumer<AuthBloc,AuthState>(
         builder: (context, state) => _buildUI(context),
         listener: (context, state) {
           if (state is AuthLoading) {
             showProgressBar(context, true);
-          } else if (state is AuthenSuccess) {
+          } else if (state is AuthSuccess) {
             showProgressBar(context, false);
             navKey.currentState.pushNamedAndRemoveUntil(routeHome, (route) => false);
             print('Success');
-          } else if (state is AuthenError) {
+          } else if (state is AuthError) {
             showProgressBar(context, false);
             showAlertDialog(
                 context, 'Error', state.message, () => Navigator.pop(context));

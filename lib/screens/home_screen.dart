@@ -9,6 +9,7 @@ import 'package:flutter_cv_maker/models/cv_model/admin_page_model.dart';
 import 'package:flutter_cv_maker/models/cv_model/cv_model.dart';
 import 'package:flutter_cv_maker/routes/routes.dart';
 import 'package:flutter_cv_maker/utils/shared_preferences_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key key}) : super(key: key);
@@ -20,6 +21,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   List<CVModel> _cvList = [];
   MasterData _masterData;
+  bool _isInit = false;
 
   @override
   void initState() {
@@ -48,28 +50,39 @@ class _HomeScreenState extends State<HomeScreen> {
       listener: (context, state) {
         if (state is CVListLoading) {
           showProgressBar(context, true);
-        } else if (state is GetCVListSuccess) {
+        } else if (state is GetMasterDataSuccess) {
           setState(() {
             _masterData = state.masterData;
           });
           print('Home MasterData: ${_masterData.summary.first.role}');
-        } else if (state is GetCVListError) {
+        } else if (state is GetMasterDataError) {
           showProgressBar(context, false);
           showAlertDialog(
               context, 'Error', state.message, () => Navigator.pop(context));
-        } else if (state is GetCvSuccess) {
+        } else if (state is GetCvListSuccess) {
           _cvList = state.cvList;
-        } else if (state is GetCvError) {
+        } else if (state is GetCvListError) {
+          showProgressBar(context, false);
+          showAlertDialog(
+              context, 'Error', state.message, () => Navigator.pop(context));
+        } else if (state is DeleteCvSuccess) {
+          showProgressBar(context, false);
+          _fetchCVList();
+          showAlertDialog(context, 'Success', 'Delete CV success!',
+              () => Navigator.pop(context));
+        } else if (state is DeleteCvError) {
           showProgressBar(context, false);
           showAlertDialog(
               context, 'Error', state.message, () => Navigator.pop(context));
         }
       },
-      buildWhen: (context, state) => state is GetCVListSuccess,
+      buildWhen: (context, state) =>
+          state is GetMasterDataSuccess || state is GetCvListSuccess,
     );
   }
 
   Widget _buildUI(BuildContext context) {
+    // _fetchCVList();
     var w = MediaQuery.of(context).size.width;
     return Scaffold(
       body: Container(
@@ -290,53 +303,79 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildCVItem2(BuildContext context, CVModel model, int index) {
-    return Container(
-        padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-        color: index % 2 == 0 ? Colors.grey.shade300 : Colors.white,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Expanded(flex: 1, child: Text('${index + 1}')),
-            Expanded(
-                flex: 3,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [Text('${model.name}'), Text('${model.position}')],
-                )),
-            Expanded(
-                flex: 1,
-                child: Text(
-                  'Status',
-                  textAlign: TextAlign.center,
-                )),
-            Expanded(
-                flex: 2,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    IconButton(
-                        tooltip: 'Preview',
-                        color: Color(0xff434b65),
-                        icon: Icon(
-                          Icons.remove_red_eye,
-                          size: 16,
-                        ),
-                        onPressed: () {}),
-                    IconButton(
-                        tooltip: 'Download',
-                        color: Color(0xff434b65),
-                        icon: Icon(Icons.download_rounded, size: 16),
-                        onPressed: () {}),
-                    IconButton(
-                        tooltip: 'Delete',
-                        color: Color(0xff434b65),
-                        icon: Icon(Icons.delete, size: 16),
-                        onPressed: () {})
-                  ],
-                ))
-          ],
-        ));
+    return InkWell(
+      onTap: () =>
+          navKey.currentState.pushNamed(routeCreateCV, arguments: model),
+      child: Container(
+          decoration: BoxDecoration(
+            color: index % 2 == 0 ? Colors.grey.shade100 : Colors.white,
+            borderRadius: BorderRadius.circular(5),
+          ),
+          width: MediaQuery.of(context).size.width,
+          padding: EdgeInsets.symmetric(
+            vertical: 16,
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Expanded(
+                  flex: 1,
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 20),
+                    child: Text('${index + 1}'),
+                  )),
+              Expanded(
+                  flex: 3,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('${model.name}'),
+                      Text('${model.position}')
+                    ],
+                  )),
+              Expanded(
+                  flex: 1,
+                  child: Text(
+                    'Status',
+                    textAlign: TextAlign.center,
+                  )),
+              Expanded(
+                  flex: 2,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      IconButton(
+                          tooltip: 'Preview',
+                          color: Color(0xff434b65),
+                          icon: Icon(
+                            Icons.remove_red_eye,
+                            size: 16,
+                          ),
+                          onPressed: () {}),
+                      IconButton(
+                          tooltip: 'Download',
+                          color: Color(0xff434b65),
+                          icon: Icon(Icons.download_rounded, size: 16),
+                          onPressed: () {}),
+                      IconButton(
+                          tooltip: 'Delete',
+                          color: Color(0xff434b65),
+                          icon: Icon(Icons.delete, size: 16),
+                          onPressed: () {
+                            setState(() async {
+                              final pref =
+                                  await SharedPreferencesService.instance;
+                              BlocProvider.of<CVBloc>(context).add(
+                                  RequestDeleteCvEvent(
+                                      pref.getAccessToken, _cvList[index].id));
+                            });
+                          })
+                    ],
+                  ))
+            ],
+          )),
+    );
   }
 
   // Build item CV
@@ -433,10 +472,10 @@ class _HomeScreenState extends State<HomeScreen> {
                               icon: Icon(Icons.download_rounded),
                               onPressed: () {}),
                           IconButton(
-                              tooltip: 'Delete',
-                              color: Color(0xff434b65),
-                              icon: Icon(Icons.delete),
-                              onPressed: () {})
+                            tooltip: 'Delete',
+                            color: Color(0xff434b65),
+                            icon: Icon(Icons.delete),
+                          )
                         ],
                       )
                     ],

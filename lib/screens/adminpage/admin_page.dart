@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_cv_maker/blocs/authen_bloc/bloc/master_bloc/master_bloc.dart';
@@ -6,6 +8,8 @@ import 'package:flutter_cv_maker/common/common_style.dart';
 import 'package:flutter_cv_maker/common/common_ui.dart';
 import 'package:flutter_cv_maker/common/progress_bar_dialog.dart';
 import 'package:flutter_cv_maker/models/cv_model/admin_page_model.dart';
+import 'package:flutter_cv_maker/screens/adminpage/role_page/company_page.dart';
+import 'package:flutter_cv_maker/screens/adminpage/role_page/project_page.dart';
 import 'package:flutter_cv_maker/screens/adminpage/role_page/highlight_page.dart';
 import 'package:flutter_cv_maker/screens/adminpage/role_page/role_page.dart';
 import 'package:flutter_cv_maker/screens/adminpage/role_page/skill_page.dart';
@@ -19,8 +23,16 @@ class AdminPage extends StatefulWidget {
 class _AdminPageState extends State<AdminPage> {
   bool showLevelView = false;
   bool showTechnicalView = false;
-  MasterData _masterData = MasterData(skills: [], technicalUsed: [], summary: [
-    Summary(role: '', levels: [Levels(levelName: '', technicals: [])])
+  MasterData _masterData =
+      MasterData(skills: [], technicalUsed: [], companyMaster: [
+    CompanyMaster(role: '', responsibilities: [''])
+  ], projectMaster: [
+    ProjectMaster(role: '', responsibilities: [''])
+  ], summary: [
+    Summary(
+      role: '',
+      levels: [Levels(levelName: '', technicals: [])],
+    ),
   ]);
 
   // Role page ID
@@ -31,6 +43,8 @@ class _AdminPageState extends State<AdminPage> {
 
   // Highlight page ID
   static const int HIGHLIGHT_PAGE_ID = 2;
+  static const int COMPANY_PAGE_ID = 3;
+  static const int PROJECT_PAGE_ID = 4;
 
   // page selected
   int _pageId = 0;
@@ -44,46 +58,52 @@ class _AdminPageState extends State<AdminPage> {
   // Get master data API
   _fetchMasterData() async {
     final pref = await SharedPreferencesService.instance;
-    BlocProvider.of<MasterBloc>(context).add(RequestGetMasterEvent(pref.getAccessToken));
+    BlocProvider.of<MasterBloc>(context)
+        .add(RequestGetMasterEvent(pref.getAccessToken));
   }
 
   @override
   Widget build(BuildContext context) {
-    var w = MediaQuery.of(context).size.width;
     return BlocConsumer<MasterBloc, MasterState>(
-        builder: (context, state) => _buildMasterData(context, w),
-        listener: (context, state) {
-          if (state is MasterLoading) {
-            showProgressBar(context, true);
-          } else if (state is MasterSuccess) {
-            showProgressBar(context, false);
-            print('success');
-          } else if (state is MasterError) {
-            showProgressBar(context, false);
-            showAlertDialog(
-                context, 'Error', state.message, () => Navigator.pop(context));
-          } else if (state is UpdateMasterSuccess) {
-            showProgressBar(context, false);
-            showAlertDialog(
-                context, 'Success', 'Update master data success!', () => Navigator.pop(context));
-          } else if (state is UpdateMasterError) {
-            showProgressBar(context, false);
-            showAlertDialog(
-                context, 'Error', state.message, () => Navigator.pop(context));
-          } else if (state is GetMasterSuccess) {
-            showProgressBar(context, false);
-            if (state.masterData != null) {
-              _masterData = state.masterData;
+      builder: (context, state) => _buildUI(context),
+      listener: (context, state) {
+        if (state is MasterLoading) {
+          // showProgressBar(context, true);
+        } else if (state is MasterSuccess) {
+          // showProgressBar(context, false);
+          print('success');
+        } else if (state is MasterError) {
+          //showProgressBar(context, false);
+          showAlertDialog(
+              context, 'Error', state.message, () => Navigator.pop(context));
+        } else if (state is UpdateMasterSuccess) {
+          // showProgressBar(context, false);
+          showAlertDialog(context, 'Success', 'Update master data success!',
+              () => Navigator.pop(context));
+        } else if (state is UpdateMasterError) {
+          // showProgressBar(context, false);
+          showAlertDialog(
+              context, 'Error', state.message, () => Navigator.pop(context));
+        } else if (state is GetMasterSuccess) {
+          // showProgressBar(context, false);
+          if (state.masterData != null) {
+            _masterData = state.masterData;
+            if (_masterData.companyMaster == null || _masterData.companyMaster.isEmpty) {
+              _masterData.companyMaster.add( CompanyMaster(role: '', responsibilities: ['']));
             }
-          } else if (state is GetMasterError) {
-            showProgressBar(context, false);
-            showAlertDialog(
-                context, 'Error', state.message, () => Navigator.pop(context));
           }
-        });
+        } else if (state is GetMasterError) {
+          //showProgressBar(context, false);
+          showAlertDialog(
+              context, 'Error', state.message, () => Navigator.pop(context));
+        }
+      },
+      buildWhen: (context, state) => state is MasterSuccess || state is UpdateMasterSuccess,
+    );
   }
 
-  Widget _buildMasterData(BuildContext context, var w) {
+  Widget _buildUI(BuildContext context) {
+    var w = MediaQuery.of(context).size.width;
     return Scaffold(
       backgroundColor: Color(0xfff6f8fa),
       body: LayoutBuilder(
@@ -108,9 +128,10 @@ class _AdminPageState extends State<AdminPage> {
 
   // Handle switch pages
   Widget _handleSwitchPage(BuildContext context, int pageId) {
+    Widget screen;
     switch (pageId) {
       case ROLE_PAGE_ID:
-        return RolePage(
+        screen = RolePage(
           masterData: _masterData,
           onPress: () {
             setState(() {
@@ -120,7 +141,7 @@ class _AdminPageState extends State<AdminPage> {
         );
         break;
       case SKILL_PAGE_ID:
-        return SkillPage(
+        screen = SkillPage(
           onNext: () {
             setState(() {
               _pageId = HIGHLIGHT_PAGE_ID;
@@ -137,7 +158,7 @@ class _AdminPageState extends State<AdminPage> {
         );
         break;
       case HIGHLIGHT_PAGE_ID:
-        return HighlightPage(
+        screen = HighlightPage(
           masterData: _masterData,
           onPrevious: () {
             setState(() {
@@ -146,13 +167,67 @@ class _AdminPageState extends State<AdminPage> {
           },
         );
         break;
-
+      case COMPANY_PAGE_ID:
+        screen = CompanyPage(
+          masterData: _masterData,
+          onPrevious: () {
+            setState(() {
+              _pageId = COMPANY_PAGE_ID;
+            });
+          },
+        );
+        break;
+      case PROJECT_PAGE_ID:
+        screen = ProjectPage(
+          masterData: _masterData,
+          onPrevious: () {
+            setState(() {
+              _pageId = PROJECT_PAGE_ID;
+            });
+          },
+        );
+        break;
       default:
-        return RolePage(
+        screen = RolePage(
           masterData: _masterData,
         );
         break;
     }
+
+    return Column(
+      children: [
+        Expanded(child: screen),
+        Container(
+          padding: EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              ButtonCommon(
+                  buttonText: 'SAVE',
+                  onClick: () async {
+                    final String requestBody =
+                        json.encoder.convert(_masterData);
+                    final pref = await SharedPreferencesService.instance;
+                    if (_masterData.id == null) {
+                      print('Create Mode');
+                      // Create mode
+                      BlocProvider.of<MasterBloc>(context).add(
+                          RequestAddMasterEvent(
+                              pref.getAccessToken, requestBody));
+                    } else {
+                      print('Edit Mode');
+                      // Update mode
+                      BlocProvider.of<MasterBloc>(context).add(
+                          RequestUpdateMasterEvent(
+                              pref.getAccessToken, requestBody));
+                    }
+                    print(requestBody);
+                  }),
+            ],
+          ),
+        )
+      ],
+    );
   }
 
   // Build Menu Nav
@@ -162,8 +237,8 @@ class _AdminPageState extends State<AdminPage> {
       children: [
         InkWell(
             onTap: () => setState(() => _pageId = ROLE_PAGE_ID),
-            child: _buildMenuItem(
-                context, ROLE_PAGE_ID, 'Role'.toUpperCase(), isNarrow)),
+            child: _buildMenuItem(context, ROLE_PAGE_ID,
+                'Technical summary'.toUpperCase(), isNarrow)),
         InkWell(
             onTap: () => setState(() => _pageId = SKILL_PAGE_ID),
             child: _buildMenuItem(
@@ -171,7 +246,15 @@ class _AdminPageState extends State<AdminPage> {
         InkWell(
             onTap: () => setState(() => _pageId = HIGHLIGHT_PAGE_ID),
             child: _buildMenuItem(context, HIGHLIGHT_PAGE_ID,
-                'Technical'.toUpperCase(), isNarrow)),
+                'Highlight project technical'.toUpperCase(), isNarrow)),
+        InkWell(
+            onTap: () => setState(() => _pageId = COMPANY_PAGE_ID),
+            child: _buildMenuItem(context, COMPANY_PAGE_ID,
+                'Company responsibility'.toUpperCase(), isNarrow)),
+        InkWell(
+            onTap: () => setState(() => _pageId = PROJECT_PAGE_ID),
+            child: _buildMenuItem(context, PROJECT_PAGE_ID,
+                'Project responsibilities'.toUpperCase(), isNarrow)),
       ],
     );
   }

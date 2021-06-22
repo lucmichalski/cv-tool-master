@@ -24,9 +24,9 @@ class CVBloc extends Bloc<CVEvent, CVState> {
       try {
         final pref = await SharedPreferencesService.instance;
         final response = await repository.fetchMasterData(pref.getAccessToken);
-        yield GetCVListSuccess(response);
+        yield GetMasterDataSuccess(response);
       } catch (e) {
-        yield GetCVListError(message: e.toString());
+        yield GetMasterDataError(message: e.toString());
       }
     }else if(event is RequestCreateCvEvent){
       yield CVListLoading();
@@ -40,9 +40,25 @@ class CVBloc extends Bloc<CVEvent, CVState> {
       yield CVListLoading();
       try{
         final responseCreate = await repository.fetchDataCV(event.accessToken);
-        yield GetCvSuccess(responseCreate);
+        yield GetCvListSuccess(responseCreate);
       }catch(e){
-        yield GetCvError(message: e.toString());
+        yield GetCvListError(message: e.toString());
+      }
+    }else if(event is RequestUpdateCvEvent){
+      yield CVListLoading();
+      try{
+        final response = await repository.updateCv(event.accessToken,event.requestBody,event.id);
+        yield UpdateCvSuccess(response);
+      }catch(e){
+        yield UpdateCvError(message: e.toString());
+      }
+    }else if(event is RequestDeleteCvEvent){
+      yield CVListLoading();
+      try{
+        final response = await repository.requestDeleteCv(event.accessToken, event.id);
+        yield DeleteCvSuccess(response);
+      }catch(e){
+        yield DeleteCvError(message: e.toString());
       }
     }
   }

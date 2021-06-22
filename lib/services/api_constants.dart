@@ -7,3 +7,6 @@ const RequestAddMasterUrl = 'summary';
 const RequestGetMasterUrl = 'summary';
 const RequestCreateCvUrl = 'sectioncv';
 const RequestGetCvUrl = 'sectioncv';
+const RequestUpdateCvUrl = 'sectioncv/';
+
+

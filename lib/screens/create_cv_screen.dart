@@ -87,6 +87,7 @@ class _CreateCVState extends State<CreateCV> {
 
   @override
   void dispose() {
+    print('disposed');
     _pageController.dispose();
     super.dispose();
   }
@@ -121,26 +122,36 @@ class _CreateCVState extends State<CreateCV> {
       listener: (context, state) {
         if (state is CVListLoading) {
           showProgressBar(context, true);
-        } else if (state is GetCVListSuccess) {
+        } else if (state is GetMasterDataSuccess) {
           showProgressBar(context, false);
           setState(() {
             masterData = state.masterData;
           });
           print('MasterData: ${masterData.summary.first.role}');
-        } else if (state is GetCVListError) {
+        } else if (state is GetMasterDataError) {
           showProgressBar(context, false);
           showAlertDialog(
               context, 'Error', state.message, () => Navigator.pop(context));
         } else if (state is CreateCvSuccess) {
           showProgressBar(context, false);
           print('create cv success');
+          showAlertDialog(context, 'Success', 'Create CV  success!',
+              () => Navigator.pop(context));
         } else if (state is CreateCvError) {
+          showProgressBar(context, false);
+          showAlertDialog(
+              context, 'Error', state.message, () => Navigator.pop(context));
+        } else if (state is UpdateCvSuccess) {
+          showProgressBar(context, false);
+          showAlertDialog(context, 'Success', 'Update CV success!',
+              () => Navigator.pop(context));
+        } else if (state is UpdateCvError) {
           showProgressBar(context, false);
           showAlertDialog(
               context, 'Error', state.message, () => Navigator.pop(context));
         }
       },
-      buildWhen: (context, state) => state is GetCVListSuccess,
+      buildWhen: (context, state) => state is GetMasterDataSuccess,
     );
   }
 
@@ -191,6 +202,13 @@ class _CreateCVState extends State<CreateCV> {
                       print(requestBody);
                       BlocProvider.of<CVBloc>(context).add(RequestCreateCvEvent(
                           pref.getAccessToken, requestBody));
+                    },
+                    update: () async {
+                      final pref = await SharedPreferencesService.instance;
+                      String requestBody = json.encoder.convert(_cvModel);
+                      print(requestBody);
+                      BlocProvider.of<CVBloc>(context).add(RequestUpdateCvEvent(
+                          pref.getAccessToken, requestBody, _cvModel.id));
                     },
                     pageController: _pageController,
                   )
@@ -252,9 +270,7 @@ class _CreateCVState extends State<CreateCV> {
                 Text(
                   modelSteps.step,
                   style: TextStyle(
-                      color: index == _pageIndex
-                          ? kmainColor
-                          : Colors.grey,
+                      color: index == _pageIndex ? kmainColor : Colors.grey,
                       fontWeight: FontWeight.w700),
                 ),
                 SizedBox(
@@ -263,8 +279,7 @@ class _CreateCVState extends State<CreateCV> {
                 Text(
                   modelSteps.title,
                   style: TextStyle(
-                      color:Colors.grey,
-                      fontWeight: FontWeight.w400),
+                      color: Colors.grey, fontWeight: FontWeight.w400),
                 )
               ],
             ),

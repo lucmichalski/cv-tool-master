@@ -1,4 +1,5 @@
 class CVModel {
+  String id;
   String name;
   String email;
   String gender;
@@ -14,7 +15,9 @@ class CVModel {
   List<Languages> languages;
 
   CVModel(
-      {this.name,
+      {
+        this.id,
+        this.name,
         this.email,
         this.gender,
         this.position,
@@ -29,50 +32,51 @@ class CVModel {
         this.languages});
 
   CVModel.fromJson(Map<String, dynamic> json) {
+    id = json['_id'] as String;
     name = json['name'];
     email = json['email'];
     gender = json['gender'];
     position = json['position'];
     status = json['status'];
     if (json['role'] != null) {
-      role = new List<Role>();
+      role = [];
       json['role'].forEach((v) {
         role.add(new Role.fromJson(v));
       });
     }
     technicalSummaryList = json['technicalSummaryList'].cast<String>();
     if (json['educationList'] != null) {
-      educationList = new List<EducationList>();
+      educationList = [];
       json['educationList'].forEach((v) {
         educationList.add(new EducationList.fromJson(v));
       });
     }
     if (json['certificateList'] != null) {
-      certificateList = new List<CertificateList>();
+      certificateList = [];
       json['certificateList'].forEach((v) {
         certificateList.add(new CertificateList.fromJson(v));
       });
     }
     if (json['skills'] != null) {
-      skills = new List<Skills>();
+      skills =[];
       json['skills'].forEach((v) {
         skills.add(new Skills.fromJson(v));
       });
     }
     if (json['professionalList'] != null) {
-      professionalList = new List<ProfessionalList>();
+      professionalList = [];
       json['professionalList'].forEach((v) {
         professionalList.add(new ProfessionalList.fromJson(v));
       });
     }
     if (json['highLightProjectList'] != null) {
-      highLightProjectList = new List<HighLightProjectList>();
+      highLightProjectList = [];
       json['highLightProjectList'].forEach((v) {
         highLightProjectList.add(new HighLightProjectList.fromJson(v));
       });
     }
     if (json['languages'] != null) {
-      languages = new List<Languages>();
+      languages = [];
       json['languages'].forEach((v) {
         languages.add(new Languages.fromJson(v));
       });
@@ -274,7 +278,7 @@ class HighLightProjectList {
     return data;
   }
 }
-
+//
 class Languages {
   String languageNm;
   String level;

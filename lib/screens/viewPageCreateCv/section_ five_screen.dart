@@ -12,8 +12,9 @@ class SectionFive extends StatelessWidget {
   final CVModel cvModel;
   final PageController pageController;
   final Function saveSv;
+  final Function update;
 
-  SectionFive({this.cvModel, this.pageController,this.saveSv});
+  SectionFive({this.cvModel, this.pageController,this.saveSv,this.update});
 
   Future<html.Blob> myGetBlobPdfContent() async {
     final styles20bold =pw.TextStyle(fontSize: 20,color:PdfColor.fromInt(0xFF000000),font:pw.Font.timesBold(),);
@@ -68,7 +69,7 @@ class SectionFive extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    //myGetBlobPdfContent();
+    myGetBlobPdfContent();
     return Scaffold(
       body: Container(
           child: SingleChildScrollView(
@@ -100,12 +101,19 @@ class SectionFive extends StatelessWidget {
                     size: 16,
                     color: Colors.white,
                   ),
-                  onClick: () =>saveSv()),
+                  onClick: (){
+                    if(cvModel.id != null){
+                      update();
+                    }else{
+                      saveSv();
+
+                    }
+                  }),
             ],
           ),
         SizedBox(height: 20,),
         Text(
-          cvModel.name + '${cvModel.gender == 'Male' ? ' (Mr.)' : ' (Mrs.)'}',
+          cvModel.name + '${cvModel.gender}',
           style: CommonStyle.size20W700black(context),
         ),
           SizedBox(

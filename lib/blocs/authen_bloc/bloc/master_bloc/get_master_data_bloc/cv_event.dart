@@ -31,3 +31,22 @@ class RequestGetCVModel extends CVEvent {
   @override
   List<Object> get props => [accessToken];
 }
+// create cv event
+class RequestUpdateCvEvent extends CVEvent {
+  final String accessToken;
+   final String id;
+  final String requestBody;
+  RequestUpdateCvEvent(this.accessToken,this.requestBody,this.id);
+
+  @override
+  List<Object> get props => [accessToken,requestBody,id];
+}
+// delete cv event
+class RequestDeleteCvEvent extends CVEvent {
+  final String accessToken;
+   final String id;
+  RequestDeleteCvEvent(this.accessToken,this.id);
+
+  @override
+  List<Object> get props => [accessToken,id];
+}

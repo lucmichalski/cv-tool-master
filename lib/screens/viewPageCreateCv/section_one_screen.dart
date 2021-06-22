@@ -176,7 +176,7 @@ class _SectionOneScreenState extends State<SectionOneScreen> {
           ConstrainedBox(
             constraints: BoxConstraints(maxWidth: width * 0.1),
             child: ButtonCommon(
-                buttonText: 'GET',
+                buttonText: 'GENERATE',
                 onClick: _roleNmSelected == null ||
                         _technicalSelected == null ||
                         _levelSelected == null

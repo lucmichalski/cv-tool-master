@@ -185,7 +185,7 @@ class _SectionThreeState extends State<SectionThree> {
                     professional.locationNm = value;
                   },
                   controller: _generateControllerProfessional('location-$index',
-                      widget.cvModel.professionalList[index].locationNm),
+                  widget.cvModel.professionalList[index].locationNm),
                   label: 'Location',
                 ),
               ),
@@ -318,6 +318,7 @@ class _SectionThreeState extends State<SectionThree> {
           SizedBox(
             height: 10,
           ),
+
           TextFieldCommon(
             label: 'Role',
             controller: _generateControllerProfessional(

@@ -12,19 +12,19 @@ class CVListLoading extends CVState {}
 
 class GetCVListInitial extends CVState {}
 
-class GetCVListSuccess extends CVState {
+class GetMasterDataSuccess extends CVState {
   final MasterData masterData;
 
-  GetCVListSuccess(this.masterData);
+  GetMasterDataSuccess(this.masterData);
 
   @override
   List<Object> get props => [masterData];
 }
 
-class GetCVListError extends CVState {
+class GetMasterDataError extends CVState {
   final String message;
 
-  GetCVListError({this.message});
+  GetMasterDataError({this.message});
   @override
   List<Object> get props => [message];
 }
@@ -47,20 +47,55 @@ class CreateCvError extends CVState {
   List<Object> get props => [message];
 }
 // get CV success
-class GetCvSuccess extends CVState {
+class GetCvListSuccess extends CVState {
   final List<CVModel> cvList;
 
-  GetCvSuccess(this.cvList);
+  GetCvListSuccess(this.cvList);
 
   @override
   List<Object> get props => [cvList];
 }
 
 // create cv error
-class GetCvError extends CVState {
+class GetCvListError extends CVState {
   final String message;
 
-  GetCvError({this.message});
+  GetCvListError({this.message});
+  @override
+  List<Object> get props => [message];
+}
+// get CV success
+class UpdateCvSuccess extends CVState {
+  final CVModel cvModel;
+
+  UpdateCvSuccess(this.cvModel);
+
+  @override
+  List<Object> get props => [cvModel];
+}
+
+// create cv error
+class UpdateCvError extends CVState {
+  final String message;
+
+  UpdateCvError({this.message});
+  @override
+  List<Object> get props => [message];
+}
+// get CV success
+class DeleteCvSuccess extends CVState {
+  final bool isDeleted;
+
+  DeleteCvSuccess(this.isDeleted);
+
+  @override
+  List<Object> get props => [isDeleted];
+}
+// delete cv error
+class DeleteCvError extends CVState {
+  final String message;
+
+  DeleteCvError({this.message});
   @override
   List<Object> get props => [message];
 }

@@ -9,7 +9,7 @@ import 'package:flutter_cv_maker/utils/shared_preferences_service.dart';
 part 'authen_event.dart';
 part 'authen_state.dart';
 
-class AuthBloc extends Bloc<AuthenEvent, AuthenState> {
+class AuthBloc extends Bloc<AuthEvent, AuthState> {
   // Repository
 
   // Constructor
@@ -17,18 +17,18 @@ class AuthBloc extends Bloc<AuthenEvent, AuthenState> {
   Repository repository = Repository();
 
   @override
-  Stream<AuthenState> mapEventToState(
-    AuthenEvent event,
+  Stream<AuthState> mapEventToState(
+    AuthEvent event,
   ) async* {
-    if (event is RequestAuthenEvent) {
+    if (event is RequestAuthEvent) {
       // Loading state
       yield AuthLoading();
       try {
         final response = await repository.signIn(event.account, event.password);
         final sharedPrefService = await SharedPreferencesService.instance..saveAccessToken(response.token);
-        yield AuthenSuccess(response: response);
+        yield AuthSuccess(response: response);
       } catch (e) {
-        yield AuthenError(message: e.toString());
+        yield AuthError(message: e.toString());
       }
     }
   }

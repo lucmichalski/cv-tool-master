@@ -14,14 +14,14 @@ class AuthenScreen extends StatefulWidget {
 class _AuthenScreenState extends State<AuthenScreen> {
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<AuthBloc, AuthenState>(
+    return BlocConsumer<AuthBloc, AuthState>(
         builder: (ctx, state) => _buildUI(context),
         listener: (ctx, state) {
           if (state is AuthLoading) {
             showProgressBar(context, true);
-          } else if (state is AuthenSuccess) {
+          } else if (state is AuthSuccess) {
             showProgressBar(context, false);
-          } else if (state is AuthenError) {
+          } else if (state is AuthError) {
             showProgressBar(context, false);
             showAlertDialog(
                 context, 'Error', state.message, () => Navigator.pop(context));
