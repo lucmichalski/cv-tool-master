@@ -88,8 +88,10 @@ class _AdminPageState extends State<AdminPage> {
           // showProgressBar(context, false);
           if (state.masterData != null) {
             _masterData = state.masterData;
-            if (_masterData.companyMaster == null || _masterData.companyMaster.isEmpty) {
-              _masterData.companyMaster.add( CompanyMaster(role: '', responsibilities: ['']));
+            if (_masterData.companyMaster == null ||
+                _masterData.companyMaster.isEmpty) {
+              _masterData.companyMaster
+                  .add(CompanyMaster(role: '', responsibilities: ['']));
             }
           }
         } else if (state is GetMasterError) {
@@ -98,7 +100,10 @@ class _AdminPageState extends State<AdminPage> {
               context, 'Error', state.message, () => Navigator.pop(context));
         }
       },
-      buildWhen: (context, state) => state is MasterSuccess || state is UpdateMasterSuccess,
+      buildWhen: (context, state) =>
+          state is MasterSuccess ||
+          state is UpdateMasterSuccess ||
+          state is GetMasterSuccess,
     );
   }
 

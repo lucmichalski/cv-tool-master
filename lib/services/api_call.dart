@@ -51,6 +51,7 @@ class Repository {
         Uri.tryParse(BaseUrl + RequestUpdateMasterUrl),
         headers: getHeader(accessToken),
         body: requestBody);
+    print('UPDATE -- ${response.statusCode} - ${response.body}');
     if (response.statusCode == 200) {
       return MasterData.fromJson(json.decode(response.body));
     } else {
@@ -64,6 +65,7 @@ class Repository {
       headers: getHeader(accessToken)
     );
     if (response.statusCode == 200) {
+      if (response.body.toString() == '{}') return null;
       return MasterData.fromJson(jsonDecode(response.body));
     } else {
       var message = json.decode(response.body)["message"];

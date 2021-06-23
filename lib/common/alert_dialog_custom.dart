@@ -4,11 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_cv_maker/common/common_style.dart';
 import 'package:flutter_cv_maker/common/common_ui.dart';
 import 'package:flutter_cv_maker/constants/constants.dart';
+import 'package:flutter_cv_maker/routes/routes.dart';
 
 class AlertDialogCustom extends StatelessWidget {
   final String title;
   final String message;
   final Function function;
+
   AlertDialogCustom({this.title, @required this.message, this.function});
 
   @override
@@ -77,13 +79,27 @@ class AlertDialogCustom extends StatelessWidget {
 
 void showAlertDialog(
     BuildContext context, String title, String msg, Function func) async {
+  if (msg.contains('token')) {
+    await showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialogCustom(
+              title: title,
+              message: msg,
+              function: () => navKey.currentState.pushNamed(
+                    routeLogin,
+                  ));
+        });
+  } else {
+    await showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialogCustom(title: title, message: msg, function: func);
+        });
+  }
   // msg.contains('Socket')
   //     ? displaySnackBarMessage(context, 'Mất kết nối internet', "ic_offline")
   //     :
-  await showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialogCustom(title: title, message: msg, function: func);
-      });
 }

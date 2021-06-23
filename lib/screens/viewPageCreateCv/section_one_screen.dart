@@ -119,14 +119,7 @@ class _SectionOneScreenState extends State<SectionOneScreen> {
                       SizedBox(
                         height: 20,
                       ),
-                      TextFieldCommon(
-                        icon: Icon(Icons.work,size: 16,),
-                        onChanged: (val){
-                          _cvModel.position= val;
-                        },
-                        label: 'Position',
-                        controller: _positionController,
-                      ),
+                      _buildAutoComplete(context),
                     ],
                   ),
                 ),
@@ -140,6 +133,43 @@ class _SectionOneScreenState extends State<SectionOneScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildAutoComplete(BuildContext context) {
+    return Autocomplete<String>(
+      fieldViewBuilder: (context, controller, focus, func) {
+        return TextFieldCommon(
+          maxLines: 1,
+          icon: Icon(Icons.work,size: 16,),
+          // textInputAction: TextInputAction.go,
+          onFieldSubmitted: (val) {
+            setState(() {
+              widget.cvModel.position = val;
+            });
+          },
+          controller: controller,
+          focusNode: focus,
+          label: 'Position',
+
+        );
+      },
+      optionsBuilder: (TextEditingValue textEditingValue) {
+        if (textEditingValue.text == '') {
+          return Iterable<String>.empty();
+        } else {
+
+          return _listRoleNm.where((element) => element
+              .toLowerCase()
+              .contains(textEditingValue.text.toLowerCase()));
+        }
+      },
+      onSelected: (String selection) {
+        // setState(() {
+        //   widget.cvModel.highLightProjectList[index].technologies
+        //       .add(selection);
+        // });
+      },
     );
   }
 
@@ -218,7 +248,7 @@ class _SectionOneScreenState extends State<SectionOneScreen> {
             children: [
               ButtonCommon(
                   buttonText: 'NEXT',
-                  icon: Icon(
+                  suffixIcon: Icon(
                     Icons.arrow_right_alt_outlined,
                     size: 16,
                     color: Colors.white,

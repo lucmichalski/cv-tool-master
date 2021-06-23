@@ -42,4 +42,8 @@ class SharedPreferencesService {
   String get getAccessToken =>
       _preferences.getString(SharedPrefKeys.token) ?? kEmpty;
 
+  // Get accessToken
+  static String get getToken =>
+      _preferences.getString(SharedPrefKeys.token) ?? kEmpty;
+
 }

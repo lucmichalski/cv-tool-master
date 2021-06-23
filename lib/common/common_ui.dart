@@ -9,7 +9,8 @@ import 'package:flutter_cv_maker/models/cv_model/cv_model.dart';
 class ButtonCommon extends StatefulWidget {
   final double borderRadius;
   final double height;
-  final Icon icon;
+  final Icon prefixIcon;
+  final Icon suffixIcon;
   final EdgeInsetsGeometry padding;
   final String buttonText;
   final TextStyle textStyle;
@@ -18,11 +19,14 @@ class ButtonCommon extends StatefulWidget {
   final Gradient gradient;
   final double width;
   final bool isCircle;
+  final double prefixDrawablePadding;
+  final double suffixDrawablePadding;
 
   ButtonCommon(
       {this.borderRadius,
       this.height,
-      this.icon,
+      this.prefixIcon,
+      this.suffixIcon,
       this.width,
       this.isCircle,
       @required this.buttonText,
@@ -30,6 +34,8 @@ class ButtonCommon extends StatefulWidget {
       this.padding,
       this.gradient,
       this.color,
+      this.prefixDrawablePadding,
+      this.suffixDrawablePadding,
       @required this.onClick});
 
   @override
@@ -64,15 +70,28 @@ class _ButtonCommonState extends State<ButtonCommon> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              Visibility(
+                visible: widget.prefixIcon != null,
+                child: Padding(
+                  padding: EdgeInsets.only(left: w * 0.005),
+                  child: widget.prefixIcon,
+                ),
+              ),
+              SizedBox(
+                width: widget.prefixDrawablePadding ?? 0,
+              ),
               Text(
                 this.widget.buttonText,
                 style: widget.textStyle ?? CommonStyle.white700Size22(context),
               ),
+              SizedBox(
+                width: widget.suffixDrawablePadding ?? 0,
+              ),
               Visibility(
-                visible: widget.icon != null,
+                visible: widget.suffixIcon != null,
                 child: Padding(
                   padding: EdgeInsets.only(left: w * 0.005),
-                  child: widget.icon,
+                  child: widget.suffixIcon,
                 ),
               )
             ],
@@ -364,7 +383,8 @@ class TextFieldCommon extends StatelessWidget {
       this.label,
       this.maxLines,
       this.contentPadding,
-      this.onFieldSubmitted,this.icon,
+      this.onFieldSubmitted,
+      this.icon,
       this.onChanged(String value)});
 
   @override
@@ -549,6 +569,47 @@ class _DeleteButtonState extends State<DeleteButton> {
       onPressed: widget.onPressed,
       icon: Icon(Icons.close),
       splashRadius: 20,
+    );
+  }
+}
+
+class FilterCustom extends StatelessWidget {
+  final String text;
+  final IconData icon;
+  final bool sizeBorder;
+  final Function onclick;
+
+  const FilterCustom(
+      {this.text, this.icon, this.onclick, this.sizeBorder = false});
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      borderRadius: BorderRadius.circular(20.0),
+      color: Colors.transparent,
+      child: InkWell(
+        customBorder: RoundedRectangleBorder(
+          borderRadius:
+          BorderRadius.circular(20),
+        ),
+        onTap: () {},
+        child: Container(
+          height: 35,
+          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20.0),
+              border: Border.all(width: sizeBorder ? 1 : 0.5, color: Colors.white)),
+          child: Row(
+            children: [
+              Text(
+                text,
+                style: TextStyle(color: Colors.white, fontSize: 14),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_cv_maker/common/common_style.dart';
 import 'package:flutter_cv_maker/common/common_ui.dart';
 import 'package:flutter_cv_maker/constants/constants.dart';
+import 'package:flutter_cv_maker/models/cv_model/admin_page_model.dart';
 import 'package:flutter_cv_maker/models/cv_model/cv_model.dart';
 
 import '../../helper.dart';
@@ -10,8 +11,9 @@ class SectionThree extends StatefulWidget {
   final CVModel cvModel;
   final DateTime initialDate;
   final PageController pageController;
+  final MasterData masterData;
 
-  SectionThree({this.initialDate, this.cvModel, this.pageController});
+  SectionThree({this.initialDate, this.cvModel, this.pageController, this.masterData});
 
   @override
   _SectionThreeState createState() => _SectionThreeState();
@@ -19,13 +21,22 @@ class SectionThree extends StatefulWidget {
 
 class _SectionThreeState extends State<SectionThree> {
   DateTime selectDate;
-
   // List<Professional> widget.cvModel.professionalList = [];
   Map<String, TextEditingController> _controllerProfessional = {};
+  List<String> _draftResponsibilities = [];
+  List<String> _professionalResponsibilities = [];
+  // List role
+  List<String> _roleNmList = [];
+  List<CompanyMaster> _companyMaster = [];
 
   @override
   void initState() {
-    // Create mode
+    if (widget.masterData != null && widget.masterData.companyMaster.isNotEmpty &&  widget.masterData.companyMaster.isNotEmpty != null) {
+      _companyMaster = widget.masterData.companyMaster;
+      widget.masterData.companyMaster.forEach((element) {
+        _roleNmList.add(element.role);
+      });
+    }
     if (widget.cvModel.professionalList == null ||
         widget.cvModel.professionalList.isEmpty) {
       widget.cvModel.professionalList = [
@@ -78,7 +89,7 @@ class _SectionThreeState extends State<SectionThree> {
                       )),
                   ButtonCommon(
                       buttonText: 'NEXT',
-                      icon: Icon(
+                      suffixIcon: Icon(
                         Icons.arrow_right_alt_outlined,
                         size: 16,
                         color: Colors.white,
@@ -318,45 +329,28 @@ class _SectionThreeState extends State<SectionThree> {
           SizedBox(
             height: 10,
           ),
-
-          TextFieldCommon(
-            label: 'Role',
-            controller: _generateControllerProfessional(
-                'role-$index', widget.cvModel.professionalList[index].roleNm),
-            onChanged: (value) {
-              widget.cvModel.professionalList[index].roleNm = value;
-            },
-          ),
+          _buildAutoComplete(context, index),
           SizedBox(
             height: 10,
-          ),
-          Row(
-            children: [
-              Icon(Icons.label, color: Color(0xff434b65)),
-              SizedBox(
-                width: 5,
-              ),
-              Expanded(
-                child: Text(
-                  'Participate in various software development phase such as:',
-                  textAlign: TextAlign.start,
-                  style: CommonStyle.size20W400black(context),
-                ),
-              ),
-            ],
           ),
           SizedBox(
             height: 10,
           ),
           Column(
-            children: professional.responsibilities
-                .map((responsibility) => _buildResponsibilityItem(
-                    context,
-                    responsibility,
-                    professional.responsibilities,
-                    '$index',
-                    professional.responsibilities.indexOf(responsibility)))
-                .toList(),
+            children: List.generate(professional.responsibilities.length, (idx) => _buildResponsibilityItem(
+            context,
+                professional.responsibilities[idx],
+            professional.responsibilities,
+            '$index',
+                idx))
+            // professional.responsibilities
+            //     .map((responsibility) => _buildResponsibilityItem(
+            //         context,
+            //         responsibility,
+            //         professional.responsibilities,
+            //         '$index',
+            //         professional.responsibilities.indexOf(responsibility)))
+            //     .toList(),
           ),
           SizedBox(
             height: 16,
@@ -370,6 +364,43 @@ class _SectionThreeState extends State<SectionThree> {
           )
         ],
       ),
+    );
+  }
+
+  Widget _buildAutoComplete(BuildContext context, int index) {
+    return Autocomplete<String>(
+      fieldViewBuilder: (context, controller, focus, func) {
+        controller.text = widget.cvModel.professionalList[index].roleNm;
+        controller.selection =
+            TextSelection.collapsed(offset: controller.text.length);
+        return TextFieldCommon(
+          maxLines: 1,
+          label: 'Role',
+          controller: controller,
+          onChanged: (value) {
+              widget.cvModel.professionalList[index].roleNm = value;
+          },
+          focusNode: focus,
+        );
+      },
+      optionsBuilder: (TextEditingValue textEditingValue) {
+        if (textEditingValue.text == '') {
+          return Iterable<String>.empty();
+        } else {
+          return _roleNmList.where((element) => element
+              .toLowerCase()
+              .contains(textEditingValue.text.toLowerCase()));
+        }
+      },
+      onSelected: (String selection) {
+        setState(() {
+          widget.cvModel.professionalList[index].roleNm = selection;
+          var responsibility = _companyMaster.firstWhere((element) => element.role == selection, orElse: () => null);
+          if (responsibility != null) {
+            widget.cvModel.professionalList[index].responsibilities.addAll(responsibility.responsibilities);
+          }
+        });
+      },
     );
   }
 

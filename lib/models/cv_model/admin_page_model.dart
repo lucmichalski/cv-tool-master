@@ -19,19 +19,19 @@ class MasterData {
     technicalUsed = json['technical_used'].cast<String>();
     skills = json['skills'].cast<String>();
     if (json['summary'] != null) {
-      summary = new List<Summary>();
+      summary = [];
       json['summary'].forEach((v) {
         summary.add(new Summary.fromJson(v));
       });
     }
     if (json['companyresponsibilities'] != null) {
-      companyMaster = new List<CompanyMaster>();
+      companyMaster = [];
       json['companyresponsibilities'].forEach((v) {
         companyMaster.add(new CompanyMaster.fromJson(v));
       });
     }
     if (json['projectresponsibilities'] != null) {
-      projectMaster = new List<ProjectMaster>();
+      projectMaster = [];
       json['projectresponsibilities'].forEach((v) {
         projectMaster.add(new ProjectMaster.fromJson(v));
       });
@@ -66,7 +66,7 @@ class Summary {
   Summary.fromJson(Map<String, dynamic> json) {
     role = json['role'];
     if (json['levels'] != null) {
-      levels = new List<Levels>();
+      levels = [];
       json['levels'].forEach((v) {
         levels.add(new Levels.fromJson(v));
       });
@@ -92,7 +92,7 @@ class Levels {
   Levels.fromJson(Map<String, dynamic> json) {
     levelName = json['level_name'];
     if (json['technicals'] != null) {
-      technicals = new List<Technicals>();
+      technicals = [];
       json['technicals'].forEach((v) {
         technicals.add(new Technicals.fromJson(v));
       });

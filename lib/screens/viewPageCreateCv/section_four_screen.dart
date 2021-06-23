@@ -25,9 +25,15 @@ class _SectionFourState extends State<SectionFour> {
 
   List<String> _languages = ['English', 'Japanese', 'Vietnamese'];
   List<String> _levels = ['Intermediate', 'Upper-Intermediate', 'Excellent'];
+  List<String> _roleNmList = [];
 
   @override
   void initState() {
+    if (widget.masterData != null && widget.masterData.companyMaster.isNotEmpty &&  widget.masterData.companyMaster.isNotEmpty != null) {
+      widget.masterData.projectMaster.forEach((element) {
+        _roleNmList.add(element.role);
+      });
+    }
     if (widget.cvModel.highLightProjectList != null &&
         widget.cvModel.highLightProjectList.isNotEmpty) {
       _highLightProjectList = widget.cvModel.highLightProjectList;
@@ -108,7 +114,7 @@ class _SectionFourState extends State<SectionFour> {
                         )),
                     ButtonCommon(
                         buttonText: 'NEXT',
-                        icon: Icon(
+                        suffixIcon: Icon(
                           Icons.arrow_right_alt_outlined,
                           size: 16,
                           color: Colors.white,
@@ -221,16 +227,17 @@ class _SectionFourState extends State<SectionFour> {
           Row(
             children: [
               Expanded(
-                child: TextFieldCommon(
-                  label: 'Position',
-                  controller: _generateController(
-                    'position-$index',
-                    _highLightProjectList[index].position,
-                  ),
-                  onChanged: (val) {
-                    widget.cvModel.highLightProjectList[index].position = val;
-                  },
-                ),
+                child: _buildAutoComplete(context, index)
+                // TextFieldCommon(
+                //   label: 'Position',
+                //   controller: _generateController(
+                //     'position-$index',
+                //     _highLightProjectList[index].position,
+                //   ),
+                //   onChanged: (val) {
+                //     widget.cvModel.highLightProjectList[index].position = val;
+                //   },
+                // ),
               ),
               SizedBox(
                 width: 15,
@@ -329,16 +336,14 @@ class _SectionFourState extends State<SectionFour> {
   Widget _autoComplete(BuildContext context, int index) {
     return Autocomplete<String>(
       fieldViewBuilder: (context, controller, focus, func) {
-        controller.text = '';
+        controller.text = widget.cvModel.highLightProjectList[index].position;
+        controller.selection =
+            TextSelection.collapsed(offset: controller.text.length);
         return TextFieldCommon(
           maxLines: 1,
-          textInputAction: TextInputAction.go,
-          onFieldSubmitted: (val) {
-            setState(() {
-              controller.text = '';
-              widget.cvModel.highLightProjectList[index].technologies
-                  .add(val);
-            });
+          // textInputAction: TextInputAction.go,
+          onChanged: (value) {
+            widget.cvModel.highLightProjectList[index].position = value;
           },
           controller: controller,
           focusNode: focus,
@@ -357,8 +362,51 @@ class _SectionFourState extends State<SectionFour> {
       },
       onSelected: (String selection) {
         setState(() {
-          widget.cvModel.highLightProjectList[index].technologies
-              .add(selection);
+          widget.cvModel.highLightProjectList[index].position = selection;
+          var responsibility = widget.cvModel.highLightProjectList.firstWhere((element) => element.position == selection, orElse: () => null);
+          if (responsibility != null) {
+            widget.cvModel.highLightProjectList[index].responsibility.addAll(responsibility.responsibility);
+          }
+        });
+      },
+    );
+  }
+
+  Widget _buildAutoComplete(BuildContext context, int index) {
+    print('${_roleNmList.first}');
+    return Autocomplete<String>(
+      fieldViewBuilder: (context, controller, focus, func) {
+        controller.text = widget.cvModel.highLightProjectList[index].position;
+        controller.selection =
+            TextSelection.collapsed(offset: controller.text.length);
+        return TextFieldCommon(
+          maxLines: 1,
+          label: 'Position',
+          controller: controller,
+          onChanged: (value) {
+            setState(() {
+              widget.cvModel.highLightProjectList[index].position = value;
+            });
+          },
+          focusNode: focus,
+        );
+      },
+      optionsBuilder: (TextEditingValue textEditingValue) {
+        if (textEditingValue.text == '') {
+          return Iterable<String>.empty();
+        } else {
+          return _roleNmList.where((element) => element
+              .toLowerCase()
+              .contains(textEditingValue.text.toLowerCase()));
+        }
+      },
+      onSelected: (String selection) {
+        setState(() {
+          widget.cvModel.highLightProjectList[index].position = selection;
+          var responsibility = widget.masterData.projectMaster.firstWhere((element) => element.role == selection, orElse: () => null);
+          if (responsibility != null) {
+            widget.cvModel.highLightProjectList[index].responsibility.addAll(responsibility.responsibilities);
+          }
         });
       },
     );
@@ -459,6 +507,8 @@ class _SectionFourState extends State<SectionFour> {
 
   Widget _buildLanguageItem(
       BuildContext context, Languages language, int index) {
+    if(language.languageNm==null || language.languageNm.isEmpty) language.languageNm = _languages[0];
+    if(language.level==null || language.level.isEmpty) language.level = _levels[0];
     return Container(
       margin: EdgeInsets.only(bottom: 15.0),
       child: Row(

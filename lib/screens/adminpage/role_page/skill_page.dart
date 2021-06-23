@@ -71,26 +71,6 @@ class _SkillPageState extends State<SkillPage> {
           SizedBox(
             height: 50,
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              TextButton(
-                  onPressed: () => widget.onPrevious(),
-                  child: Text(
-                    'PREVIOUS',
-                    style: CommonStyle.white700Size22(context)
-                        .copyWith(color: Colors.grey),
-                  )),
-              ButtonCommon(
-                  buttonText: 'NEXT',
-                  icon: Icon(
-                    Icons.arrow_right_alt_outlined,
-                    size: 16,
-                    color: Colors.white,
-                  ),
-                  onClick: () => widget.onNext()),
-            ],
-          )
         ],
       ),
     );

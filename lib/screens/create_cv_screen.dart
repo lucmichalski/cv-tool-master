@@ -188,6 +188,7 @@ class _CreateCVState extends State<CreateCV> {
                     pageController: _pageController,
                     cvModel: _cvModel,
                     initialDate: DateTime.now(),
+                    masterData: masterData,
                   ),
                   SectionFour(
                     cvModel: _cvModel,

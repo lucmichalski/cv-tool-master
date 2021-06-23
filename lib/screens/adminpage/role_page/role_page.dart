@@ -53,24 +53,6 @@ class _RolePageState extends State<RolePage> {
               isButtonText: true,
               textButton: 'ADD ROLE',
             ),
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: w * 0.03),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  ButtonCommon(
-                      buttonText: 'NEXT',
-                      icon: Icon(
-                        Icons.arrow_right_alt_outlined,
-                        size: 16,
-                        color: Colors.white,
-                      ),
-                      onClick: () {
-                        widget.onPress();
-                      }),
-                ],
-              ),
-            ),
           ],
         ),
       ),
@@ -275,7 +257,6 @@ class _RolePageState extends State<RolePage> {
             children: [
               Expanded(
                 child: TextFieldCommon(
-                  label: 'Technical',
                   controller: _generateController(
                       'technical-$index-$levelId', technicals.technicalName),
                   onChanged: (val) {
@@ -344,7 +325,6 @@ class _RolePageState extends State<RolePage> {
             children: [
               Expanded(
                 child: TextFieldCommon(
-                  label: 'Summary item',
                   controller:
                       _generateController('summary-$index-$summaryId', value),
                   onChanged: (val) {

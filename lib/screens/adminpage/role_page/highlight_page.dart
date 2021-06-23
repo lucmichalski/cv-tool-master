@@ -71,36 +71,6 @@ class _HighlightPageState extends State<HighlightPage> {
               });
             },
           ),
-          SizedBox(
-            height: 50.0,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              TextButton(
-                  onPressed: () => widget.onPrevious(),
-                  child: Text(
-                    'PREVIOUS',
-                    style: CommonStyle.white700Size22(context)
-                        .copyWith(color: Colors.grey),
-                  )),
-              ButtonCommon(
-                  buttonText: 'SAVE',
-                  onClick: () async {
-                    final String requestBody =
-                        json.encoder.convert(widget.masterData);
-                    final pref = await SharedPreferencesService.instance;
-                    if (widget.masterData.id == null) {
-                      // Create mode
-                      BlocProvider.of<MasterBloc>(context).add(RequestAddMasterEvent(pref.getAccessToken, requestBody));
-                    } else {
-                      // Update mode
-                      BlocProvider.of<MasterBloc>(context).add(RequestUpdateMasterEvent(pref.getAccessToken, requestBody));
-                    }
-                    print(requestBody);
-                  }),
-            ],
-          )
         ],
       ),
     );

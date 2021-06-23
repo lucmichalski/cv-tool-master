@@ -42,6 +42,9 @@ class _SecondScreenState extends State<SecondScreen> {
       });
       _skillNmList = widget.masterData.skills ?? [];
     }
+    if(widget.cvModel.educationList == null || widget.cvModel.educationList.isEmpty) {
+      widget.cvModel.educationList.add(EducationList(majorNm: '',schoolNm: '',classYear: '2021'));
+    }
     super.initState();
   }
 
@@ -95,7 +98,7 @@ class _SecondScreenState extends State<SecondScreen> {
                       )),
                   ButtonCommon(
                       buttonText: 'NEXT',
-                      icon: Icon(
+                      suffixIcon: Icon(
                         Icons.arrow_right_alt_outlined,
                         size: 16,
                         color: Colors.white,

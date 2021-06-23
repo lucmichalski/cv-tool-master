@@ -66,6 +66,12 @@ class CommonStyle {
         fontWeight: FontWeight.w700,
         color: Colors.black);
   }
+  static TextStyle size48W700White(BuildContext context) {
+    return GoogleFonts.roboto(
+        fontSize: DoubleExt(48).textSize(context),
+        fontWeight: FontWeight.w700,
+        color: Colors.white);
+  }
 
   static TextStyle size20W400black(BuildContext context) {
     return GoogleFonts.roboto(
@@ -126,6 +132,23 @@ class CommonStyle {
   static TextStyle size12W400black(BuildContext context) {
     return GoogleFonts.ptSerif(
         fontSize: DoubleExt(12).textSizePdf(context),
+        fontWeight: FontWeight.w400,
+        color: Colors.black);
+  }
+  static TextStyle size12W400xam(BuildContext context) {
+    return GoogleFonts.roboto(
+        fontSize: DoubleExt(12).textSizePdf(context),
+        fontWeight: FontWeight.w700,
+        color: Color(0xff4a4a4a));
+  }
+  static TextStyle size10xam(BuildContext context) {
+    return GoogleFonts.roboto(
+        fontSize: DoubleExt(10).textSizePdf(context),
+        color: Colors.grey);
+  }
+  static TextStyle size10W400black(BuildContext context) {
+    return GoogleFonts.ptSerif(
+        fontSize: DoubleExt(10).textSizePdf(context),
         fontWeight: FontWeight.w400,
         color: Colors.black);
   }

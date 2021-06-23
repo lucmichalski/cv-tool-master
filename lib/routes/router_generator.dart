@@ -7,6 +7,7 @@ import 'package:flutter_cv_maker/screens/auth_screen.dart';
 import 'package:flutter_cv_maker/screens/create_cv_screen.dart';
 import 'package:flutter_cv_maker/screens/home_screen.dart';
 import 'package:flutter_cv_maker/screens/loginScreen.dart';
+import 'package:flutter_cv_maker/utils/shared_preferences_service.dart';
 
 class RouteGenerator {
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -16,29 +17,33 @@ class RouteGenerator {
       queryParameters: uriData.queryParameters,
       route: uriData.path,
     );
-    switch (routingData.route) {
-      case routeLogin:
-       case '/':
-        return MaterialPageRoute(
-            builder: (_) => LoginScreen(), settings: settings);
-        break;
-      case routeHome:
-        return MaterialPageRoute(
-            builder: (_) => HomeScreen(), settings: settings);
-        break;
-      case routeAdmin:
-        return MaterialPageRoute(builder: (_) => AdminPage(),settings: settings);
-      case routeCreateCV:
+    // if (SharedPreferencesService.getToken.isEmpty || SharedPreferencesService.getToken == null) {
+    //   return MaterialPageRoute(
+    //       builder: (_) => LoginScreen(), settings: settings);
+    // }
+      switch (routingData.route) {
+        case routeLogin:
+        case '/':
+          return MaterialPageRoute(
+              builder: (_) => LoginScreen(), settings: settings);
+          break;
+        case routeHome:
+          return MaterialPageRoute(
+              builder: (_) => HomeScreen(), settings: settings);
+          break;
+        case routeAdmin:
+          return MaterialPageRoute(builder: (_) => AdminPage(),settings: settings);
+        case routeCreateCV:
         // Get arguments
-        var data = settings.arguments;
-        // Pass data to CreateCV screen
-        return MaterialPageRoute(
-            builder: (_) => CreateCV(cvModel: data as CVModel,), settings: settings);
-        break;
-      default:
-        return MaterialPageRoute(
-            builder: (_) => LoginScreen(), settings: settings);
-        break;
+          var data = settings.arguments;
+          // Pass data to CreateCV screen
+          return MaterialPageRoute(
+              builder: (_) => CreateCV(cvModel: data as CVModel,), settings: settings);
+          break;
+        default:
+          return MaterialPageRoute(
+              builder: (_) => LoginScreen(), settings: settings);
+          break;
+      }
     }
-  }
 }
