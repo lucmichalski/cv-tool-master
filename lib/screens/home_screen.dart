@@ -25,7 +25,9 @@ class _HomeScreenState extends State<HomeScreen> {
   List<CVModel> _cvList = [];
   MasterData _masterData;
     List<int> arrayIndex =[];
-    bool status = false;
+    bool statusComplete = false;
+    bool statusDraft = false ;
+    bool statusAll ;
   @override
   void initState() {
 
@@ -81,7 +83,7 @@ class _HomeScreenState extends State<HomeScreen> {
         }
       },
       buildWhen: (context, state) =>
-          state is GetMasterDataSuccess || state is GetCvListSuccess,
+          state is GetMasterDataSuccess || state is GetCvListSuccess || statusDraft ==true || statusComplete == true,
     );
   }
 
@@ -283,13 +285,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                                 FilterCustom(
                                   onclick: (){
-                                      for(int i = 0; i < _cvList.length ;i++){
                                         setState(() {
-                                          arrayIndex.clear();
-                                          arrayIndex.add(i);
-                                         // print(arrayIndex);
+                                         statusAll =true;
                                         });
-                                      }
+
 
                                   },
                                   text: 'All',
@@ -298,34 +297,17 @@ class _HomeScreenState extends State<HomeScreen> {
                                 FilterCustom(
                                   onclick: (){
                                    setState(() {
-                                     status = true;
+                                     statusComplete = true;
                                    });
-                                         // for(int i = 0; i < _cvList.length ;i++){
-                                         //   if(_cvList[i].status == false){
-                                         //     setState(() {
-                                         //       arrayIndex.clear();
-                                         //       arrayIndex.add(i);
-                                         //       //print(arrayIndex);
-                                         //     });
-                                         //   }
-                                         // }
-
                                   },
                                   text: 'Draft',
                                   sizeBorder: true,
                                 ),
                                 FilterCustom(
                                   onclick: (){
-                                      for(int i = 0; i < _cvList.length ;i++){
-                                        if(_cvList[i].status == true){
                                        setState(() {
-                                         arrayIndex.clear();
-                                         arrayIndex.add(i);
-                                         //print(arrayIndex);
+                                         statusDraft = true;
                                        });
-                                        }
-                                      }
-
                                   },
                                   text: 'Completed',
                                   sizeBorder: true,
@@ -424,6 +406,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
   // Create list CV
   Widget _buildListCV(BuildContext context) {
+    print('status : ${statusComplete}');
     var w = MediaQuery.of(context).size.width;
     return Column(
       mainAxisSize: MainAxisSize.max,
@@ -455,7 +438,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 itemCount: _cvList.length,
                 itemBuilder: (context, index) {
                   final item = _cvList[index];
-                  return _buildCVItem(context, item, false,index);
+                if(_cvList[index].status==true && statusComplete ==true){
+                  statusDraft = null;
+                   return _buildCVItem(context, item, false,index);
+                }else if(_cvList[index].status == false && statusDraft == true){
+                  statusComplete = null ;
+                    return _buildCVItem(context, item, false,index);
+                }
+                  return Container();
                 }),
           ),
         ),
