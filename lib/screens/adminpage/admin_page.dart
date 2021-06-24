@@ -8,6 +8,7 @@ import 'package:flutter_cv_maker/common/common_style.dart';
 import 'package:flutter_cv_maker/common/common_ui.dart';
 import 'package:flutter_cv_maker/common/progress_bar_dialog.dart';
 import 'package:flutter_cv_maker/models/cv_model/admin_page_model.dart';
+import 'package:flutter_cv_maker/routes/routes.dart';
 import 'package:flutter_cv_maker/screens/adminpage/role_page/company_page.dart';
 import 'package:flutter_cv_maker/screens/adminpage/role_page/project_page.dart';
 import 'package:flutter_cv_maker/screens/adminpage/role_page/highlight_page.dart';
@@ -245,10 +246,6 @@ class _AdminPageState extends State<AdminPage> {
             child: _buildMenuItem(context, ROLE_PAGE_ID,
                 'Technical summary'.toUpperCase(), isNarrow)),
         InkWell(
-            onTap: () => setState(() => _pageId = SKILL_PAGE_ID),
-            child: _buildMenuItem(
-                context, SKILL_PAGE_ID, 'Skill'.toUpperCase(), isNarrow)),
-        InkWell(
             onTap: () => setState(() => _pageId = HIGHLIGHT_PAGE_ID),
             child: _buildMenuItem(context, HIGHLIGHT_PAGE_ID,
                 'Highlight project technical'.toUpperCase(), isNarrow)),
@@ -260,6 +257,22 @@ class _AdminPageState extends State<AdminPage> {
             onTap: () => setState(() => _pageId = PROJECT_PAGE_ID),
             child: _buildMenuItem(context, PROJECT_PAGE_ID,
                 'Project responsibilities'.toUpperCase(), isNarrow)),
+        InkWell(
+            onTap: () => setState(() => _pageId = SKILL_PAGE_ID),
+            child: _buildMenuItem(
+                context, SKILL_PAGE_ID, 'Skill'.toUpperCase(), isNarrow)),
+
+        SizedBox(height: 30,),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ButtonCommon(buttonText: 'Home Page', onClick: (){
+              navKey.currentState.pushNamed(
+                  routeHome);
+            }),
+          ],
+        )
+
       ],
     );
   }

@@ -146,9 +146,20 @@ class CommonStyle {
         fontSize: DoubleExt(10).textSizePdf(context),
         color: Colors.grey);
   }
-  static TextStyle size10W400black(BuildContext context) {
+  static TextStyle size8grey(BuildContext context) {
+    return GoogleFonts.roboto(
+        fontSize: DoubleExt(8).textSizePdf(context),
+        color: Colors.grey, fontWeight: FontWeight.w400);
+  }
+  static TextStyle size10W700black(BuildContext context) {
     return GoogleFonts.ptSerif(
         fontSize: DoubleExt(10).textSizePdf(context),
+        fontWeight: FontWeight.w700,
+        color: Colors.black);
+  }
+  static TextStyle size8W400black(BuildContext context) {
+    return GoogleFonts.ptSerif(
+        fontSize: DoubleExt(6).textSizePdf(context),
         fontWeight: FontWeight.w400,
         color: Colors.black);
   }

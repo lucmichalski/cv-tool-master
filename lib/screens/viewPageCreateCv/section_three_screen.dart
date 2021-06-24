@@ -60,11 +60,12 @@ class _SectionThreeState extends State<SectionThree> {
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Container(
-          margin: EdgeInsets.symmetric(horizontal: w * 0.2),
+          padding: EdgeInsets.symmetric(horizontal: w * 0.02),
           child: Column(
             children: [
               SizedBox(height: 50,),
               HorizontalLine('Professional Experience'),
+              SizedBox(height: 20,),
               _buildProfessional(context),
               SizedBox(
                 height: 10,
@@ -246,7 +247,7 @@ class _SectionThreeState extends State<SectionThree> {
                       child: Row(
                         children: [
                           Text(
-                            '${professional.startDate ?? monthYear(DateTime.now())}',
+                            '${professional.startDate ?? monthYear(DateTime.now())}' ?? kEmpty,
                             style: CommonStyle.inputStyle(context),
                           ),
                           Container(
@@ -304,7 +305,7 @@ class _SectionThreeState extends State<SectionThree> {
                         child: Row(
                           children: [
                             Text(
-                              '${professional.endDate ?? monthYear(DateTime.now())}',
+                              '${professional.endDate ?? monthYear(DateTime.now())}'?? kEmpty,
                               style: CommonStyle.inputStyle(context),
                             ),
                             Container(

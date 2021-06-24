@@ -77,10 +77,10 @@ class _SectionOneScreenState extends State<SectionOneScreen> {
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
-          padding: EdgeInsets.only(bottom: sizeWith * 0.05),
+          padding: EdgeInsets.symmetric(horizontal: sizeWith * 0.02),
           child: Container(
             width: MediaQuery.of(context).size.width,
-            margin: EdgeInsets.symmetric(horizontal: sizeWith * 0.2),
+          //  margin: EdgeInsets.symmetric(horizontal: sizeWith * 0.2),
             child: Column(
               children: [
                 SizedBox(
@@ -139,12 +139,14 @@ class _SectionOneScreenState extends State<SectionOneScreen> {
   Widget _buildAutoComplete(BuildContext context) {
     return Autocomplete<String>(
       fieldViewBuilder: (context, controller, focus, func) {
+        controller.text = widget.cvModel.position;
+        controller.selection =
+            TextSelection.collapsed(offset: controller.text.length);
         return TextFieldCommon(
-          maxLines: 1,
           icon: Icon(Icons.work,size: 16,),
-          // textInputAction: TextInputAction.go,
-          onFieldSubmitted: (val) {
+          onChanged: (val) {
             setState(() {
+              print(val);
               widget.cvModel.position = val;
             });
           },
@@ -165,10 +167,9 @@ class _SectionOneScreenState extends State<SectionOneScreen> {
         }
       },
       onSelected: (String selection) {
-        // setState(() {
-        //   widget.cvModel.highLightProjectList[index].technologies
-        //       .add(selection);
-        // });
+        setState(() {
+          widget.cvModel.position = selection;
+        });
       },
     );
   }
@@ -185,9 +186,14 @@ class _SectionOneScreenState extends State<SectionOneScreen> {
                       '$gender',
                       style: CommonStyle.inputStyle(context),
                     ),
+                    autofocus: true,
+
                     groupValue:_genderSelected,
                     onChanged: (val) {
-                      setState(() => _genderSelected = val);
+                      setState(() {
+                        _genderSelected = val;
+                        widget.cvModel.gender = val;
+                      });
                     }),
               ))
           .toList(),

@@ -346,8 +346,8 @@ class HorizontalLine extends StatelessWidget {
             height: 3,
           ),
           Container(
-              margin:
-                  EdgeInsets.only(right: MediaQuery.of(context).size.width / 4),
+              // margin:
+              //     EdgeInsets.only(right: MediaQuery.of(context).size.width / 4),
               child: Divider(color: Color(0xff434b65))),
         ],
       ),
@@ -592,7 +592,7 @@ class FilterCustom extends StatelessWidget {
           borderRadius:
           BorderRadius.circular(20),
         ),
-        onTap: () {},
+        onTap:onclick,
         child: Container(
           height: 35,
           padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),

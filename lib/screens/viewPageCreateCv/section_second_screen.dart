@@ -54,9 +54,9 @@ class _SecondScreenState extends State<SecondScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
-        padding: EdgeInsets.only(bottom: w * 0.05),
+        padding: EdgeInsets.symmetric(horizontal: w * 0.02),
         child: Container(
-          margin: EdgeInsets.symmetric(horizontal: w * 0.2),
+          //margin: EdgeInsets.symmetric(horizontal: w * 0.2),
           child: Column(
             children: [
               SizedBox(height: 50,),

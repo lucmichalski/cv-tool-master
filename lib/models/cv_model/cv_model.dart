@@ -39,14 +39,14 @@ class CVModel {
     position = json['position'];
     status = json['status'];
     if (json['role'] != null) {
-      role = [];
+      role =  [];
       json['role'].forEach((v) {
         role.add(new Role.fromJson(v));
       });
     }
     technicalSummaryList = json['technicalSummaryList'].cast<String>();
     if (json['educationList'] != null) {
-      educationList = [];
+      educationList =  [];
       json['educationList'].forEach((v) {
         educationList.add(new EducationList.fromJson(v));
       });
@@ -58,7 +58,7 @@ class CVModel {
       });
     }
     if (json['skills'] != null) {
-      skills =[];
+      skills =  [];
       json['skills'].forEach((v) {
         skills.add(new Skills.fromJson(v));
       });
@@ -70,7 +70,7 @@ class CVModel {
       });
     }
     if (json['highLightProjectList'] != null) {
-      highLightProjectList = [];
+      highLightProjectList =[];
       json['highLightProjectList'].forEach((v) {
         highLightProjectList.add(new HighLightProjectList.fromJson(v));
       });
@@ -249,6 +249,10 @@ class HighLightProjectList {
   String position;
   List<String> responsibility;
   List<String> technologies;
+  String communicationused;
+  String uiuxdesign;
+  String documentcontrol;
+  String projectmanagementtool;
 
   HighLightProjectList(
       {this.projectNm,
@@ -256,7 +260,11 @@ class HighLightProjectList {
         this.teamSize,
         this.position,
         this.responsibility,
-        this.technologies});
+        this.technologies,
+        this.communicationused,
+        this.uiuxdesign,
+        this.documentcontrol,
+        this.projectmanagementtool});
 
   HighLightProjectList.fromJson(Map<String, dynamic> json) {
     projectNm = json['projectNm'];
@@ -265,6 +273,10 @@ class HighLightProjectList {
     position = json['position'];
     responsibility = json['responsibility'].cast<String>();
     technologies = json['technologies'].cast<String>();
+    communicationused = json['communicationused'];
+    uiuxdesign = json['uiuxdesign'];
+    documentcontrol = json['documentcontrol'];
+    projectmanagementtool = json['projectmanagementtool'];
   }
 
   Map<String, dynamic> toJson() {
@@ -275,10 +287,14 @@ class HighLightProjectList {
     data['position'] = this.position;
     data['responsibility'] = this.responsibility;
     data['technologies'] = this.technologies;
+    data['communicationused'] = this.communicationused;
+    data['uiuxdesign'] = this.uiuxdesign;
+    data['documentcontrol'] = this.documentcontrol;
+    data['projectmanagementtool'] = this.projectmanagementtool;
     return data;
   }
 }
-//
+
 class Languages {
   String languageNm;
   String level;

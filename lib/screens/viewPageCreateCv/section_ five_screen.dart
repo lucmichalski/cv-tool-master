@@ -2,10 +2,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cv_maker/common/common_style.dart';
 import 'package:flutter_cv_maker/common/common_ui.dart';
+import 'package:flutter_cv_maker/constants/constants.dart';
 import 'package:flutter_cv_maker/models/cv_model/cv_model.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:universal_html/html.dart' as html;
+import 'package:universal_html/js.dart';
 
 class SectionFive extends StatelessWidget {
   final CVModel cvModel;
@@ -39,6 +41,7 @@ class SectionFive extends StatelessWidget {
     pdf.addPage(
       pw.MultiPage(
         build: (pw.Context context) => [
+          pw.Header(child: pw.Text('CV Tool from: Techvify.com.vn',style: styles14bold)),
           pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
@@ -70,6 +73,9 @@ class SectionFive extends StatelessWidget {
             ],
           ),
         ],
+        footer: (context){
+          return pw.Text('techvify.com.vn',style: styles14bold);
+        }
       ),
     );
     final bytes = await pdf.save();
@@ -94,34 +100,15 @@ class SectionFive extends StatelessWidget {
   Widget _buildPdfFile(BuildContext context) {
     var w = MediaQuery.of(context).size.width;
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: w * 0.2),
+      margin: EdgeInsets.symmetric(horizontal: w * 0.05),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              ButtonCommon(
-                  buttonText: 'SAVE CV',
-                  suffixIcon: Icon(
-                    Icons.arrow_right_alt_outlined,
-                    size: 16,
-                    color: Colors.white,
-                  ),
-                  onClick: () {
-                    if (cvModel.id != null) {
-                      update();
-                    } else {
-                      saveSv();
-                    }
-                  }),
-            ],
-          ),
           SizedBox(
             height: 20,
           ),
           Text(
-            cvModel.name + '${cvModel.gender}',
+            cvModel.name + '(${cvModel.gender})',
             style: CommonStyle.size20W700black(context),
           ),
           SizedBox(
@@ -670,6 +657,14 @@ class SectionFive extends StatelessWidget {
                   _getDataResponsibility(highLightProject.responsibility)),
               _buildTableRow(context, 'Technology used',
                   highLightProject.technologies.join(', ').toString()),
+              _buildTableRow(context, 'Communication used ',
+                  highLightProject.communicationused),
+              _buildTableRow(context, 'UI&UX design ',
+                  highLightProject.uiuxdesign),
+              _buildTableRow(context, 'Document Control ',
+                  highLightProject.documentcontrol),
+              _buildTableRow(context, 'Project management tool ',
+                  highLightProject.projectmanagementtool),
             ],
           ),
         ],
@@ -712,6 +707,14 @@ class SectionFive extends StatelessWidget {
                   _getDataResponsibility(highLightProject.responsibility)),
               _buildTableRowPdf('Technology used',
                   highLightProject.technologies.join(',').toString()),
+              _buildTableRowPdf('Communication used ',
+                  highLightProject.communicationused),
+              _buildTableRowPdf( 'UI&UX design ',
+                  highLightProject.uiuxdesign),
+              _buildTableRowPdf('Document Control ',
+                  highLightProject.documentcontrol),
+              _buildTableRowPdf('Project management tool ',
+                  highLightProject.projectmanagementtool),
             ],
           ),
         ],
@@ -733,11 +736,11 @@ class SectionFive extends StatelessWidget {
     return TableRow(children: [
       Padding(
         padding: EdgeInsets.all(16.0),
-        child: Text(title, style: CommonStyle.size12W400black(context)),
+        child: Text(title ?? kEmpty, style: CommonStyle.size12W400black(context)),
       ),
       Padding(
         padding: EdgeInsets.all(16.0),
-        child: Text(content, style: CommonStyle.size12W400black(context)),
+        child: Text(content ?? kEmpty, style: CommonStyle.size12W400black(context)),
       ),
     ]);
   }

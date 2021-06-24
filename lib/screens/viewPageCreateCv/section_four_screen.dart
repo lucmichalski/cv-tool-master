@@ -73,9 +73,9 @@ class _SectionFourState extends State<SectionFour> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
-        padding: EdgeInsets.only(bottom: w * 0.05),
+        padding: EdgeInsets.symmetric(horizontal: w * 0.02),
         child: Container(
-            margin: EdgeInsets.symmetric(horizontal: w * 0.2),
+           // margin: EdgeInsets.symmetric(horizontal: w * 0.2),
             child: Column(
               children: [
                 SizedBox(
@@ -208,6 +208,73 @@ class _SectionFourState extends State<SectionFour> {
           SizedBox(
             height: 10,
           ),
+          Row(
+            children: [
+              Expanded(
+                child: TextFieldCommon(
+                  label: 'Communication used',
+                  controller: _generateController(
+                    'Communicationused-$index',
+                    _highLightProjectList[index].communicationused,
+                  ),
+                  onChanged: (val) {
+                    widget.cvModel.highLightProjectList[index].communicationused = val;
+                  },
+                ),
+              ),
+              SizedBox(
+               width: 10,
+              ),
+              Expanded(
+                child: TextFieldCommon(
+                  label: 'UI&UX design ',
+                  controller: _generateController(
+                    'UIUXdesign -$index',
+                    _highLightProjectList[index].uiuxdesign,
+                  ),
+                  onChanged: (val) {
+                    widget.cvModel.highLightProjectList[index].uiuxdesign = val;
+                  },
+                ),
+              ),
+
+            ],
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: TextFieldCommon(
+                  label: 'Document Control',
+                  controller: _generateController(
+                    'DocumentControl -$index',
+                    _highLightProjectList[index].documentcontrol,
+                  ),
+                  onChanged: (val) {
+                    widget.cvModel.highLightProjectList[index].documentcontrol = val;
+                  },
+                ),
+              ),
+              SizedBox(
+                width: 10,
+              ),
+              Expanded(
+                child: TextFieldCommon(
+                  label: 'Project management tool ',
+                  controller: _generateController(
+                    'Projectmanagementtool -$index',
+                    _highLightProjectList[index].projectmanagementtool,
+                  ),
+                  onChanged: (val) {
+                    widget.cvModel.highLightProjectList[index].projectmanagementtool = val;
+                  },
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 15,),
           TextFieldCommon(
             maxLines: 3,
             contentPadding: EdgeInsets.symmetric(vertical: 12, horizontal: 12),
@@ -227,17 +294,7 @@ class _SectionFourState extends State<SectionFour> {
           Row(
             children: [
               Expanded(
-                child: _buildAutoComplete(context, index)
-                // TextFieldCommon(
-                //   label: 'Position',
-                //   controller: _generateController(
-                //     'position-$index',
-                //     _highLightProjectList[index].position,
-                //   ),
-                //   onChanged: (val) {
-                //     widget.cvModel.highLightProjectList[index].position = val;
-                //   },
-                // ),
+                child: _autoCompletePosition(context, index)
               ),
               SizedBox(
                 width: 15,
@@ -307,7 +364,7 @@ class _SectionFourState extends State<SectionFour> {
               SizedBox(
                 height: 20,
               ),
-              _autoComplete(context, index)
+              _autoCompleteTechnology(context, index)
             ],
           ),
           SizedBox(
@@ -332,48 +389,7 @@ class _SectionFourState extends State<SectionFour> {
     );
   }
 
-  // AutocompleteTextField UI
-  Widget _autoComplete(BuildContext context, int index) {
-    return Autocomplete<String>(
-      fieldViewBuilder: (context, controller, focus, func) {
-        controller.text = widget.cvModel.highLightProjectList[index].position;
-        controller.selection =
-            TextSelection.collapsed(offset: controller.text.length);
-        return TextFieldCommon(
-          maxLines: 1,
-          // textInputAction: TextInputAction.go,
-          onChanged: (value) {
-            widget.cvModel.highLightProjectList[index].position = value;
-          },
-          controller: controller,
-          focusNode: focus,
-          label: 'Technology',
-
-        );
-      },
-      optionsBuilder: (TextEditingValue textEditingValue) {
-        if (textEditingValue.text == '') {
-          return Iterable<String>.empty();
-        } else {
-          return _technologiesList.where((element) => element
-              .toLowerCase()
-              .contains(textEditingValue.text.toLowerCase()));
-        }
-      },
-      onSelected: (String selection) {
-        setState(() {
-          widget.cvModel.highLightProjectList[index].position = selection;
-          var responsibility = widget.cvModel.highLightProjectList.firstWhere((element) => element.position == selection, orElse: () => null);
-          if (responsibility != null) {
-            widget.cvModel.highLightProjectList[index].responsibility.addAll(responsibility.responsibility);
-          }
-        });
-      },
-    );
-  }
-
-  Widget _buildAutoComplete(BuildContext context, int index) {
-    print('${_roleNmList.first}');
+  Widget _autoCompletePosition(BuildContext context, int index) {
     return Autocomplete<String>(
       fieldViewBuilder: (context, controller, focus, func) {
         controller.text = widget.cvModel.highLightProjectList[index].position;
@@ -407,6 +423,44 @@ class _SectionFourState extends State<SectionFour> {
           if (responsibility != null) {
             widget.cvModel.highLightProjectList[index].responsibility.addAll(responsibility.responsibilities);
           }
+        });
+      },
+    );
+  }
+
+  // AutocompleteTextField UI
+  Widget _autoCompleteTechnology(BuildContext context, int index) {
+    return Autocomplete<String>(
+      fieldViewBuilder: (context, controller, focus, func) {
+        controller.text = '';
+        return TextFieldCommon(
+          textInputAction: TextInputAction.go,
+          onFieldSubmitted: (val) {
+            setState(() {
+              controller.text = '';
+              widget.cvModel.highLightProjectList[index].technologies
+                  .add(val);
+            });
+          },
+          controller: controller,
+          focusNode: focus,
+          label: 'Technology',
+
+        );
+      },
+      optionsBuilder: (TextEditingValue textEditingValue) {
+        if (textEditingValue.text == '') {
+          return Iterable<String>.empty();
+        } else {
+          return _technologiesList.where((element) => element
+              .toLowerCase()
+              .contains(textEditingValue.text.toLowerCase()));
+        }
+      },
+      onSelected: (String selection) {
+        setState(() {
+          widget.cvModel.highLightProjectList[index].technologies
+              .add(selection);
         });
       },
     );
@@ -475,7 +529,7 @@ class _SectionFourState extends State<SectionFour> {
           },
           labelPadding: EdgeInsets.symmetric(horizontal: 4),
           deleteIconColor: Colors.white,
-          label: Text(listTechnologies[index].toString())),
+          label: Text(listTechnologies[index].toString() ?? kEmpty)),
     );
   }
 
