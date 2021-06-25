@@ -78,41 +78,44 @@ class _SecondScreenState extends State<SecondScreen> {
                 height: 10.0,
               ),
               _buildCertificate(context),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  TextButton(
-                      onPressed: () {
-                        if (widget.pageController.hasClients) {
-                          widget.pageController.animateToPage(
-                            0,
-                            duration: const Duration(milliseconds: 700),
-                            curve: Curves.easeInOut,
-                          );
-                        }
-                      },
-                      child: Text(
-                        'PREVIOUS',
-                        style: CommonStyle.white700Size22(context)
-                            .copyWith(color: Colors.grey),
-                      )),
-                  ButtonCommon(
-                      buttonText: 'NEXT',
-                      suffixIcon: Icon(
-                        Icons.arrow_right_alt_outlined,
-                        size: 16,
-                        color: Colors.white,
-                      ),
-                      onClick: () {
-                        if (widget.pageController.hasClients) {
-                          widget.pageController.animateToPage(
-                            2,
-                            duration: const Duration(milliseconds: 700),
-                            curve: Curves.easeInOut,
-                          );
-                        }
-                      }),
-                ],
+              Padding(
+                padding: EdgeInsets.only(bottom: MediaQuery.of(context).size.width * 0.05),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    TextButton(
+                        onPressed: () {
+                          if (widget.pageController.hasClients) {
+                            widget.pageController.animateToPage(
+                              0,
+                              duration: const Duration(milliseconds: 700),
+                              curve: Curves.easeInOut,
+                            );
+                          }
+                        },
+                        child: Text(
+                          'PREVIOUS',
+                          style: CommonStyle.white700Size22(context)
+                              .copyWith(color: Colors.grey),
+                        )),
+                    ButtonCommon(
+                        buttonText: 'NEXT',
+                        suffixIcon: Icon(
+                          Icons.arrow_right_alt_outlined,
+                          size: 16,
+                          color: Colors.white,
+                        ),
+                        onClick: () {
+                          if (widget.pageController.hasClients) {
+                            widget.pageController.animateToPage(
+                              2,
+                              duration: const Duration(milliseconds: 700),
+                              curve: Curves.easeInOut,
+                            );
+                          }
+                        }),
+                  ],
+                ),
               )
             ],
           ),

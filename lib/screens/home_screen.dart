@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -6,13 +8,12 @@ import 'package:flutter_cv_maker/blocs/authen_bloc/bloc/master_bloc/get_master_d
 import 'package:flutter_cv_maker/common/alert_dialog_custom.dart';
 import 'package:flutter_cv_maker/common/common_style.dart';
 import 'package:flutter_cv_maker/common/common_ui.dart';
-import 'package:flutter_cv_maker/common/progress_bar_dialog.dart';
+import 'package:flutter_cv_maker/common/confirm_dialog.dart';
 import 'package:flutter_cv_maker/helper.dart';
 import 'package:flutter_cv_maker/models/cv_model/admin_page_model.dart';
 import 'package:flutter_cv_maker/models/cv_model/cv_model.dart';
 import 'package:flutter_cv_maker/routes/routes.dart';
 import 'package:flutter_cv_maker/utils/shared_preferences_service.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key key}) : super(key: key);
@@ -24,17 +25,25 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   List<CVModel> _cvList = [];
   MasterData _masterData;
-    List<int> arrayIndex =[];
-    bool statusComplete = false;
-    bool statusDraft = false ;
-    bool statusAll ;
+  int _pageIndex = 1;
+  bool _isStatusFiltered;
+  bool _isDateFiltered;
+  bool _isLoading = false;
+  int _totalPage = 1;
+  int _totalRecords = 0;
+  int _totalDraft = 0;
+  int _totalCompleted = 0;
+  List<PaginationModel> _pageIndexList = [];
+  bool _isLastSelected = false;
+
   @override
   void initState() {
-
+    print('DAy la date: ${DateTime.now()}');
     // Get master data
     _fetchMasterData();
     // Get list cv
-    _fetchCVList();
+    _fetchCVList(1);
+    _pageIndexList.add(PaginationModel(index: 1, isSelected: true));
     super.initState();
   }
 
@@ -43,10 +52,10 @@ class _HomeScreenState extends State<HomeScreen> {
     BlocProvider.of<CVBloc>(context).add(RequestGetCVListEvent());
   }
 
-  _fetchCVList() async {
+  _fetchCVList(int index) async {
     final pref = await SharedPreferencesService.instance;
-    BlocProvider.of<CVBloc>(context)
-        .add(RequestGetCVModel(pref.getAccessToken));
+    BlocProvider.of<CVBloc>(context).add(RequestGetCVModel(
+        pref.getAccessToken, index, _isStatusFiltered, _isDateFiltered));
   }
 
   @override
@@ -55,35 +64,51 @@ class _HomeScreenState extends State<HomeScreen> {
       builder: (context, state) => _buildHomePage(context),
       listener: (context, state) {
         if (state is CVListLoading) {
-          showProgressBar(context, true);
+          _isLoading = true;
         } else if (state is GetMasterDataSuccess) {
+          _isLoading = false;
           setState(() {
             _masterData = state.masterData;
           });
           print('Home MasterData: ${_masterData.summary.first.role}');
         } else if (state is GetMasterDataError) {
-          showProgressBar(context, false);
+          _isLoading = false;
           showAlertDialog(
               context, 'Error', state.message, () => Navigator.pop(context));
         } else if (state is GetCvListSuccess) {
-          _cvList = state.cvList;
+          _totalRecords = state.cvList.total;
+          _totalCompleted = state.cvList.totalCompleted;
+          _totalDraft = state.cvList.totalDraft;
+          _totalPage = state.cvList.totalPages;
+          _isLoading = false;
+          print('CVList: ' + state.cvList.items.length.toString());
+          _cvList = state.cvList.items;
+          if (_pageIndexList.isNotEmpty && _pageIndexList[0].isSelected) {
+            _pageIndexList.clear();
+            for (int i = 1; i <= state.cvList.totalPages; i++) {
+              // if (!_pageIndexList.contains(PaginationModel(index: i, isSelected: false))) {
+              _pageIndexList.add(
+                  PaginationModel(index: i, isSelected: i == 1 ? true : false));
+              // }
+            }
+          }
         } else if (state is GetCvListError) {
-          showProgressBar(context, false);
+          _isLoading = false;
           showAlertDialog(
               context, 'Error', state.message, () => Navigator.pop(context));
         } else if (state is DeleteCvSuccess) {
-          showProgressBar(context, false);
-          _fetchCVList();
+          _isLoading = false;
+          _fetchCVList(1);
           showAlertDialog(context, 'Success', 'Delete CV success!',
               () => Navigator.pop(context));
         } else if (state is DeleteCvError) {
-          showProgressBar(context, false);
+          _isLoading = false;
           showAlertDialog(
               context, 'Error', state.message, () => Navigator.pop(context));
         }
       },
       buildWhen: (context, state) =>
-          state is GetMasterDataSuccess || state is GetCvListSuccess || statusDraft ==true || statusComplete == true,
+          state is GetMasterDataSuccess || state is GetCvListSuccess,
     );
   }
 
@@ -134,93 +159,114 @@ class _HomeScreenState extends State<HomeScreen> {
         // padding: EdgeInsets.only(top: w * 0.05),F'F
         child: Column(
           children: [
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: w * 0.01),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Container(
-                      decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border:
-                              Border.all(color: Colors.lightBlue, width: 2)),
-                      child: CircleAvatar(
-                        child: Icon(Icons.person),
-                      )),
-                  SizedBox(
-                    width: 16,
-                  ),
-                  LinkText(
-                      text: 'Kelvin Khanh',
-                      color: Colors.white,
-                      onTapLink: () {
-                        navKey.currentState.pushNamed(
-                          routeAdmin,
-                        );
-                      }),
-                  SizedBox(
-                    width: w * 0.05,
-                  )
-                ],
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _buildTopMenu(context),
+                LinkText(
+                    text: 'Logout',
+                    color: Colors.red,
+                    onTapLink: () async {
+                      final pref = await SharedPreferencesService.instance;
+                      pref.removeAccessToken();
+                      navKey.currentState.pushNamedAndRemoveUntil(routeLogin, (route) => false);
+                    }),
+              ],
             ),
             Expanded(
               child: Container(
                 child: Column(
                   children: [
                     Padding(
-                      padding:  EdgeInsets.symmetric(vertical: 10),
-                      child: Text('${monthYear(DateTime.now())}',style: CommonStyle.size12W400black(context),),
+                      padding: EdgeInsets.symmetric(vertical: 10),
+                      child: Text(
+                        '${ddMMMyyyy(DateTime.now())}',
+                        style: CommonStyle.size12W400black(context),
+                      ),
                     ),
                     Padding(
                       padding: EdgeInsets.all(8.0),
-                      child: Divider(height:1,color: Colors.grey),
+                      child: Divider(height: 1, color: Colors.grey),
                     ),
                     Row(
                       children: [
-                        Expanded(child: Column(
+                        Expanded(
+                            child: Column(
                           children: [
-                            Icon(Icons.summarize,color:Colors.lightGreen),
-                            SizedBox(height: 5,),
-                           Text.rich(TextSpan(
-                             children: [
-                               TextSpan(text: '${_cvList.length} ', style: CommonStyle.size16W400hintTitle(context).copyWith(fontWeight: FontWeight.w700)),
-                               TextSpan(text: 'Total', style: CommonStyle.grey400Size22(context).copyWith(fontSize: 10)),
-                             ]
-                           ))
+                            Icon(Icons.summarize, color: Colors.lightGreen),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            Text.rich(TextSpan(children: [
+                              TextSpan(
+                                  text: '$_totalRecords ',
+                                  style:
+                                      CommonStyle.size16W400hintTitle(context)
+                                          .copyWith(
+                                              fontWeight: FontWeight.w700)),
+                              TextSpan(
+                                  text: 'Total',
+                                  style: CommonStyle.grey400Size22(context)
+                                      .copyWith(fontSize: 10)),
+                            ]))
                           ],
                         )),
-                        Expanded(child: Column(
+                        Expanded(
+                            child: Column(
                           children: [
-                            Icon(Icons.timelapse,color: Colors.yellow,),
-                            SizedBox(height: 5,),
-                            Text.rich(TextSpan(
-                                children: [
-                                  TextSpan(text: '${draft.length} ', style: CommonStyle.size16W400hintTitle(context).copyWith(fontWeight: FontWeight.w700)),
-                                  TextSpan(text: 'Draft', style: CommonStyle.grey400Size22(context).copyWith(fontSize: 10)),
-                                ]
-                            ))
+                            Icon(
+                              Icons.timelapse,
+                              color: Colors.yellow,
+                            ),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            Text.rich(TextSpan(children: [
+                              TextSpan(
+                                  text: '$_totalDraft ',
+                                  style:
+                                      CommonStyle.size16W400hintTitle(context)
+                                          .copyWith(
+                                              fontWeight: FontWeight.w700)),
+                              TextSpan(
+                                  text: 'Draft',
+                                  style: CommonStyle.grey400Size22(context)
+                                      .copyWith(fontSize: 10)),
+                            ]))
                           ],
                         )),
-                        Expanded(child: Column(
+                        Expanded(
+                            child: Column(
                           children: [
-                            Icon(Icons.check_circle,color:Colors.lightGreen),
-                            SizedBox(height: 5,),
-                            Text.rich(TextSpan(
-                                children: [
-                                  TextSpan(text: '${complete.length} ', style: CommonStyle.size16W400hintTitle(context).copyWith(fontWeight: FontWeight.w700)),
-                                  TextSpan(text: 'Completed', style: CommonStyle.grey400Size22(context).copyWith(fontSize: 10)),
-                                ]
-                            ))
+                            Icon(Icons.check_circle, color: Colors.lightGreen),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            Text.rich(TextSpan(children: [
+                              TextSpan(
+                                  text: '$_totalCompleted ',
+                                  style:
+                                      CommonStyle.size16W400hintTitle(context)
+                                          .copyWith(
+                                              fontWeight: FontWeight.w700)),
+                              TextSpan(
+                                  text: 'Completed',
+                                  style: CommonStyle.grey400Size22(context)
+                                      .copyWith(fontSize: 10)),
+                            ]))
                           ],
                         )),
-
                       ],
                     ),
-                    SizedBox(height: 16,),
+                    SizedBox(
+                      height: 16,
+                    ),
                     Padding(
                       padding: EdgeInsets.all(8.0),
-                      child: Divider(height: 1,color: Colors.grey,),
+                      child: Divider(
+                        height: 1,
+                        color: Colors.grey,
+                      ),
                     )
                   ],
                 ),
@@ -284,38 +330,53 @@ class _HomeScreenState extends State<HomeScreen> {
                                       fontWeight: FontWeight.bold),
                                 ),
                                 FilterCustom(
-                                  onclick: (){
-                                        setState(() {
-                                         statusAll =true;
-                                        });
-
-
+                                  onclick: () {
+                                    setState(() {
+                                      _isStatusFiltered = null;
+                                      _isDateFiltered = null;
+                                      _fetchCVList(1);
+                                    });
                                   },
                                   text: 'All',
                                   sizeBorder: true,
                                 ),
                                 FilterCustom(
-                                  onclick: (){
-                                   setState(() {
-                                     statusComplete = true;
-                                   });
+                                  onclick: () {
+                                    setState(() {
+                                      if (_isStatusFiltered == null) {
+                                        _isStatusFiltered = false;
+                                      } else {
+                                        _isStatusFiltered = !_isStatusFiltered;
+                                      }
+                                      _fetchCVList(1);
+                                    });
                                   },
-                                  text: 'Draft',
+                                  text: _isStatusFiltered == null
+                                      ? 'Status'
+                                      : _isStatusFiltered
+                                          ? 'Completed'
+                                          : 'Draft',
                                   sizeBorder: true,
                                 ),
                                 FilterCustom(
-                                  onclick: (){
-                                       setState(() {
-                                         statusDraft = true;
-                                       });
+                                  onclick: () {
+                                    setState(() {
+                                      if (_isDateFiltered == null) {
+                                        _isDateFiltered = false;
+                                      } else {
+                                        _isDateFiltered = !_isDateFiltered;
+                                      }
+                                      _fetchCVList(1);
+                                    });
                                   },
-                                  text: 'Completed',
+                                  text: 'Created Date',
                                   sizeBorder: true,
+                                  isDesc: _isDateFiltered,
                                 ),
-                                FilterCustom(
-                                  text: 'Role',
-                                  sizeBorder: true,
-                                ),
+                                // FilterCustom(
+                                //   text: 'Role',
+                                //   sizeBorder: true,
+                                // ),
                               ],
                             ),
                           ),
@@ -367,13 +428,15 @@ class _HomeScreenState extends State<HomeScreen> {
                         ? _cvList.elementAt(0)
                         : CVModel(
                             position: '', email: '', status: false, name: ''),
-                    true ,1),
+                    true,
+                    1),
                 // _buildCVItem(context, _cvList[0])
               ))
         ],
       ),
     );
   }
+
   // Handle onClick create CV event
   _handleCreateCVEvent() {
     CVModel model = CVModel(
@@ -388,11 +451,10 @@ class _HomeScreenState extends State<HomeScreen> {
               position: '',
               teamSize: '',
               projectDescription: '',
-            communicationused: '',
-            documentcontrol: '',
-            projectmanagementtool: '',
-            uiuxdesign: ''
-          )
+              communicationused: '',
+              documentcontrol: '',
+              projectmanagementtool: '',
+              uiuxdesign: '')
         ],
         technicalSummaryList: [],
         status: false,
@@ -400,53 +462,67 @@ class _HomeScreenState extends State<HomeScreen> {
         skills: [],
         professionalList: [],
         certificateList: [],
-        gender: '');
+        gender: 'Mr.');
 
     navKey.currentState.pushNamed(routeCreateCV, arguments: model);
   }
+
   // Create list CV
   Widget _buildListCV(BuildContext context) {
-    print('status : ${statusComplete}');
     var w = MediaQuery.of(context).size.width;
     return Column(
       mainAxisSize: MainAxisSize.max,
       children: [
-        SizedBox(height: 20,),
-        Padding(
-          padding:  EdgeInsets.symmetric(horizontal: w*0.078),
-          child: Divider(height: 1,color: Colors.grey,),
+        SizedBox(
+          height: 5,
         ),
-        SizedBox(height: 20,),
         Padding(
-          padding:  EdgeInsets.symmetric(horizontal: w*0.078),
+          padding: EdgeInsets.symmetric(horizontal: w * 0.078),
+          child: _buildPaginationLayout(context),
+        ),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: w * 0.078),
+          child: Divider(
+            height: 1,
+            color: Colors.grey,
+          ),
+        ),
+        SizedBox(
+          height: 10,
+        ),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: w * 0.078),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Upcoming',style: CommonStyle.size14W700black(context),),
+              Text(
+                'CV List',
+                style: CommonStyle.size14W700black(context),
+              ),
             ],
           ),
         ),
-        SingleChildScrollView(
-        scrollDirection: Axis.vertical,
-        physics: AlwaysScrollableScrollPhysics(),
+        _isLoading ? Container(color: Colors.white, child: CircularProgressIndicator(),)
+            :SingleChildScrollView(
+          scrollDirection: Axis.vertical,
+          physics: AlwaysScrollableScrollPhysics(),
           child: Container(
-            height: MediaQuery.of(context).size.height/2,
-            child: ListView.builder(
-              scrollDirection: Axis.vertical,
-                padding: EdgeInsets.only(top: 30),
-                shrinkWrap: true,
-                itemCount: _cvList.length,
-                itemBuilder: (context, index) {
-                  final item = _cvList[index];
-                if(_cvList[index].status==true && statusComplete ==true){
-                  statusDraft = null;
-                   return _buildCVItem(context, item, false,index);
-                }else if(_cvList[index].status == false && statusDraft == true){
-                  statusComplete = null ;
-                    return _buildCVItem(context, item, false,index);
-                }
-                  return Container();
-                }),
+            height: MediaQuery.of(context).size.height / 2,
+            child: _cvList.length > 0
+                ? ListView.builder(
+                    scrollDirection: Axis.vertical,
+                    padding: EdgeInsets.only(top: 30),
+                    shrinkWrap: true,
+                    itemCount: _cvList.length,
+                    itemBuilder: (context, index) {
+                      final item = _cvList[index];
+                      return _buildCVItem(context, item, false, index);
+                    })
+                : Container(
+                    child: Text('No CV available',
+                        style: CommonStyle.grey900Size48(context).copyWith(
+                            fontSize: 20, fontWeight: FontWeight.w400)),
+                  ),
           ),
         ),
       ],
@@ -454,15 +530,15 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // Build item CV
-  Widget _buildCVItem(BuildContext context, CVModel model, bool isRecent , int index) {
+  Widget _buildCVItem(
+      BuildContext context, CVModel model, bool isRecent, int index) {
     var w = MediaQuery.of(context).size.width;
     return Container(
       margin: EdgeInsets.symmetric(
           vertical: !isRecent ? w * 0.01 : 0,
           horizontal: !isRecent ? w * 0.074 : 0),
       decoration:
-          BoxDecoration(
-              borderRadius: BorderRadius.all(Radius.circular(12))),
+          BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(12))),
       child: Material(
         color: Colors.white,
         borderRadius: BorderRadius.all(Radius.circular(12)),
@@ -471,42 +547,47 @@ class _HomeScreenState extends State<HomeScreen> {
           onTap: () =>
               navKey.currentState.pushNamed(routeCreateCV, arguments: model),
           child: Container(
-            decoration: BoxDecoration(
-            ),
+              decoration: BoxDecoration(),
               height: 100,
               // padding: EdgeInsets.symmetric(vertical: w * 0.01),
               child: Row(
                 children: [
                   // Date time
                   Expanded(
-                    flex: 1,
-                    child: Row(
-                      children: [
-                        Container(
-                          height: MediaQuery.of(context).size.height*0.087,
-                          width: 3.5,
-                          decoration: BoxDecoration(
-                              color:model.status ? Colors.lightGreen :Colors.red.shade400,
-                            borderRadius: BorderRadius.only(topLeft:Radius.circular(50.0),bottomLeft:Radius.circular(50.0))
+                      flex: 1,
+                      child: Row(
+                        children: [
+                          Container(
+                            height: MediaQuery.of(context).size.height * 0.087,
+                            width: 3.5,
+                            decoration: BoxDecoration(
+                                color: model.status
+                                    ? Colors.lightGreen
+                                    : Colors.amber,
+                                borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(50.0),
+                                    bottomLeft: Radius.circular(50.0))),
                           ),
-                        ),
-                        SizedBox(width: 30,),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              '11:00 AM',
-                              style: CommonStyle.size12W400xam(context),
-                            ),
-                            Text('Yesterday', style: CommonStyle.size10xam(context))
-                          ],
-                        ),
-                      ],
-                    )
-                  ),
+                          SizedBox(
+                            width: 30,
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                '${hhMM(model.createdDate)}',
+                                style: CommonStyle.size12W400xam(context),
+                              ),
+                              Text('${getDate(model.createdDate)}',
+                                  style: CommonStyle.size10xam(context))
+                            ],
+                          ),
+                        ],
+                      )),
                   Padding(
-                    padding: EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.width*0.005),
+                    padding: EdgeInsets.symmetric(
+                        vertical: MediaQuery.of(context).size.width * 0.005),
                     child: VerticalDivider(
                       color: Colors.grey.shade200,
                       width: 1,
@@ -530,8 +611,14 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                           Row(
                             children: [
-                              Icon(Icons.location_pin,size: 16,color: Colors.grey,),
-                              SizedBox(width: 6,),
+                              Icon(
+                                Icons.work,
+                                size: 16,
+                                color: Colors.grey,
+                              ),
+                              SizedBox(
+                                width: 6,
+                              ),
                               Text('${model.position}',
                                   style: CommonStyle.size10xam(context))
                             ],
@@ -585,22 +672,24 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Row(
                       children: [
                         IconButton(
-                            tooltip: 'Preview',
-                            color: Color(0xff434b65),
-                            icon: Icon(Icons.remove_red_eye),
-                            onPressed: () {}),
-                        IconButton(
                             tooltip: 'Download',
                             color: Color(0xff434b65),
                             icon: Icon(Icons.download_rounded),
                             onPressed: () {}),
                         IconButton(
                           onPressed: () async {
-                            final pref =
-                                await SharedPreferencesService.instance;
-                            BlocProvider.of<CVBloc>(context).add(
-                                RequestDeleteCvEvent(
-                                    pref.getAccessToken, _cvList[index].id));
+                            await showDialog(
+                                context: context,
+                                barrierDismissible: false,
+                                builder: (BuildContext context) {
+                                  return ConfirmDialog(onDeleteConfirmed: () async {
+                                    final pref =
+                                        await SharedPreferencesService.instance;
+                                    BlocProvider.of<CVBloc>(context).add(
+                                        RequestDeleteCvEvent(
+                                            pref.getAccessToken, _cvList[index].id));
+                                  },);
+                                });
                           },
                           tooltip: 'Delete',
                           color: Color(0xff434b65),
@@ -615,4 +704,151 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+
+  Widget _buildTopMenu(BuildContext context) {
+    var w = MediaQuery.of(context).size.width;
+    // final widgets = ['Admin page', 'Account', 'Logout']
+    //     .map((x) => DropdownMenuItem(
+    //   child: Text(
+    //     x,
+    //     style: CommonStyle.inputStyle(context),
+    //   ),
+    //   value: ['Admin page', 'Account', 'Logout'].indexOf(x),
+    // ))
+    //     .toList();
+
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: w * 0.01),
+      child: Material(
+        color: Color(0xff2c3a5c).withOpacity(0.8),
+        borderRadius: BorderRadius.all(Radius.circular(100)),
+        child: InkWell(
+          borderRadius: BorderRadius.all(Radius.circular(100)),
+          onTap: () {},
+          child: Container(
+            padding: EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(100)),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Container(
+                    decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border:
+                        Border.all(color: Colors.lightBlue, width: 2)),
+                    child: CircleAvatar(
+                      child: Icon(Icons.person),
+                    )),
+                SizedBox(
+                  width: 16,
+                ),
+                LinkText(
+                    text: 'Kelvin Khanh',
+                    color: Colors.white,
+                    onTapLink: () {
+                      navKey.currentState.pushNamed(
+                        routeAdmin,
+                      );
+                    }),
+                SizedBox(
+                  width: w * 0.05,
+                )
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPaginationLayout(BuildContext context) {
+    // if (_pageIndexList.isNotEmpty) _pageIndexList.clear();
+    if (_totalPage == null) return Container();
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Visibility(
+          visible: !_pageIndexList[0].isSelected,
+          child: TextButton(onPressed: () {
+            setState(() {
+              _isLastSelected = false;
+              _pageIndexList.forEach((element) {
+                element.isSelected = false;
+              });
+              _pageIndexList[0].isSelected = true;
+              _fetchCVList(1);
+            });
+          }, child: Text('PREV')),
+        ),
+        Row(
+           children:_pageIndexList.map((e) => InkWell(
+             onTap: (){
+              setState(() {
+                _isLastSelected = false;
+                _pageIndexList.forEach((element) {
+                  element.isSelected = false;
+                });
+                e.isSelected = true;
+                print('Index: ${e.index}');
+                _fetchCVList(e.index);
+              });
+             },
+             child: Container(
+               color: e.isSelected ? Colors.blue : Colors.transparent,
+               child: Padding(
+                 padding:  EdgeInsets.symmetric(vertical: 10,horizontal: 16),
+                 child: Text('${e.index}',style: TextStyle(color:e.isSelected ? Colors.white :Colors.blue,fontSize: 16),),
+               ),
+             ),
+           )).toList(),
+        ),
+        Visibility(
+          visible: _totalPage > 4,
+          child: Padding(
+            padding:  EdgeInsets.symmetric(vertical: 10,horizontal: 16),
+            child: Text('...',style: TextStyle(color:Colors.blue,fontSize: 16),),
+          ),
+        ),
+        Visibility(
+          visible: _totalPage > 4,
+          child: InkWell(
+            onTap: () {
+              setState(() {
+                _pageIndexList.forEach((element) {
+                  element.isSelected = false;
+                });
+                _isLastSelected = true;
+              });
+              _fetchCVList(_totalPage);
+            },
+            child: Container(
+              color: _isLastSelected ? Colors.blue : Colors.transparent,
+              child: Padding(
+                padding:  EdgeInsets.symmetric(vertical: 10,horizontal: 16),
+                child: Text('$_totalPage',style: TextStyle(color: _isLastSelected ? Colors.white : Colors.blue, fontSize: 16),),
+              ),
+            ),
+          ),
+        ),
+        Visibility(
+          visible: _totalPage > 4,
+          child: TextButton(onPressed: () {
+            setState(() {
+              _isLastSelected = true;
+            });
+            _fetchCVList(_totalPage);
+          }, child: Text('NEXT')),
+        ),
+      ],
+    );
+  }
+
+}
+
+class PaginationModel {
+  int index;
+  bool isSelected;
+  PaginationModel({this.index, this.isSelected});
 }

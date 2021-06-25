@@ -25,11 +25,14 @@ class RequestCreateCvEvent extends CVEvent {
 }
 class RequestGetCVModel extends CVEvent {
   final String accessToken;
+  final int pageIndex;
+  final bool status;
+  final bool createdDate;
 
-  const RequestGetCVModel(this.accessToken);
+  const RequestGetCVModel(this.accessToken, this.pageIndex, this.status, this.createdDate);
 
   @override
-  List<Object> get props => [accessToken];
+  List<Object> get props => [accessToken, pageIndex, status, createdDate];
 }
 // create cv event
 class RequestUpdateCvEvent extends CVEvent {

@@ -59,6 +59,11 @@ class _SectionOneScreenState extends State<SectionOneScreen> {
     _fullNameController.text = _cvModel.name ?? kEmpty;
     _emailController.text = _cvModel.email ?? kEmpty;
     _positionController.text = _cvModel.position ?? kEmpty;
+    if (widget.cvModel.gender == null || widget.cvModel.gender.isEmpty) {
+      widget.cvModel.gender = 'Mr.';
+    } else {
+      _genderSelected = widget.cvModel.gender;
+    }
     // Get data for Technical Summary
   }
 
@@ -186,8 +191,6 @@ class _SectionOneScreenState extends State<SectionOneScreen> {
                       '$gender',
                       style: CommonStyle.inputStyle(context),
                     ),
-                    autofocus: true,
-
                     groupValue:_genderSelected,
                     onChanged: (val) {
                       setState(() {
@@ -249,26 +252,29 @@ class _SectionOneScreenState extends State<SectionOneScreen> {
           SizedBox(
             height: MediaQuery.of(context).size.width * 0.03,
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              ButtonCommon(
-                  buttonText: 'NEXT',
-                  suffixIcon: Icon(
-                    Icons.arrow_right_alt_outlined,
-                    size: 16,
-                    color: Colors.white,
-                  ),
-                  onClick: () {
-                    if (widget.pageController.hasClients) {
-                      widget.pageController.animateToPage(
-                        1,
-                        duration: const Duration(milliseconds: 700),
-                        curve: Curves.easeInOut,
-                      );
-                    }
-                  }),
-            ],
+          Padding(
+            padding: EdgeInsets.only(bottom: MediaQuery.of(context).size.width * 0.05),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                ButtonCommon(
+                    buttonText: 'NEXT',
+                    suffixIcon: Icon(
+                      Icons.arrow_right_alt_outlined,
+                      size: 16,
+                      color: Colors.white,
+                    ),
+                    onClick: () {
+                      if (widget.pageController.hasClients) {
+                        widget.pageController.animateToPage(
+                          1,
+                          duration: const Duration(milliseconds: 700),
+                          curve: Curves.easeInOut,
+                        );
+                      }
+                    }),
+              ],
+            ),
           )
         ],
       ),

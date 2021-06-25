@@ -13,23 +13,24 @@ class CVModel {
   List<ProfessionalList> professionalList;
   List<HighLightProjectList> highLightProjectList;
   List<Languages> languages;
+  String createdDate;
 
   CVModel(
-      {
-        this.id,
-        this.name,
-        this.email,
-        this.gender,
-        this.position,
-        this.status,
-        this.role,
-        this.technicalSummaryList,
-        this.educationList,
-        this.certificateList,
-        this.skills,
-        this.professionalList,
-        this.highLightProjectList,
-        this.languages});
+      {this.id,
+      this.name,
+      this.email,
+      this.gender,
+      this.position,
+      this.status,
+      this.role,
+      this.technicalSummaryList,
+      this.educationList,
+      this.certificateList,
+      this.skills,
+      this.professionalList,
+      this.highLightProjectList,
+      this.languages,
+      this.createdDate});
 
   CVModel.fromJson(Map<String, dynamic> json) {
     id = json['_id'] as String;
@@ -44,6 +45,7 @@ class CVModel {
         role.add(new Role.fromJson(v));
       });
     }
+    createdDate = json['createdDate'];
     technicalSummaryList = json['technicalSummaryList'].cast<String>();
     if (json['educationList'] != null) {
       educationList =  [];
@@ -122,15 +124,15 @@ class CVModel {
 
 class Role {
   String roleNm;
-  String level;
-  String technicals;
+  List<String> level;
+  List<String> technicals;
 
   Role({this.roleNm, this.level, this.technicals});
 
   Role.fromJson(Map<String, dynamic> json) {
     roleNm = json['roleNm'];
-    level = json['level'];
-    technicals = json['technicals'];
+    level = json['level'].cast<String>();
+    technicals = json['technicals'].cast<String>();
   }
 
   Map<String, dynamic> toJson() {

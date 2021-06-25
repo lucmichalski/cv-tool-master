@@ -4,6 +4,7 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_cv_maker/models/cv_model/admin_page_model.dart';
 import 'package:flutter_cv_maker/models/cv_model/cv_model.dart';
+import 'package:flutter_cv_maker/models/cv_model/cv_model_response.dart';
 import 'package:flutter_cv_maker/services/api_call.dart';
 import 'package:flutter_cv_maker/utils/shared_preferences_service.dart';
 
@@ -39,8 +40,8 @@ class CVBloc extends Bloc<CVEvent, CVState> {
     }else if(event is RequestGetCVModel){
       yield CVListLoading();
       try{
-        final responseCreate = await repository.fetchDataCV(event.accessToken);
-        yield GetCvListSuccess(responseCreate);
+        final response = await repository.fetchDataCV(event.accessToken, event.pageIndex, event.status, event.createdDate);
+        yield GetCvListSuccess(response);
       }catch(e){
         yield GetCvListError(message: e.toString());
       }

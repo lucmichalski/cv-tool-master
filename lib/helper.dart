@@ -1,3 +1,4 @@
+import 'package:flutter_cv_maker/constants/constants.dart';
 import 'package:intl/intl.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
@@ -7,6 +8,33 @@ String monthYear(DateTime date) {
     return formattedDate;
   }
   return null;
+}
+
+String ddMMMyyyy(DateTime date) {
+  if (date != null) {
+    String formattedDate = DateFormat('dd MMM yyyy').format(date);
+    return formattedDate;
+  }
+  return null;
+}
+
+String hhMM(String value) {
+  if (value != null) {
+    final f = new DateFormat('yyyy-MM-ddTHH:mm:ss').parse(value);
+    String formattedDate = DateFormat('hh:mm a').format(f);
+    return formattedDate;
+  }
+  return kEmpty;
+}
+
+String getDate(String value) {
+  print(value);
+  if (value != null) {
+    final f = new DateFormat('yyyy-MM-ddTHH:mm:ss').parse(value);
+    String formattedDate = DateFormat('dd/MM/yyyy').format(f);
+    return formattedDate;
+  }
+  return kEmpty;
 }
 
 Future<DateTime> showMonthPicker({

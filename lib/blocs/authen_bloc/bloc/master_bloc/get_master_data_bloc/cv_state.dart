@@ -48,7 +48,7 @@ class CreateCvError extends CVState {
 }
 // get CV success
 class GetCvListSuccess extends CVState {
-  final List<CVModel> cvList;
+  final ListCVResponse cvList;
 
   GetCvListSuccess(this.cvList);
 

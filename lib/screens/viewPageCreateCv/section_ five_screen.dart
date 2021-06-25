@@ -1,5 +1,8 @@
+import 'dart:typed_data';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_cv_maker/common/common_style.dart';
 import 'package:flutter_cv_maker/common/common_ui.dart';
 import 'package:flutter_cv_maker/constants/constants.dart';
@@ -9,7 +12,7 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:universal_html/html.dart' as html;
 import 'package:universal_html/js.dart';
 
-class SectionFive extends StatelessWidget {
+class SectionFive extends StatefulWidget {
   final CVModel cvModel;
   final PageController pageController;
   final Function saveSv;
@@ -17,7 +20,16 @@ class SectionFive extends StatelessWidget {
 
   SectionFive({this.cvModel, this.pageController, this.saveSv, this.update});
 
+  @override
+  _SectionFiveState createState() => _SectionFiveState();
+}
+
+class _SectionFiveState extends State<SectionFive> {
+
+
+
   Future<html.Blob> myGetBlobPdfContent() async {
+    final imageSvg = await rootBundle.loadString('assets/image/ic_logo_tvf.svg');
     final styles20bold = pw.TextStyle(
       fontSize: 20,
       color: PdfColor.fromInt(0xFF000000),
@@ -25,6 +37,11 @@ class SectionFive extends StatelessWidget {
     );
     final styles14bold = pw.TextStyle(
       fontSize: 14,
+      color: PdfColor.fromInt(0xFF000000),
+      font: pw.Font.times(),
+    );
+    final styles8 = pw.TextStyle(
+      fontSize: 8,
       color: PdfColor.fromInt(0xFF000000),
       font: pw.Font.times(),
     );
@@ -41,40 +58,53 @@ class SectionFive extends StatelessWidget {
     pdf.addPage(
       pw.MultiPage(
         build: (pw.Context context) => [
-          pw.Header(child: pw.Text('CV Tool from: Techvify.com.vn',style: styles14bold)),
           pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
               pw.Text(
-                  cvModel.name +
-                      '${cvModel.gender == 'Male' ? ' (Mr.)' : ' (Mrs.)'}',
+                  widget.cvModel.name +
+                      '${widget.cvModel.gender == 'Male' ? ' (Mr.)' : ' (Mrs.)'}',
                   style: styles20bold),
               pw.SizedBox(
                 height: 6,
               ),
-              pw.Text(cvModel.position, style: styles14bold),
+              pw.Text(widget.cvModel.position, style: styles14bold),
               pw.Padding(
                   padding:
                       pw.EdgeInsets.symmetric(horizontal: 35.0, vertical: 16.0),
                   child:
-                      pw.Text('Email: ${cvModel.email}', style: styles12bold)),
-             cvModel.professionalList.isNotEmpty ? _buildSectionTitlePdf('Professional summary', styles16bold) :pw.Container(),
-              cvModel.professionalList.isNotEmpty ?  _buildProfessionalPdf() :pw.Container(),
-        cvModel.educationList.isNotEmpty  ? _buildSectionTitlePdf('Education', styles16bold) : pw.Container() ,
-              cvModel.educationList.isNotEmpty  ? _buildEducationPdf() : pw.Container() ,
-              cvModel.technicalSummaryList.isNotEmpty ? _buildSectionTitlePdf('Technical Skills', styles16bold) : pw.Container(),
-              cvModel.technicalSummaryList.isNotEmpty ? _buildTechnicalSkillsPdf() : pw.Container(),
-              cvModel.professionalList.isNotEmpty ? _buildSectionTitlePdf('Professional Experience', styles16bold) : pw.Container(),
-              cvModel.professionalList.isNotEmpty ? _buildProfessionalExperiencesPdf() : pw.Container(),
-              cvModel.highLightProjectList.isNotEmpty ? _buildSectionTitlePdf('HighLight Project', styles16bold) : pw.Container(),
-              cvModel.highLightProjectList.isNotEmpty ? _buildHighLightProjectsPdf() : pw.Container(),
+                      pw.Text('Email: ${widget.cvModel.email}', style: styles12bold)),
+             widget.cvModel.professionalList.isNotEmpty ? _buildSectionTitlePdf('Professional summary', styles16bold) :pw.Container(),
+              widget.cvModel.professionalList.isNotEmpty ?  _buildProfessionalPdf() :pw.Container(),
+        widget.cvModel.educationList.isNotEmpty  ? _buildSectionTitlePdf('Education', styles16bold) : pw.Container() ,
+              widget.cvModel.educationList.isNotEmpty  ? _buildEducationPdf() : pw.Container() ,
+              widget.cvModel.technicalSummaryList.isNotEmpty ? _buildSectionTitlePdf('Technical Skills', styles16bold) : pw.Container(),
+              widget.cvModel.technicalSummaryList.isNotEmpty ? _buildTechnicalSkillsPdf() : pw.Container(),
+              widget.cvModel.professionalList.isNotEmpty ? _buildSectionTitlePdf('Professional Experience', styles16bold) : pw.Container(),
+              widget.cvModel.professionalList.isNotEmpty ? _buildProfessionalExperiencesPdf() : pw.Container(),
+              widget.cvModel.highLightProjectList.isNotEmpty ? _buildSectionTitlePdf('Highlight Project', styles16bold) : pw.Container(),
+              widget.cvModel.highLightProjectList.isNotEmpty ? _buildHighLightProjectsPdf() : pw.Container(),
                _buildSectionTitlePdf('Languages', styles16bold) ,
               _buildLanguagePdf()
             ],
           ),
         ],
+        header: (context) {
+          return pw.Row(
+            mainAxisAlignment: pw.MainAxisAlignment.end,
+            children: [
+              pw.SvgImage(svg: imageSvg, width: 140, height: 25, fit: pw.BoxFit.cover)
+            ]
+          );
+        },
         footer: (context){
-          return pw.Text('techvify.com.vn',style: styles14bold);
+          return pw.Row(
+            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+            children: [
+              pw.Text('TECHVIFY., JSC - CV - Confidential',style: styles8),
+              pw.Text('Page ${context.pageNumber} of ${context.pagesCount}',style: styles8)
+            ]
+          );
         }
       ),
     );
@@ -84,8 +114,13 @@ class SectionFive extends StatelessWidget {
   }
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    myGetBlobPdfContent();
+    // myGetBlobPdfContent();
     return Scaffold(
       body: Container(
           child: SingleChildScrollView(
@@ -108,31 +143,31 @@ class SectionFive extends StatelessWidget {
             height: 20,
           ),
           Text(
-            cvModel.name + '(${cvModel.gender})',
+            widget.cvModel.name + '(${widget.cvModel.gender})',
             style: CommonStyle.size20W700black(context),
           ),
           SizedBox(
             height: 6,
           ),
           Text(
-            cvModel.position,
+            widget.cvModel.position,
             style: CommonStyle.size14W500black(context),
           ),
           Padding(
               padding: EdgeInsets.symmetric(horizontal: 35.0, vertical: 16.0),
-              child: Text('Email: ${cvModel.email}',
+              child: Text('Email: ${widget.cvModel.email}',
                   style: CommonStyle.size12W400black(context))),
-          cvModel.technicalSummaryList.isNotEmpty
+          widget.cvModel.technicalSummaryList.isNotEmpty
               ? _buildSectionTitle(context, 'Professional summary')
               : Container(),
           _buildProfessional(context),
-         cvModel.educationList.isNotEmpty ? _buildSectionTitle(context, 'Education') :Container(),
-          cvModel.educationList.isNotEmpty ?  _buildEducation(context) :Container(),
-         cvModel.technicalSummaryList.isNotEmpty ? _buildSectionTitle(context, 'Technical Skills'):Container(),
-          cvModel.technicalSummaryList.isNotEmpty ? _buildTechnicalSkills(context) :Container(),
-         cvModel.professionalList.isNotEmpty ? _buildSectionTitle(context, 'Professional Experience'):Container(),
-          cvModel.professionalList.isNotEmpty  ?  _buildProfessionalExperiences(context):Container(),
-        cvModel.highLightProjectList.isNotEmpty ?  _buildHighLightProjects(context) : Container(),
+         widget.cvModel.educationList.isNotEmpty ? _buildSectionTitle(context, 'Education') :Container(),
+          widget.cvModel.educationList.isNotEmpty ?  _buildEducation(context) :Container(),
+         widget.cvModel.technicalSummaryList.isNotEmpty ? _buildSectionTitle(context, 'Technical Skills'):Container(),
+          widget.cvModel.technicalSummaryList.isNotEmpty ? _buildTechnicalSkills(context) :Container(),
+         widget.cvModel.professionalList.isNotEmpty ? _buildSectionTitle(context, 'Professional Experience'):Container(),
+          widget.cvModel.professionalList.isNotEmpty  ?  _buildProfessionalExperiences(context):Container(),
+        widget.cvModel.highLightProjectList.isNotEmpty ?  _buildHighLightProjects(context) : Container(),
           _buildSectionTitle(context, 'Languages'),
           _buildLanguage(context)
         ],
@@ -140,7 +175,6 @@ class SectionFive extends StatelessWidget {
     );
   }
 
-  // Build section title
   Widget _buildSectionTitle(BuildContext context, String title) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 16),
@@ -157,7 +191,6 @@ class SectionFive extends StatelessWidget {
     );
   }
 
-  //buidl section title Pdf
   pw.Widget _buildSectionTitlePdf(String title, final styles16bold) {
     return pw.Padding(
       padding: pw.EdgeInsets.symmetric(vertical: 16),
@@ -197,7 +230,7 @@ class SectionFive extends StatelessWidget {
                 html.document.createElement('a') as html.AnchorElement
                   ..href = url
                   ..style.display = 'none'
-                  ..download = 'some_name.pdf';
+                  ..download = 'CV_TVF_${widget.cvModel.name.replaceAll(' ', '_')}.pdf';
             html.document.body.children.add(anchor);
             anchor.click();
             html.document.body.children.remove(anchor);
@@ -208,25 +241,24 @@ class SectionFive extends StatelessWidget {
     );
   }
 
-  // Create Professional list
+
+
   Widget _buildProfessional(BuildContext context) {
     return Column(
-      children: cvModel.technicalSummaryList
+      children: widget.cvModel.technicalSummaryList
           .map((summary) => _buildProfessionalItem(context, summary))
           .toList(),
     );
   }
 
-  //create Professional list pdf
   pw.Widget _buildProfessionalPdf() {
     return pw.Column(
-      children: cvModel.technicalSummaryList
+      children: widget.cvModel.technicalSummaryList
           .map((summary) => _buildProfessionalItemPdf(summary))
           .toList(),
     );
   }
 
-  // Create Professional item
   Widget _buildProfessionalItem(BuildContext context, String summaryItem) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 5, horizontal: 35),
@@ -247,7 +279,6 @@ class SectionFive extends StatelessWidget {
     );
   }
 
-  // Create Professional item pdf
   pw.Widget _buildProfessionalItemPdf(String summaryItem) {
     return pw.Padding(
       padding: pw.EdgeInsets.symmetric(vertical: 5, horizontal: 35),
@@ -279,25 +310,22 @@ class SectionFive extends StatelessWidget {
     );
   }
 
-  // Build Education list
   Widget _buildEducation(BuildContext context) {
     return Column(
-      children: cvModel.educationList
+      children: widget.cvModel.educationList
           .map((education) => _buildEducationItem(context, education))
           .toList(),
     );
   }
 
-  // Build Education list pdf
   pw.Widget _buildEducationPdf() {
     return pw.Column(
-      children: cvModel.educationList
+      children: widget.cvModel.educationList
           .map((education) => _buildEducationItempdf(education))
           .toList(),
     );
   }
 
-  // Build Education item
   Widget _buildEducationItem(BuildContext context, EducationList education) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 4, horizontal: 35),
@@ -318,7 +346,6 @@ class SectionFive extends StatelessWidget {
     );
   }
 
-  // Build Education item pdf
   pw.Widget _buildEducationItempdf(EducationList education) {
     return pw.Padding(
       padding: pw.EdgeInsets.symmetric(vertical: 4, horizontal: 35),
@@ -348,25 +375,22 @@ class SectionFive extends StatelessWidget {
     );
   }
 
-  // Build Technical skill list
   Widget _buildTechnicalSkills(BuildContext context) {
     return Column(
-      children: cvModel.skills
+      children: widget.cvModel.skills
           .map((skill) => _buildTechnicalSkillItem(context, skill))
           .toList(),
     );
   }
 
-  // Build Technical skill list pdf
   pw.Widget _buildTechnicalSkillsPdf() {
     return pw.Column(
-      children: cvModel.skills
+      children: widget.cvModel.skills
           .map((skill) => _buildTechnicalSkillItemPdf(skill))
           .toList(),
     );
   }
 
-  // Build Technical skill item
   Widget _buildTechnicalSkillItem(BuildContext context, Skills skill) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 5, horizontal: 35),
@@ -385,7 +409,6 @@ class SectionFive extends StatelessWidget {
     );
   }
 
-  // Build Technical skill item pdf
   pw.Widget _buildTechnicalSkillItemPdf(Skills skill) {
     return pw.Padding(
       padding: pw.EdgeInsets.symmetric(vertical: 5, horizontal: 35),
@@ -414,27 +437,24 @@ class SectionFive extends StatelessWidget {
     );
   }
 
-  // Build Professional Experience list
   Widget _buildProfessionalExperiences(BuildContext context) {
     return Column(
-      children: cvModel.professionalList
+      children: widget.cvModel.professionalList
           .map((professional) =>
               _buildProfessionalExperienceItem(context, professional))
           .toList(),
     );
   }
 
-  // Build Professional Experience list pdf
   pw.Widget _buildProfessionalExperiencesPdf() {
     return pw.Column(
-      children: cvModel.professionalList
+      children: widget.cvModel.professionalList
           .map((professional) =>
               _buildProfessionalExperienceItemPdf(professional))
           .toList(),
     );
   }
 
-  // Build Professional Experience item
   Widget _buildProfessionalExperienceItem(
       BuildContext context, ProfessionalList professional) {
     return Padding(
@@ -486,7 +506,6 @@ class SectionFive extends StatelessWidget {
     );
   }
 
-  // Build Professional Experience item pdf
   pw.Widget _buildProfessionalExperienceItemPdf(ProfessionalList professional) {
     return pw.Padding(
       padding: pw.EdgeInsets.symmetric(vertical: 5, horizontal: 35),
@@ -494,27 +513,24 @@ class SectionFive extends StatelessWidget {
         crossAxisAlignment: pw.CrossAxisAlignment.start,
         children: [
           pw.Row(
+            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
             children: [
-              pw.Row(children: [
-                pw.Text(
-                  '${professional.companyNm}, ',
-                  style: pw.TextStyle(
-                    fontSize: 12,
-                    color: PdfColor.fromInt(0xFF000000),
-                    font: pw.Font.timesBold(),
-                  ),
+              pw.Text(
+                '${professional.companyNm}'.toUpperCase(),
+                style: pw.TextStyle(
+                  fontSize: 12,
+                  color: PdfColor.fromInt(0xFF000000),
+                  font: pw.Font.timesBold(),
                 ),
-                pw.SizedBox(width: 14.0),
-                pw.Text(
-                  '${professional.locationNm} ',
-                  style: pw.TextStyle(
-                    fontSize: 12,
-                    color: PdfColor.fromInt(0xFF000000),
-                    font: pw.Font.times(),
-                  ),
-                )
-              ]),
-              pw.Spacer(),
+              ),
+              pw.Text(
+                '${professional.locationNm} ',
+                style: pw.TextStyle(
+                  fontSize: 12,
+                  color: PdfColor.fromInt(0xFF000000),
+                  font: pw.Font.times(),
+                ),
+              ),
               pw.Text(
                 '${professional.startDate} - ${professional.endDate}',
                 style: pw.TextStyle(
@@ -528,14 +544,13 @@ class SectionFive extends StatelessWidget {
           pw.SizedBox(height: 8.0),
           pw.Row(children: [
             pw.Text(
-              'Role:  ',
+              'Role: ',
               style: pw.TextStyle(
                 fontSize: 12,
                 color: PdfColor.fromInt(0xFF000000),
                 font: pw.Font.timesBold(),
               ),
             ),
-            pw.SizedBox(width: 14.0),
             pw.Text(
               '${professional.roleNm} ',
               style: pw.TextStyle(
@@ -554,26 +569,6 @@ class SectionFive extends StatelessWidget {
               font: pw.Font.times(),
             ),
           ),
-          pw.Row(
-            children: [
-              pw.Container(
-                height: 8,
-                width: 8,
-                decoration: pw.BoxDecoration(
-                    color: PdfColor.fromInt(0xFF000000),
-                    borderRadius: pw.BorderRadius.circular(5)),
-              ),
-              pw.SizedBox(width: 16.0),
-              pw.Text(
-                'Participate in various software development phase such as:',
-                style: pw.TextStyle(
-                  fontSize: 12,
-                  color: PdfColor.fromInt(0xFF000000),
-                  font: pw.Font.times(),
-                ),
-              )
-            ],
-          ),
           pw.SizedBox(
             height: 8.0,
           ),
@@ -584,6 +579,11 @@ class SectionFive extends StatelessWidget {
               children: professional.responsibilities
                   .map((responsibility) => pw.Bullet(
                         text: responsibility,
+                style: pw.TextStyle(
+                  fontSize: 12,
+                  color: PdfColor.fromInt(0xFF000000),
+                  font: pw.Font.times(),
+                )
                       ))
                   .toList(),
             ),
@@ -593,15 +593,14 @@ class SectionFive extends StatelessWidget {
     );
   }
 
-  // Build highlight project list
   Widget _buildHighLightProjects(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _buildSectionTitle(context, 'HighLight Project'),
+        _buildSectionTitle(context, 'Highlight Project'),
         Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: cvModel.highLightProjectList
+          children: widget.cvModel.highLightProjectList
               .map((highLightProject) =>
                   _buildHighLightProjectItem(context, highLightProject))
               .toList(),
@@ -610,14 +609,13 @@ class SectionFive extends StatelessWidget {
     );
   }
 
-  // Build highlight project list pdf
   pw.Widget _buildHighLightProjectsPdf() {
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.stretch,
       children: [
         pw.Column(
           crossAxisAlignment: pw.CrossAxisAlignment.stretch,
-          children: cvModel.highLightProjectList
+          children: widget.cvModel.highLightProjectList
               .map((highLightProject) =>
                   _buildHighLightProjectItemPdfT(highLightProject))
               .toList(),
@@ -626,7 +624,6 @@ class SectionFive extends StatelessWidget {
     );
   }
 
-  // Build highlight project item
   Widget _buildHighLightProjectItem(
       BuildContext context, HighLightProjectList highLightProject) {
     return Container(
@@ -649,21 +646,21 @@ class SectionFive extends StatelessWidget {
             },
             border: TableBorder.all(color: Colors.black),
             children: [
-              _buildTableRow(context, 'Project Description',
-                  highLightProject.projectDescription),
-              _buildTableRow(context, 'Team size', highLightProject.teamSize),
-              _buildTableRow(context, 'Position', highLightProject.position),
-              _buildTableRow(context, 'Responsibility',
-                  _getDataResponsibility(highLightProject.responsibility)),
-              _buildTableRow(context, 'Technology used',
+              if(highLightProject.projectDescription.isNotEmpty)_buildTableRow(context, 'Project Description',
+                  highLightProject.projectDescription) ,
+              if( highLightProject.teamSize.isNotEmpty)  _buildTableRow(context, 'Team size', highLightProject.teamSize),
+              if(highLightProject.position.isNotEmpty ) _buildTableRow(context, 'Position', highLightProject.position),
+              if(highLightProject.responsibility.isNotEmpty )_buildTableRow(context, 'Responsibility',
+                  _getDataResponsibility(highLightProject.responsibility)) ,
+              if( highLightProject.technologies.isNotEmpty ) _buildTableRow(context, 'Technology used',
                   highLightProject.technologies.join(', ').toString()),
-              _buildTableRow(context, 'Communication used ',
+              if( highLightProject.communicationused.isNotEmpty) _buildTableRow(context, 'Communication used ',
                   highLightProject.communicationused),
-              _buildTableRow(context, 'UI&UX design ',
-                  highLightProject.uiuxdesign),
-              _buildTableRow(context, 'Document Control ',
+              if(highLightProject.uiuxdesign.isNotEmpty ) _buildTableRow(
+                  context, 'UI&UX design ', highLightProject.uiuxdesign),
+              if(highLightProject.documentcontrol.isNotEmpty ) _buildTableRow(context, 'Document Control ',
                   highLightProject.documentcontrol),
-              _buildTableRow(context, 'Project management tool ',
+              if(highLightProject.projectmanagementtool.isNotEmpty ) _buildTableRow(context, 'Project management tool ',
                   highLightProject.projectmanagementtool),
             ],
           ),
@@ -672,7 +669,6 @@ class SectionFive extends StatelessWidget {
     );
   }
 
-  // Build highlight project item
   pw.Widget _buildHighLightProjectItemPdfT(
       HighLightProjectList highLightProject) {
     return pw.Container(
@@ -699,21 +695,21 @@ class SectionFive extends StatelessWidget {
             },
             border: pw.TableBorder.all(color: PdfColor.fromInt(0xFF000000)),
             children: [
-              _buildTableRowPdf(
+              if(highLightProject.projectDescription.isNotEmpty) _buildTableRowPdf(
                   'Project Description', highLightProject.projectDescription),
-              _buildTableRowPdf('Team size', highLightProject.teamSize),
-              _buildTableRowPdf('Position', highLightProject.position),
-              _buildTableRowPdf('Responsibility',
+              if(highLightProject.teamSize.isNotEmpty)  _buildTableRowPdf('Team size', highLightProject.teamSize),
+              if(highLightProject.position.isNotEmpty) _buildTableRowPdf('Position', highLightProject.position),
+              if(highLightProject.responsibility.isNotEmpty) _buildTableRowPdf('Responsibility',
                   _getDataResponsibility(highLightProject.responsibility)),
-              _buildTableRowPdf('Technology used',
+              if(highLightProject.technologies.isNotEmpty) _buildTableRowPdf('Technology used',
                   highLightProject.technologies.join(',').toString()),
-              _buildTableRowPdf('Communication used ',
+              if(highLightProject.communicationused.isNotEmpty) _buildTableRowPdf('Communication used ',
                   highLightProject.communicationused),
-              _buildTableRowPdf( 'UI&UX design ',
+              if(highLightProject.uiuxdesign.isNotEmpty)  _buildTableRowPdf( 'UI&UX design ',
                   highLightProject.uiuxdesign),
-              _buildTableRowPdf('Document Control ',
+              if(highLightProject.documentcontrol.isNotEmpty)  _buildTableRowPdf('Document Control ',
                   highLightProject.documentcontrol),
-              _buildTableRowPdf('Project management tool ',
+              if(highLightProject.projectmanagementtool.isNotEmpty) _buildTableRowPdf('Project management tool ',
                   highLightProject.projectmanagementtool),
             ],
           ),
@@ -722,7 +718,6 @@ class SectionFive extends StatelessWidget {
     );
   }
 
-  // Get data for responsibility
   String _getDataResponsibility(List<String> responsibilities) {
     String a = '';
     responsibilities.forEach((element) {
@@ -731,25 +726,23 @@ class SectionFive extends StatelessWidget {
     return a;
   }
 
-  // Build table row
   TableRow _buildTableRow(BuildContext context, String title, String content) {
     return TableRow(children: [
       Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(8.0),
         child: Text(title ?? kEmpty, style: CommonStyle.size12W400black(context)),
       ),
       Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(8.0),
         child: Text(content ?? kEmpty, style: CommonStyle.size12W400black(context)),
       ),
     ]);
   }
 
-  // Build table row
   pw.TableRow _buildTableRowPdf(String title, String content) {
     return pw.TableRow(children: [
       pw.Padding(
-        padding: pw.EdgeInsets.all(16.0),
+        padding: pw.EdgeInsets.all(8.0),
         child: pw.Text(title,
             style: pw.TextStyle(
               fontSize: 12,
@@ -758,7 +751,7 @@ class SectionFive extends StatelessWidget {
             )),
       ),
       pw.Padding(
-        padding: pw.EdgeInsets.all(16.0),
+        padding: pw.EdgeInsets.all(8.0),
         child: pw.Text(content,
             style: pw.TextStyle(
               fontSize: 12,
@@ -769,27 +762,22 @@ class SectionFive extends StatelessWidget {
     ]);
   }
 
-  //Build custom table
-
-  // Build language project
   Widget _buildLanguage(BuildContext context) {
     return Column(
-      children: cvModel.languages
+      children: widget.cvModel.languages
           .map((language) => _buildLanguageItem(context, language))
           .toList(),
     );
   }
 
-  // Build language project pdf
   pw.Widget _buildLanguagePdf() {
     return pw.Column(
-      children: cvModel.languages
+      children: widget.cvModel.languages
           .map((language) => _buildLanguageItemPdf(language))
           .toList(),
     );
   }
 
-  // Build language project item
   Widget _buildLanguageItem(BuildContext context, Languages language) {
     return Padding(
       padding: EdgeInsets.only(left: 35),
@@ -804,7 +792,6 @@ class SectionFive extends StatelessWidget {
     );
   }
 
-  // Build language project item pdf
   pw.Widget _buildLanguageItemPdf(Languages language) {
     return pw.Padding(
       padding: pw.EdgeInsets.only(left: 35),

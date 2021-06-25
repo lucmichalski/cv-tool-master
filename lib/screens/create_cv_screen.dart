@@ -3,14 +3,12 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_cv_maker/blocs/authen_bloc/bloc/master_bloc/get_master_data_bloc/cv_bloc.dart';
-import 'package:flutter_cv_maker/blocs/authen_bloc/bloc/master_bloc/master_bloc.dart';
 import 'package:flutter_cv_maker/common/TabModels.dart';
 import 'package:flutter_cv_maker/common/alert_dialog_custom.dart';
 import 'package:flutter_cv_maker/common/common_style.dart';
 import 'package:flutter_cv_maker/common/common_ui.dart';
 import 'package:flutter_cv_maker/common/progress_bar_dialog.dart';
 import 'package:flutter_cv_maker/constants/constants.dart';
-import 'package:flutter_cv_maker/helper.dart';
 import 'package:flutter_cv_maker/models/cv_model/admin_page_model.dart';
 import 'package:flutter_cv_maker/models/cv_model/cv_model.dart';
 import 'package:flutter_cv_maker/routes/routes.dart';
@@ -20,12 +18,15 @@ import 'package:flutter_cv_maker/screens/viewPageCreateCv/section_one_screen.dar
 import 'package:flutter_cv_maker/screens/viewPageCreateCv/section_second_screen.dart';
 import 'package:flutter_cv_maker/screens/viewPageCreateCv/section_three_screen.dart';
 import 'package:flutter_cv_maker/utils/shared_preferences_service.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:universal_html/html.dart';
 
 import '../common/common_style.dart';
 
 class CreateCV extends StatefulWidget {
   final CVModel cvModel;
   final int pageINdex;
+
   const CreateCV({this.cvModel, this.pageINdex});
 
   @override
@@ -33,8 +34,7 @@ class CreateCV extends StatefulWidget {
 }
 
 class _CreateCVState extends State<CreateCV> {
-   PageController controller = PageController(initialPage: 0);
-  final PageController _pageController = PageController();
+  PageController _pageController = PageController(initialPage: 0);
   List<TabModelSteps> _tab = [];
   CVModel _cvModel;
   MasterData masterData;
@@ -110,7 +110,7 @@ class _CreateCVState extends State<CreateCV> {
       _cvModel = widget.cvModel;
     }
     _addItemsSteps();
-    controller = PageController(initialPage: 0);
+    _pageController = PageController(initialPage: 0);
     super.initState();
   }
 
@@ -140,8 +140,7 @@ class _CreateCVState extends State<CreateCV> {
           showProgressBar(context, false);
           print('create cv success');
           showAlertDialog(context, 'Success', 'Create CV  success!',
-              () => navKey.currentState.pushNamed(
-                  routeHome));
+              () => navKey.currentState.pushNamed(routeHome));
         } else if (state is CreateCvError) {
           showProgressBar(context, false);
           showAlertDialog(
@@ -149,9 +148,7 @@ class _CreateCVState extends State<CreateCV> {
         } else if (state is UpdateCvSuccess) {
           showProgressBar(context, false);
           showAlertDialog(context, 'Success', 'Update CV success!',
-              () => navKey.currentState.pushNamed(
-                  routeHome));
-
+              () => navKey.currentState.pushNamed(routeHome));
         } else if (state is UpdateCvError) {
           showProgressBar(context, false);
           showAlertDialog(
@@ -161,6 +158,7 @@ class _CreateCVState extends State<CreateCV> {
       buildWhen: (context, state) => state is GetMasterDataSuccess,
     );
   }
+
   Widget _buildSecondaryPage(BuildContext context) {
     var w = MediaQuery.of(context).size.width;
     return Container(
@@ -179,8 +177,7 @@ class _CreateCVState extends State<CreateCV> {
                       text: 'Home Page',
                       color: Colors.white,
                       onTapLink: () {
-                        navKey.currentState.pushNamed(
-                            routeHome);
+                        navKey.currentState.pushNamed(routeHome);
                       }),
                   SizedBox(
                     width: w * 0.05,
@@ -190,18 +187,19 @@ class _CreateCVState extends State<CreateCV> {
             ),
             Expanded(
               child: Container(
-                 child:_buildPreview(context),
+                child: _buildPreview(context),
                 width: w,
                 // height: MediaQuery.of(context).size.height,
                 decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius:
-                    BorderRadius.only(topLeft: Radius.circular(40))),
+                        BorderRadius.only(topLeft: Radius.circular(40))),
               ),
             ),
           ],
         ));
   }
+
   Widget _buildUI(BuildContext context) {
     var w = MediaQuery.of(context).size.width;
     return Scaffold(
@@ -214,7 +212,7 @@ class _CreateCVState extends State<CreateCV> {
                 child: Column(
                   children: [
                     _buildMainPageHeader(context),
-                  //SizedBox(height: 5,),
+                    //SizedBox(height: 5,),
                     Expanded(child: _pageViewBuild(context)),
                   ],
                 )),
@@ -227,11 +225,12 @@ class _CreateCVState extends State<CreateCV> {
       ),
     );
   }
-  Widget _pageViewBuild(BuildContext context){
-    return  PageView(
+
+  Widget _pageViewBuild(BuildContext context) {
+    return PageView(
       onPageChanged: _onPageViewChange,
       scrollDirection: Axis.horizontal,
-      controller: controller,
+      controller: _pageController,
       children: <Widget>[
         SectionOneScreen(
           cvModel: _cvModel,
@@ -261,6 +260,7 @@ class _CreateCVState extends State<CreateCV> {
       ],
     );
   }
+
   Widget _buildMainPageHeader(BuildContext context) {
     var w = MediaQuery.of(context).size.width;
     return Container(
@@ -274,93 +274,139 @@ class _CreateCVState extends State<CreateCV> {
             )),
         child: Container(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding:  EdgeInsets.only(left: MediaQuery.of(context).size.width*0.02),
-                  child: Text(
-                    'CV Tool',
-                    style: CommonStyle.size48W700White(context),
-                  ),
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            InkWell(
+              onTap: () {
+                navKey.currentState.pushNamedAndRemoveUntil(routeHome, (route) => false);
+              },
+              child: Padding(
+                padding: EdgeInsets.only(
+                    left: MediaQuery.of(context).size.width * 0.02),
+                child: Row(
+                  children: [
+                    Icon(Icons.home_filled, color: Colors.white,size: 40,),
+                    SizedBox(width: 16,),
+                    Text(
+                      'CV Tool',
+                      style: CommonStyle.size48W700White(context),
+                    ),
+                  ],
                 ),
-                SizedBox(
-                  height: 30.0,
-                ),
-                _buildPageSteps(context),
-                Container(
-                  padding:  EdgeInsets.only(left: MediaQuery.of(context).size.width*0.02,top: 50),
-                  child: Text(
-                    'Recent Add',
-                    style: CommonStyle.size48W700White(context)
-                        .copyWith(fontSize: 18),
-                  ),
-                ),
-                Padding(
-                  padding:  EdgeInsets.only(right:MediaQuery.of(context).size.width*0.05 ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      ButtonCommon(
-                        borderRadius: 10,
-                          buttonText: 'SAVE CV',
-                          onClick: () async {
-                            if(widget.cvModel.name.isNotEmpty && widget.cvModel.position.isNotEmpty && widget.cvModel.email.isNotEmpty
-                                && widget.cvModel.technicalSummaryList.isNotEmpty && widget.cvModel.certificateList.isNotEmpty
-                                && widget.cvModel.professionalList.isNotEmpty && widget.cvModel.highLightProjectList.isNotEmpty && widget.cvModel.educationList.isNotEmpty)
-                            {
-                             setState(() {
-                               widget.cvModel.status = true;
-                             });
-                            }else{
-                              setState(() {
-                                widget.cvModel.status = false;
-                              });
-                            }
-                          print(widget.cvModel.status);
+              ),
+            ),
+            SizedBox(
+              height: 30.0,
+            ),
+            _buildPageSteps(context),
+            Container(
+              padding: EdgeInsets.only(
+                  left: MediaQuery.of(context).size.width * 0.02, top: 50),
 
-                            if (widget.cvModel.id != null) {
+            ),
+            Padding(
+              padding: EdgeInsets.only(
+                  right: MediaQuery.of(context).size.width * 0.05),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  ButtonCommon(
+                      borderRadius: 10,
+                      buttonText: 'SAVE CV',
+                      onClick: () async {
+                        var professionalExp;
+                        if (widget.cvModel.professionalList != null && widget.cvModel.professionalList.isNotEmpty) {
+                          professionalExp = widget.cvModel.professionalList
+                              .firstWhere(
+                                  (element) =>
+                              element.roleNm.isEmpty ||
+                                  element.companyNm.isEmpty ||
+                                  element.locationNm.isEmpty ||
+                                  element.responsibilities.isEmpty,
+                              orElse: () => null);
+                        }
+                        var projectHighlight;
+                        if (widget.cvModel.highLightProjectList != null && widget.cvModel.highLightProjectList.isNotEmpty) {
+                          projectHighlight = widget.cvModel.highLightProjectList
+                              .firstWhere(
+                                  (element) =>
+                                  element.projectNm.isEmpty ||
+                              element.position.isEmpty ||
+                              element.technologies.isEmpty ||
+                              element.responsibility.isEmpty ||
+                              element.teamSize.isEmpty ||
+                              element.projectDescription.isEmpty,
+                              orElse: () => null);
+                        }
 
-                              final pref = await SharedPreferencesService.instance;
-                              String requestBody = json.encoder.convert(_cvModel);
-                              print(requestBody);
-                              BlocProvider.of<CVBloc>(context).add(RequestUpdateCvEvent(
-                                  pref.getAccessToken, requestBody, _cvModel.id));
-                            } else {
-                              final pref = await SharedPreferencesService.instance;
-                              String requestBody = json.encoder.convert(_cvModel);
-                              print(requestBody);
-                              BlocProvider.of<CVBloc>(context).add(RequestCreateCvEvent(
+                        if (widget.cvModel.name.isNotEmpty &&
+                            widget.cvModel.position.isNotEmpty &&
+                            widget.cvModel.email.isNotEmpty &&
+                            widget.cvModel.technicalSummaryList.isNotEmpty &&
+                            professionalExp == null &&
+                            projectHighlight== null &&
+                            widget.cvModel.highLightProjectList.isNotEmpty &&
+                            widget.cvModel.educationList.isNotEmpty) {
+                          setState(() {
+                            widget.cvModel.status = true;
+                          });
+                        } else {
+                          setState(() {
+                            widget.cvModel.status = false;
+                          });
+                        }
+                        print(widget.cvModel.status);
+
+                        if (widget.cvModel.id != null) {
+                          final pref = await SharedPreferencesService.instance;
+                          String requestBody = json.encoder.convert(_cvModel);
+                          print(requestBody);
+                          BlocProvider.of<CVBloc>(context).add(
+                              RequestUpdateCvEvent(pref.getAccessToken,
+                                  requestBody, _cvModel.id));
+                        } else {
+                          final pref = await SharedPreferencesService.instance;
+                          String requestBody = json.encoder.convert(_cvModel);
+                          print(requestBody);
+                          BlocProvider.of<CVBloc>(context).add(
+                              RequestCreateCvEvent(
                                   pref.getAccessToken, requestBody));
-                            }
-                          }),
-                    ],
-                  ),
-                ),
-              ],
-            )),
+                        }
+                      }),
+                ],
+              ),
+            ),
+          ],
+        )),
       ),
     );
   }
 
   Widget _buildPageSteps(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children:
-          _tab.map((e) => _buildStepItem(context, e, _tab.indexOf(e))).toList(),
+    return Padding(
+      padding: EdgeInsets.only(
+          left: MediaQuery.of(context).size.width * 0.02,
+          right: MediaQuery.of(context).size.width * 0.05
+      ),
+      child: Row(
+        children: _tab
+            .map((e) => _buildStepItem(context, e, _tab.indexOf(e)))
+            .toList(),
+      ),
     );
   }
 
   Widget _buildStepItem(
       BuildContext context, TabModelSteps modelSteps, int index) {
     return Container(
-      padding: EdgeInsets.only(left: MediaQuery.of(context).size.width *0.006),
+      // padding: EdgeInsets.only(left: MediaQuery.of(context).size.width * 0.006),
       child: Row(
         children: [
           InkWell(
-            onTap: (){
+            onTap: () {
               setState(() {
-                if (controller.hasClients) {
-                  controller.animateToPage(
+                if (_pageController.hasClients) {
+                  _pageController.animateToPage(
                     modelSteps.numberPage,
                     duration: Duration(milliseconds: 100),
                     curve: Curves.easeInOut,
@@ -376,7 +422,7 @@ class _CreateCVState extends State<CreateCV> {
                     ? Colors.white
                     : modelSteps.colorIcons
                         ? Colors.greenAccent.shade400
-                        : Color(0xffFFFF99),
+                        : Colors.grey,
                 border: Border.all(
                     color: _pageIndex == modelSteps.numberPage
                         ? Colors.blue
@@ -388,7 +434,8 @@ class _CreateCVState extends State<CreateCV> {
               ),
               alignment: Alignment.center,
               child: Text('${modelSteps.numberPage + 1}',
-                  style: CommonStyle.main700Size18(context).copyWith(fontSize: 10,
+                  style: CommonStyle.main700Size18(context).copyWith(
+                    fontSize: 10,
                     color: _pageIndex == modelSteps.numberPage
                         ? Colors.blue
                         : modelSteps.colorIcons
@@ -402,22 +449,23 @@ class _CreateCVState extends State<CreateCV> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  modelSteps.step,
-                  style:CommonStyle.size8grey(context).copyWith(fontSize: 10,color: index == _pageIndex ? Color(0xffF6C6EA) : Colors.grey,
-                      fontWeight: FontWeight.w700)
-                ),
+                Text(modelSteps.step,
+                    style: CommonStyle.size8grey(context).copyWith(
+                        fontSize: 10,
+                        color: index == _pageIndex
+                            ? Color(0xffF6C6EA)
+                            : Colors.grey,
+                        fontWeight: FontWeight.w700)),
                 Text(
                   modelSteps.title,
-                  style:CommonStyle.size8grey(context).copyWith(fontSize: 10)
-                      ,
+                  style: CommonStyle.size8grey(context).copyWith(fontSize: 10),
                 )
               ],
             ),
           ),
           modelSteps.horizontalLine == true
               ? Container(
-                  width: MediaQuery.of(context).size.width *0.055,
+                  width: MediaQuery.of(context).size.width * 0.047,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -426,7 +474,10 @@ class _CreateCVState extends State<CreateCV> {
                               color: modelSteps.colorIcons
                                   ? Colors.greenAccent.shade400
                                   : Colors.tealAccent)
-                          : Container(),
+                          : Container(
+                        width: 0,
+                        height: 0,
+                      ),
                     ],
                   ),
                 )
@@ -435,57 +486,88 @@ class _CreateCVState extends State<CreateCV> {
       ),
     );
   }
-  _buildPreview(BuildContext context){
-    return  SingleChildScrollView(
-        child:   Container(
-          padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width * 0.01),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(
-                height: 10,
+
+  _buildPreview(BuildContext context) {
+    return SingleChildScrollView(
+      child: Container(
+        padding: EdgeInsets.symmetric(
+            horizontal: MediaQuery.of(context).size.width * 0.01),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+              height: 10,
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 40.0),
+              child: Text(
+                widget.cvModel.name + ' (${widget.cvModel.gender})',
+                style: CommonStyle.size10W700black(context).copyWith(fontSize: 20),
               ),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 40.0),
-                child: Text(
-                  widget.cvModel.name + '(${widget.cvModel.gender})',
-                  style: CommonStyle.size10W700black(context),
-                ),
+            ),
+            SizedBox(
+              height: 4,
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 40.0),
+              child: Text(
+                widget.cvModel.position.toUpperCase() ?? kEmpty,
+                style: GoogleFonts.caladea(fontSize: 16, color: Colors.black)
+                // CommonStyle.size10W700black(context).copyWith(fontSize: 12),
               ),
-              SizedBox(
-                height: 4,
-              ),
-              Text(
-                widget.cvModel.position ?? kEmpty,
-                style: CommonStyle.size10W700black(context),
-              ),
-              Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 40.0, vertical: 10.0),
-                  child: Text('Email: ${widget.cvModel.email}',
-                      style: CommonStyle.size8W400black(context))),
-              widget.cvModel.technicalSummaryList.isNotEmpty ? _buildSectionTitle(context, 'Professional summary') : Container(),
-              widget.cvModel.technicalSummaryList.isNotEmpty ?  _buildProfessional(context) :Container(),
-              widget.cvModel.educationList.isNotEmpty ? _buildSectionTitle(context, 'Education') :Container(),
-              widget.cvModel.educationList.isNotEmpty ?  _buildEducation(context) :Container(),
-              widget.cvModel.technicalSummaryList.isNotEmpty ? _buildSectionTitle(context, 'Technical Skills'):Container(),
-              widget.cvModel.technicalSummaryList.isNotEmpty ? _buildTechnicalSkills(context) :Container(),
-              widget.cvModel.professionalList.isNotEmpty ? _buildSectionTitle(context, 'Professional Experience'):Container(),
-              widget.cvModel.professionalList.isNotEmpty  ?  _buildProfessionalExperiences(context):Container(),
-              widget.cvModel.highLightProjectList.isNotEmpty ?  _buildHighLightProjects(context) : Container(),
-              //   _buildSectionTitle(context, 'Languages'),
-              // widget.cvModel.languages.isNotEmpty ? _buildLanguage(context): Container(),
-            ],
-          ),
+            ),
+            Padding(
+                padding: EdgeInsets.symmetric(horizontal: 40.0, vertical: 10.0),
+                child: Text('Email: ${widget.cvModel.email}',
+                    style: CommonStyle.size8W400black(context))),
+            widget.cvModel.technicalSummaryList.isNotEmpty
+                ? _buildSectionTitle(context, 'Professional summary')
+                : Container(),
+            widget.cvModel.technicalSummaryList.isNotEmpty
+                ? _buildProfessional(context)
+                : Container(),
+            widget.cvModel.educationList.isNotEmpty
+                ? _buildSectionTitle(context, 'Education')
+                : Container(),
+            widget.cvModel.educationList.isNotEmpty
+                ? _buildEducation(context)
+                : Container(),
+            widget.cvModel.technicalSummaryList.isNotEmpty
+                ? _buildSectionTitle(context, 'Technical Skills')
+                : Container(),
+            widget.cvModel.technicalSummaryList.isNotEmpty
+                ? _buildTechnicalSkills(context)
+                : Container(),
+            widget.cvModel.professionalList.isNotEmpty
+                ? _buildSectionTitle(context, 'Professional Experience')
+                : Container(),
+            widget.cvModel.professionalList.isNotEmpty
+                ? _buildProfessionalExperiences(context)
+                : Container(),
+            widget.cvModel.highLightProjectList.isNotEmpty
+                ? _buildHighLightProjects(context)
+                : Container(),
+            widget.cvModel.languages != null &&
+                    widget.cvModel.languages.isNotEmpty
+                ? _buildSectionTitle(context, 'Languages')
+                : Container(),
+            widget.cvModel.languages != null &&
+                    widget.cvModel.languages.isNotEmpty
+                ? _buildLanguage(context)
+                : Container(),
+          ],
         ),
+      ),
     );
   }
+
   Widget _buildSectionTitle(BuildContext context, String title) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: CommonStyle.size10W700black(context)),
+          Text(title.toUpperCase(), style: CommonStyle.size10W700black(context).copyWith(fontSize: 12)),
           Divider(
             color: Colors.black,
             height: 1,
@@ -494,6 +576,7 @@ class _CreateCVState extends State<CreateCV> {
       ),
     );
   }
+
   Widget _buildProfessional(BuildContext context) {
     return Column(
       children: widget.cvModel.technicalSummaryList
@@ -522,6 +605,7 @@ class _CreateCVState extends State<CreateCV> {
       ),
     );
   }
+
   // Build Education list
   Widget _buildEducation(BuildContext context) {
     return Column(
@@ -551,6 +635,7 @@ class _CreateCVState extends State<CreateCV> {
       ),
     );
   }
+
   // Build Technical skill list
   Widget _buildTechnicalSkills(BuildContext context) {
     return Column(
@@ -559,6 +644,7 @@ class _CreateCVState extends State<CreateCV> {
           .toList(),
     );
   }
+
   // Build Technical skill item
   Widget _buildTechnicalSkillItem(BuildContext context, Skills skill) {
     return Padding(
@@ -568,7 +654,7 @@ class _CreateCVState extends State<CreateCV> {
           Text.rich(TextSpan(children: [
             TextSpan(
                 text: '${skill.skillNm}: ',
-                style: CommonStyle.size10W700black(context)),
+                style: CommonStyle.size8W400black(context)),
             TextSpan(
                 text: skill.skillData,
                 style: CommonStyle.size8W400black(context)),
@@ -577,14 +663,16 @@ class _CreateCVState extends State<CreateCV> {
       ),
     );
   }
+
   Widget _buildProfessionalExperiences(BuildContext context) {
     return Column(
       children: widget.cvModel.professionalList
           .map((professional) =>
-          _buildProfessionalExperienceItem(context, professional))
+              _buildProfessionalExperienceItem(context, professional))
           .toList(),
     );
   }
+
   // Build Professional Experience item
   Widget _buildProfessionalExperienceItem(
       BuildContext context, ProfessionalList professional) {
@@ -595,7 +683,7 @@ class _CreateCVState extends State<CreateCV> {
         children: [
           Row(
             children: [
-              RichTextCommon(
+              RichTextCommonPreview(
                 boldText: '${professional.companyNm}, ',
                 regularText: professional.locationNm,
                 size: 6,
@@ -608,15 +696,15 @@ class _CreateCVState extends State<CreateCV> {
             ],
           ),
           SizedBox(height: 4.0),
-          RichTextCommon(
+          RichTextCommonPreview(
             boldText: 'Role: ',
             regularText: professional.roleNm,
             size: 6,
           ),
           SizedBox(height: 4.0),
           Text(
-            'Responsibilities:',
-            style: CommonStyle.size10W700black(context),
+            'Responsibilities:'.toUpperCase(),
+            style: CommonStyle.size10W700black(context).copyWith(fontSize: 12),
           ),
           SizedBox(
             height: 8.0,
@@ -626,10 +714,10 @@ class _CreateCVState extends State<CreateCV> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: professional.responsibilities
-                  .map((responsibility) => Bullet(
-                text: responsibility,
-                isFill: false,
-              ))
+                  .map((responsibility) => BulletPreview(
+                        text: responsibility,
+                        isFill: false,
+                      ))
                   .toList(),
             ),
           )
@@ -637,22 +725,24 @@ class _CreateCVState extends State<CreateCV> {
       ),
     );
   }
+
   // Build highlight project
   Widget _buildHighLightProjects(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _buildSectionTitle(context, 'HighLight Project'),
+        _buildSectionTitle(context, 'Highlight Project'),
         Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: widget.cvModel.highLightProjectList
               .map((highLightProject) =>
-              _buildHighLightProjectItem(context, highLightProject))
+                  _buildHighLightProjectItem(context, highLightProject))
               .toList(),
         )
       ],
     );
   }
+
   // Build highlight project item
   Widget _buildHighLightProjectItem(
       BuildContext context, HighLightProjectList highLightProject) {
@@ -676,21 +766,21 @@ class _CreateCVState extends State<CreateCV> {
             },
             border: TableBorder.all(color: Colors.black),
             children: [
-              _buildTableRow(context, 'Project Description',
-                  highLightProject.projectDescription),
-              _buildTableRow(context, 'Team size', highLightProject.teamSize),
-              _buildTableRow(context, 'Position', highLightProject.position),
-              _buildTableRow(context, 'Responsibility',
-                  _getDataResponsibility(highLightProject.responsibility)),
-              _buildTableRow(context, 'Technology used',
-                  highLightProject.technologies.join(', ').toString()),
-              _buildTableRow(context, 'Communication used ',
+             if(highLightProject.projectDescription.isNotEmpty)_buildTableRow(context, 'Project Description',
+                  highLightProject.projectDescription) ,
+             if( highLightProject.teamSize.isNotEmpty)  _buildTableRow(context, 'Team size', highLightProject.teamSize),
+             if(highLightProject.position.isNotEmpty ) _buildTableRow(context, 'Position', highLightProject.position),
+              if(highLightProject.responsibility.isNotEmpty )_buildTableRow(context, 'Responsibility',
+                   _getDataResponsibility(highLightProject.responsibility)) ,
+             if( highLightProject.technologies.isNotEmpty ) _buildTableRow(context, 'Technology used',
+                   highLightProject.technologies.join(', ').toString()),
+             if( highLightProject.communicationused.isNotEmpty) _buildTableRow(context, 'Communication used ',
                   highLightProject.communicationused),
-              _buildTableRow(context, 'UI&UX design ',
-                  highLightProject.uiuxdesign),
-              _buildTableRow(context, 'Document Control ',
+             if(highLightProject.uiuxdesign.isNotEmpty ) _buildTableRow(
+                  context, 'UI&UX design ', highLightProject.uiuxdesign),
+             if(highLightProject.documentcontrol.isNotEmpty ) _buildTableRow(context, 'Document Control ',
                   highLightProject.documentcontrol),
-              _buildTableRow(context, 'Project management tool ',
+            if(highLightProject.projectmanagementtool.isNotEmpty ) _buildTableRow(context, 'Project management tool ',
                   highLightProject.projectmanagementtool),
             ],
           ),
@@ -698,6 +788,7 @@ class _CreateCVState extends State<CreateCV> {
       ),
     );
   }
+
   String _getDataResponsibility(List<String> responsibilities) {
     String a = '';
     responsibilities.forEach((element) {
@@ -709,12 +800,14 @@ class _CreateCVState extends State<CreateCV> {
   TableRow _buildTableRow(BuildContext context, String title, String content) {
     return TableRow(children: [
       Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Text(title ?? kEmpty, style: CommonStyle.size8W400black(context)),
+        padding: EdgeInsets.all(8.0),
+        child:
+            Text(title ?? kEmpty, style: CommonStyle.size8W400black(context)),
       ),
       Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Text(content ?? kEmpty, style: CommonStyle.size8W400black(context)),
+        padding: EdgeInsets.all(8.0),
+        child:
+            Text(content ?? kEmpty, style: CommonStyle.size8W400black(context)),
       ),
     ]);
   }
@@ -735,12 +828,11 @@ class _CreateCVState extends State<CreateCV> {
       child: Row(
         children: [
           Text('${language.languageNm}:',
-              style: CommonStyle.size10W700black(context)),
+              style: CommonStyle.size10W700black(context).copyWith(fontSize: 12)),
           SizedBox(width: 10),
           Text(language.level, style: CommonStyle.size8W400black(context)),
         ],
       ),
     );
   }
-
 }

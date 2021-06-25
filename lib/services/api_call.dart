@@ -1,8 +1,10 @@
 import 'dart:convert';
 
+import 'package:flutter_cv_maker/constants/constants.dart';
 import 'package:flutter_cv_maker/models/auth/login_response.dart';
 import 'package:flutter_cv_maker/models/cv_model/admin_page_model.dart';
 import 'package:flutter_cv_maker/models/cv_model/cv_model.dart';
+import 'package:flutter_cv_maker/models/cv_model/cv_model_response.dart';
 import 'package:flutter_cv_maker/services/api_constants.dart';
 import 'package:http/http.dart' as http;
 
@@ -86,13 +88,13 @@ class Repository {
     }
   }
   // get cv
-  Future<List<CVModel>> fetchDataCV(String accessToken) async {
-    final response = await http.get(Uri.parse(BaseUrl + RequestGetCvUrl),
+  Future<ListCVResponse> fetchDataCV(String accessToken, int pageIndex, bool status, bool createdDate) async {
+    print('URL GET CV: ${BaseUrl + RequestGetCvUrl + '/$pageIndex' +'?status=$status' + '&createddate=$createdDate'}');
+    final response = await http.get(Uri.parse(BaseUrl + RequestGetCvUrl + '/$pageIndex' +'?status=${status ?? kEmpty}' + '&createddate=${createdDate ?? kEmpty}'),
         headers: getHeader(accessToken)
     );
     if (response.statusCode == 200) {
-      Iterable list = json.decode(response.body);
-      return list.map((model) => CVModel.fromJson(model)).toList();
+      return ListCVResponse.fromJson(json.decode(response.body));
     } else {
       var message = json.decode(response.body)["message"];
       throw Exception('$message');

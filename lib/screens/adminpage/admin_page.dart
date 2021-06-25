@@ -40,12 +40,12 @@ class _AdminPageState extends State<AdminPage> {
   static const int ROLE_PAGE_ID = 0;
 
   // Skill page ID
-  static const int SKILL_PAGE_ID = 1;
+  static const int SKILL_PAGE_ID = 4;
 
   // Highlight page ID
-  static const int HIGHLIGHT_PAGE_ID = 2;
-  static const int COMPANY_PAGE_ID = 3;
-  static const int PROJECT_PAGE_ID = 4;
+  static const int HIGHLIGHT_PAGE_ID = 1;
+  static const int COMPANY_PAGE_ID = 2;
+  static const int PROJECT_PAGE_ID = 3;
 
   // page selected
   int _pageId = 0;
@@ -241,6 +241,17 @@ class _AdminPageState extends State<AdminPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        SizedBox(height: 25,),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.home,size: 30,color: Colors.blue,),
+            SizedBox(width: 10,),
+            LinkText(text: 'Home Page',linkTextStyle: TextStyle(fontSize: 20,color: Colors.blue,fontWeight: FontWeight.w700), onTapLink: ()=> navKey.currentState.pushNamed(
+    routeHome))
+          ],
+        ),
+        SizedBox(height: 30,),
         InkWell(
             onTap: () => setState(() => _pageId = ROLE_PAGE_ID),
             child: _buildMenuItem(context, ROLE_PAGE_ID,
@@ -262,16 +273,8 @@ class _AdminPageState extends State<AdminPage> {
             child: _buildMenuItem(
                 context, SKILL_PAGE_ID, 'Skill'.toUpperCase(), isNarrow)),
 
-        SizedBox(height: 30,),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ButtonCommon(buttonText: 'Home Page', onClick: (){
-              navKey.currentState.pushNamed(
-                  routeHome);
-            }),
-          ],
-        )
+
+
 
       ],
     );

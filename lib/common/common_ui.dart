@@ -476,6 +476,29 @@ class RichTextCommon extends StatelessWidget {
     ]));
   }
 }
+class RichTextCommonPreview extends StatelessWidget {
+  final String boldText;
+  final String regularText;
+  final double size;
+
+  const RichTextCommonPreview({this.boldText, this.regularText, this.size});
+
+  @override
+  Widget build(BuildContext context) {
+    return Text.rich(TextSpan(children: [
+      TextSpan(
+          text: '$boldText',
+          style: size == 8
+              ? CommonStyle.size8W400black(context)
+              : CommonStyle.size8W400black(context)),
+      TextSpan(
+          text: '$regularText',
+          style: size == 14
+              ? CommonStyle.size8W400black(context)
+              : CommonStyle.size8W400black(context)),
+    ]));
+  }
+}
 
 class Bullet extends StatelessWidget {
   final String text;
@@ -502,6 +525,36 @@ class Bullet extends StatelessWidget {
         Text(
           '$text',
           style: CommonStyle.size12W400black(context),
+        )
+      ],
+    );
+  }
+}
+class BulletPreview extends StatelessWidget {
+  final String text;
+  final bool isFill;
+
+  const BulletPreview({this.text, this.isFill = true});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        isFill
+            ? Icon(
+                Icons.circle,
+                color: Colors.black,
+                size: 6,
+              )
+            : Icon(
+                Icons.circle,
+                color: Colors.black,
+                size: 6,
+              ),
+        SizedBox(width: 16.0),
+        Text(
+          '$text',
+          style: CommonStyle.size8W400black(context),
         )
       ],
     );
@@ -573,15 +626,21 @@ class _DeleteButtonState extends State<DeleteButton> {
   }
 }
 
-class FilterCustom extends StatelessWidget {
+class FilterCustom extends StatefulWidget {
   final String text;
   final IconData icon;
   final bool sizeBorder;
   final Function onclick;
+  final bool isDesc;
 
   const FilterCustom(
-      {this.text, this.icon, this.onclick, this.sizeBorder = false});
+      {this.text, this.icon, this.onclick, this.sizeBorder = false, this.isDesc});
 
+  @override
+  _FilterCustomState createState() => _FilterCustomState();
+}
+
+class _FilterCustomState extends State<FilterCustom> {
   @override
   Widget build(BuildContext context) {
     return Material(
@@ -592,20 +651,34 @@ class FilterCustom extends StatelessWidget {
           borderRadius:
           BorderRadius.circular(20),
         ),
-        onTap:onclick,
+        onTap:widget.onclick,
         child: Container(
           height: 35,
           padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
           alignment: Alignment.center,
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20.0),
-              border: Border.all(width: sizeBorder ? 1 : 0.5, color: Colors.white)),
+              border: Border.all(width: widget.sizeBorder ? 1 : 0.5, color: Colors.white)),
           child: Row(
             children: [
               Text(
-                text,
+                widget.text,
                 style: TextStyle(color: Colors.white, fontSize: 14),
               ),
+              SizedBox(width: 4,),
+              widget.isDesc == null
+                  ? Container()
+                  : !widget.isDesc
+                      ? Icon(
+                          Icons.arrow_circle_down_sharp,
+                          color: Colors.red,
+                          size: 12,
+                        )
+                      : Icon(
+                          Icons.arrow_circle_up_sharp,
+                          color: Colors.green,
+                          size: 12,
+                        )
             ],
           ),
         ),
