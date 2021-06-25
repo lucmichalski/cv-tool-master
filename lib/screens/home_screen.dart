@@ -9,6 +9,7 @@ import 'package:flutter_cv_maker/common/alert_dialog_custom.dart';
 import 'package:flutter_cv_maker/common/common_style.dart';
 import 'package:flutter_cv_maker/common/common_ui.dart';
 import 'package:flutter_cv_maker/common/confirm_dialog.dart';
+import 'package:flutter_cv_maker/common/dropdown_custom.dart';
 import 'package:flutter_cv_maker/helper.dart';
 import 'package:flutter_cv_maker/models/cv_model/admin_page_model.dart';
 import 'package:flutter_cv_maker/models/cv_model/cv_model.dart';
@@ -162,7 +163,36 @@ class _HomeScreenState extends State<HomeScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _buildTopMenu(context),
+                CustomDropdown<int>(
+                  child:  _buildTopMenu(context),
+                  onChange: (int value, int index) => print(value),
+                  dropdownButtonStyle: DropdownButtonStyle(
+                    elevation: 1,
+                    // backgroundColor: Colors.white,
+                  ),
+                  dropdownStyle: DropdownStyle(
+                    borderRadius: BorderRadius.circular(8),
+                    elevation: 6,
+                  ),
+                  items: [
+                    'item 1',
+                    'item 2',
+                    'item 3',
+                    'item 4',
+                  ]
+                      .asMap()
+                      .entries
+                      .map(
+                        (item) => DropdownItem<int>(
+                      value: item.key + 1,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(item.value),
+                      ),
+                    ),
+                  )
+                      .toList(),
+                ),
                 LinkText(
                     text: 'Logout',
                     color: Colors.red,
