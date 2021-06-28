@@ -60,6 +60,7 @@ class GetCvListSuccess extends CVState {
 class GetCvListError extends CVState {
   final String message;
 
+
   GetCvListError({this.message});
   @override
   List<Object> get props => [message];

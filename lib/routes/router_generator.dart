@@ -6,7 +6,7 @@ import 'package:flutter_cv_maker/screens/adminpage/admin_page.dart';
 import 'package:flutter_cv_maker/screens/auth_screen.dart';
 import 'package:flutter_cv_maker/screens/create_cv_screen.dart';
 import 'package:flutter_cv_maker/screens/home_screen.dart';
-import 'package:flutter_cv_maker/screens/loginScreen.dart';
+import 'package:flutter_cv_maker/screens/login_screen.dart';
 import 'package:flutter_cv_maker/utils/shared_preferences_service.dart';
 
 class RouteGenerator {
@@ -22,7 +22,7 @@ class RouteGenerator {
     //       builder: (_) => LoginScreen(), settings: settings);
     // }
       switch (routingData.route) {
-        case routeLogin:
+         case routeLogin:
         case '/':
           return MaterialPageRoute(
               builder: (_) => LoginScreen(), settings: settings);

@@ -19,6 +19,7 @@ String ddMMMyyyy(DateTime date) {
 }
 
 String hhMM(String value) {
+
   if (value != null) {
     final f = new DateFormat('yyyy-MM-ddTHH:mm:ss').parse(value);
     String formattedDate = DateFormat('hh:mm a').format(f);
@@ -28,7 +29,6 @@ String hhMM(String value) {
 }
 
 String getDate(String value) {
-  print(value);
   if (value != null) {
     final f = new DateFormat('yyyy-MM-ddTHH:mm:ss').parse(value);
     String formattedDate = DateFormat('dd/MM/yyyy').format(f);

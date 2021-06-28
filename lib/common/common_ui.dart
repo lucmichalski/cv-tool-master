@@ -364,6 +364,7 @@ class TextFieldCommon extends StatelessWidget {
   final Function onChanged;
   final FocusNode focusNode;
   final Icon icon;
+  final Widget suffixIcon;
   final TextInputAction textInputAction;
   final Function onFieldSubmitted;
   final Function(String value) validator;
@@ -385,13 +386,15 @@ class TextFieldCommon extends StatelessWidget {
       this.contentPadding,
       this.onFieldSubmitted,
       this.icon,
+        this.suffixIcon,
       this.onChanged(String value)});
 
   @override
   Widget build(BuildContext context) {
     var w = MediaQuery.of(context).size.width;
     return Container(
-      child: TextFormField(
+      child:
+      TextFormField(
         onFieldSubmitted: onFieldSubmitted,
         maxLines: maxLines,
         onChanged: onChanged,
@@ -404,6 +407,7 @@ class TextFieldCommon extends StatelessWidget {
         style: CommonStyle.inputStyle(context),
         decoration: new InputDecoration(
           prefixIcon: icon,
+          suffixIcon: suffixIcon,
           labelStyle: CommonStyle.hintStyle(context),
           filled: true,
           fillColor: Colors.white,

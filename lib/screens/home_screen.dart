@@ -1,4 +1,3 @@
-import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
@@ -18,7 +17,10 @@ import 'package:flutter_cv_maker/models/cv_model/cv_model.dart';
 import 'package:flutter_cv_maker/routes/routes.dart';
 import 'package:flutter_cv_maker/utils/shared_preferences_service.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:universal_html/html.dart' as html;
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key key}) : super(key: key);
 
@@ -26,7 +28,7 @@ class HomeScreen extends StatefulWidget {
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin  {
   List<CVModel> _cvList = [];
   int touchedIndex = -1;
   List<String> _menuList = [
@@ -45,10 +47,19 @@ class _HomeScreenState extends State<HomeScreen> {
   int _totalCompleted = 0;
   List<PaginationModel> _pageIndexList = [];
   bool _isLastSelected = false;
+  AnimationController rotationController;
+  List<Legend> _legends = [
+    Legend(title: 'Mobile Developer', percent: 0.15, value: '15%', color: Colors.amber, backgroundColor: Colors.amberAccent),
+    Legend(title: 'Frontend Developer', percent: 0.15, value: '15%', color: Colors.red, backgroundColor: Colors.redAccent),
+    Legend(title: 'Backend Developer', percent: 0.20, value: '20%', color: Colors.green, backgroundColor: Colors.greenAccent),
+    Legend(title: 'Project Manager', percent: 0.40, value: '40%', color: Colors.purple, backgroundColor: Colors.purpleAccent),
+    Legend(title: 'Golang', percent: 0.1, value: '10%', color: Colors.indigo, backgroundColor: Colors.indigoAccent),
+  ];
 
   @override
   void initState() {
-    print('DAy la date: ${DateTime.now()}');
+    // rotationController = AnimationController(vsync: this, duration: Duration(seconds: 5), upperBound: pi * 2);
+    // rotationController.repeat();
     // Get master data
     _fetchMasterData();
     // Get list cv
@@ -69,6 +80,13 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   @override
+  void dispose() {
+    // receivePort.close();
+    // isolate.kill();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return BlocConsumer<CVBloc, CVState>(
       builder: (context, state) => _buildHomePage(context),
@@ -80,7 +98,6 @@ class _HomeScreenState extends State<HomeScreen> {
           setState(() {
             _masterData = state.masterData;
           });
-          print('Home MasterData: ${_masterData.summary.first.role}');
         } else if (state is GetMasterDataError) {
           _isLoading = false;
           showAlertDialog(
@@ -91,7 +108,6 @@ class _HomeScreenState extends State<HomeScreen> {
           _totalDraft = state.cvList.totalDraft;
           _totalPage = state.cvList.totalPages;
           _isLoading = false;
-          print('CVList: ' + state.cvList.items.length.toString());
           _cvList = state.cvList.items;
           if (_pageIndexList.isNotEmpty && _pageIndexList[0].isSelected) {
             _pageIndexList.clear();
@@ -109,8 +125,6 @@ class _HomeScreenState extends State<HomeScreen> {
         } else if (state is DeleteCvSuccess) {
           _isLoading = false;
           _fetchCVList(1);
-          showAlertDialog(context, 'Success', 'Delete CV success!',
-              () => Navigator.pop(context));
         } else if (state is DeleteCvError) {
           _isLoading = false;
           showAlertDialog(
@@ -125,7 +139,6 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildHomePage(BuildContext context) {
     var w = MediaQuery.of(context).size.width;
     return Scaffold(
-      backgroundColor: Color(0xfffbfbfb),
       body: Container(
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -176,7 +189,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   margin: EdgeInsets.symmetric(vertical: w * 0.01),
                   child: CustomDropdown<int>(
                     child: _buildTopMenu(context),
-                    onChange: (int value, int index) => _handleDropdownTopUp(context, _menuList[index]),
+                    onChange: (int value, int index) =>
+                        _handleDropdownTopUp(context, _menuList[index]),
                     dropdownButtonStyle: DropdownButtonStyle(
                       elevation: 1,
                       // backgroundColor: Colors.white,
@@ -198,8 +212,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       ? BorderRadius.only(
                                           topLeft: Radius.circular(8),
                                           topRight: Radius.circular(8))
-                                      : item.key + 1 ==
-                                      _menuList.length
+                                      : item.key + 1 == _menuList.length
                                           ? BorderRadius.only(
                                               bottomLeft: Radius.circular(8),
                                               bottomRight: Radius.circular(8))
@@ -231,7 +244,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius:
-                    BorderRadius.only(topLeft: Radius.circular(40))),
+                        BorderRadius.only(topLeft: Radius.circular(40))),
                 child: Column(
                   children: [
                     Padding(
@@ -250,7 +263,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         Expanded(
                             child: Column(
                           children: [
-                            Icon(Icons.summarize, color: Colors.lightGreen),
+                            Icon(Icons.summarize, color: Colors.pink),
                             SizedBox(
                               height: 5,
                             ),
@@ -273,7 +286,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           children: [
                             Icon(
                               Icons.timelapse,
-                              color: Colors.yellow,
+                              color: Colors.amber,
                             ),
                             SizedBox(
                               height: 5,
@@ -295,7 +308,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         Expanded(
                             child: Column(
                           children: [
-                            Icon(Icons.check_circle, color: Colors.lightGreen),
+                            Icon(Icons.check_circle, color: Colors.greenAccent),
                             SizedBox(
                               height: 5,
                             ),
@@ -325,29 +338,50 @@ class _HomeScreenState extends State<HomeScreen> {
                         color: Colors.grey,
                       ),
                     ),
- _buildChart(context)
+                    //:TODO - Build chart
+                    // _buildChart(context),
+                    Wrap(
+                      runAlignment: WrapAlignment.spaceAround,
+                      spacing: 16,
+                      runSpacing: 16,
+                      children: List.generate(_legends.length, (index) => _buildLegendItem(context, _legends[index])),
+                    )
+                    // RotationTransition(
+                    //   turns: Tween(begin: 0.0, end: 1.0)
+                    //       .animate(rotationController),
+                    //   child: Icon(
+                    //     Icons.home,
+                    //     size: 40,
+                    //   ),
+                    // ),
+                    // OutlinedButton(onPressed: () {
+                    //   runForLoop();
+                    // }, child: Text('Bấm vào em đi')),
+                    // Text('$counter')
                   ],
                 ),
-
               ),
             ),
           ],
         ));
   }
 
-  Widget _buildChart(BuildContext context){
+  // Create chart
+  Widget _buildChart(BuildContext context) {
     return Container(
-width: MediaQuery.of(context).size.width,
-      height: 500,
-      child:PieChart(
+      width: MediaQuery.of(context).size.width,
+      height: 300,
+      child: PieChart(
           PieChartData(
-          centerSpaceRadius: 10,
+              centerSpaceRadius: 1,
               pieTouchData: PieTouchData(touchCallback: (pieTouchResponse) {
                 setState(() {
-                  final desiredTouch = pieTouchResponse.touchInput is! PointerExitEvent &&
-                      pieTouchResponse.touchInput is! PointerUpEvent;
+                  final desiredTouch =
+                      pieTouchResponse.touchInput is! PointerExitEvent &&
+                          pieTouchResponse.touchInput is! PointerUpEvent;
                   if (desiredTouch && pieTouchResponse.touchedSection != null) {
-                    touchedIndex = pieTouchResponse.touchedSection.touchedSectionIndex;
+                    touchedIndex =
+                        pieTouchResponse.touchedSection.touchedSectionIndex;
                   } else {
                     touchedIndex = -1;
                   }
@@ -356,14 +390,13 @@ width: MediaQuery.of(context).size.width,
               borderData: FlBorderData(
                 show: false,
               ),
-              sectionsSpace: 0,
-          sections: showingSections()
-      ),
-          swapAnimationDuration: Duration(milliseconds: 400), // Optional
-          swapAnimationCurve: Curves.linear
-      ),
+              sectionsSpace: 16,
+              sections: showingSections()),
+          swapAnimationDuration: Duration(milliseconds: 150), // Optional
+          swapAnimationCurve: Curves.linear),
     );
   }
+
   Widget _buildMainPageHeader(BuildContext context) {
     var w = MediaQuery.of(context).size.width;
     return Container(
@@ -763,7 +796,7 @@ width: MediaQuery.of(context).size.width,
                             tooltip: 'Download',
                             color: Color(0xff434b65),
                             icon: Icon(Icons.download_rounded),
-                            onPressed: ()async {
+                            onPressed: () async {
                               // final url =
                               // html.Url.createObjectUrlFromBlob(await myGetBlobPdfContent());
                               // final anchor =
@@ -831,11 +864,7 @@ width: MediaQuery.of(context).size.width,
           SizedBox(
             width: 16,
           ),
-          LinkText(
-              text: 'Kelvin Khanh',
-              color: Colors.white,
-              onTapLink: () {
-              }),
+          LinkText(text: 'Kelvin Khanh', color: Colors.white, onTapLink: () {}),
           SizedBox(
             width: w * 0.05,
           )
@@ -875,7 +904,6 @@ width: MediaQuery.of(context).size.width,
                           element.isSelected = false;
                         });
                         e.isSelected = true;
-                        print('Index: ${e.index}');
                         _fetchCVList(e.index);
                       });
                     },
@@ -965,8 +993,7 @@ width: MediaQuery.of(context).size.width,
   _handleSignOut(BuildContext context) async {
     final pref = await SharedPreferencesService.instance;
     pref.removeAccessToken();
-    navKey.currentState.pushNamedAndRemoveUntil(
-        routeLogin, (route) => false);
+    navKey.currentState.pushNamedAndRemoveUntil(routeLogin, (route) => false);
   }
 
   // Process handle event for transition to Admin page
@@ -982,59 +1009,112 @@ width: MediaQuery.of(context).size.width,
       routeAdmin,
     );
   }
+
   List<PieChartSectionData> showingSections() {
     return List.generate(4, (i) {
-      final isTouched = i == touchedIndex;
-      final fontSize = isTouched ? 25.0 : 16.0;
-      final radius = isTouched ? 145.0 : 140.0;
+      final bool isTouched = i == touchedIndex;
       switch (i) {
         case 0:
-          return PieChartSectionData(
-            color: const Color(0xff0293ee),
-            value: 40,
-            title: '40%',
-            radius: radius,
-            titleStyle: TextStyle(
-                fontSize: fontSize, fontWeight: FontWeight.bold, color: const Color(0xffffffff)),
-          );
+          return _buildPieChartData(context, isTouched, Color(0xff0293ee), 40);
         case 1:
-          return PieChartSectionData(
-            color: const Color(0xfff8b250),
-            value: 30,
-            title: '30%',
-            radius: radius,
-            titleStyle: TextStyle(
-                fontSize: fontSize, fontWeight: FontWeight.bold, color: const Color(0xffffffff)),
-          );
+          return _buildPieChartData(context, isTouched, Color(0xfff8b250), 30);
         case 2:
-          return PieChartSectionData(
-            color: const Color(0xff845bef),
-            value: 15,
-            title: '15%',
-            radius: radius,
-            titleStyle: TextStyle(
-                fontSize: fontSize, fontWeight: FontWeight.bold, color: const Color(0xffffffff)),
-          );
+          return _buildPieChartData(context, isTouched, Color(0xff845bef), 15);
         case 3:
-          return PieChartSectionData(
-            color: const Color(0xff13d38e),
-            value: 15,
-            title: '15%',
-            radius: radius,
-            titleStyle: TextStyle(
-                fontSize: fontSize, fontWeight: FontWeight.bold, color: const Color(0xffffffff)),
-          );
+          return _buildPieChartData(context, isTouched, Color(0xff13d38e), 15);
         default:
           throw Error();
       }
     });
   }
 
+  PieChartSectionData _buildPieChartData(
+      BuildContext context, bool isTouched, Color color, double value) {
+    final fontSize = isTouched ? 25.0 : 16.0;
+    final radius = isTouched ? 145.0 : 140.0;
+    return PieChartSectionData(
+      color: color,
+      value: value,
+      title: '$value %',
+      radius: radius,
+      titleStyle: TextStyle(
+          fontSize: fontSize,
+          fontWeight: FontWeight.bold,
+          color: const Color(0xffffffff)),
+    );
+  }
+
+  Widget _buildLegendItem(BuildContext context, Legend legend,) {
+    var w = MediaQuery.of(context).size.width;
+    return MouseRegion(
+      onHover: (val) {
+        setState(() {
+          _legends.forEach((element) {
+            element.isHover = false;
+          });
+          legend.isHover = true;
+        });
+      },
+      onExit: (val) {
+        setState(() {
+          legend.isHover = false;
+        });
+      },
+      child: AnimatedContainer(
+        duration: Duration(milliseconds: 150),
+        width: w * 0.1,
+        margin: EdgeInsets.symmetric(horizontal: 16),
+        padding: EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: legend.isHover ? legend.color : Color(0xfffafafa),
+          borderRadius: BorderRadius.all(Radius.circular(8.0))
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('${legend.title}', style: GoogleFonts.roboto(color: legend.isHover ? Colors.white : legend.color, fontSize: 10,)),
+            SizedBox(height: 8,),
+            Row(
+              children: [
+                CircularPercentIndicator(
+                  radius: 50.0,
+                  lineWidth: 4.0,
+                  percent: legend.percent,
+                  center: Text('${legend.value}', style: GoogleFonts.roboto(color: legend.isHover ?  Colors.white : legend.color, fontSize: 9,)),
+                  backgroundColor: legend.backgroundColor,
+                  progressColor: Colors.white,
+                ),
+                Spacer(),
+                Text.rich(TextSpan(
+                  children: [
+                    TextSpan(text: 'total: ', style: GoogleFonts.roboto(color: legend.isHover ? Colors.white : legend.color, fontSize: 9,)),
+                    TextSpan(text: '${(legend.percent * 100).toString().replaceAll('%', '')}', style: GoogleFonts.roboto(color: legend.isHover ? Colors.white : legend.color, fontSize: 20,fontWeight: FontWeight.w700)),
+                  ]
+                ))
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
+
 
 class PaginationModel {
   int index;
   bool isSelected;
 
   PaginationModel({this.index, this.isSelected});
+}
+
+class Legend {
+  String title;
+  double percent;
+  String value;
+  Color color;
+  Color backgroundColor;
+  bool isHover;
+
+  Legend({this.title, this.percent, this.value, this.color, this.backgroundColor, this.isHover = false});
 }

@@ -4,12 +4,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPrefKeys {
   SharedPrefKeys._();
-
-  static const String taiKhoan = 'taiKhoan';
-  static const String ten = 'ten';
-  static const String email = 'email';
+  //
+  // static const String taiKhoan = 'taiKhoan';
+  // static const String ten = 'ten';
+  // static const String email = 'email';
   static const String token = 'token';
-  static const String password = 'password';
+ // static const String password = 'password';
 }
 
 class SharedPreferencesService {

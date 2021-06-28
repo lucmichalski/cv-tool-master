@@ -693,7 +693,7 @@ class _SectionFiveState extends State<SectionFive> {
               0: pw.FlexColumnWidth(2),
               1: pw.FlexColumnWidth(5),
             },
-            border: pw.TableBorder.all(color: PdfColor.fromInt(0xFF000000)),
+            border: pw.TableBorder.all(color: PdfColor.fromInt(0xFF000000),width: 0.5),
             children: [
               if(highLightProject.projectDescription.isNotEmpty) _buildTableRowPdf(
                   'Project Description', highLightProject.projectDescription),
