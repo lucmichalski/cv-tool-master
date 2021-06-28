@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -10,12 +11,14 @@ import 'package:flutter_cv_maker/common/common_style.dart';
 import 'package:flutter_cv_maker/common/common_ui.dart';
 import 'package:flutter_cv_maker/common/confirm_dialog.dart';
 import 'package:flutter_cv_maker/common/dropdown_custom.dart';
+import 'package:flutter_cv_maker/common/gender_pdf.dart';
 import 'package:flutter_cv_maker/helper.dart';
 import 'package:flutter_cv_maker/models/cv_model/admin_page_model.dart';
 import 'package:flutter_cv_maker/models/cv_model/cv_model.dart';
 import 'package:flutter_cv_maker/routes/routes.dart';
 import 'package:flutter_cv_maker/utils/shared_preferences_service.dart';
-
+import 'package:fl_chart/fl_chart.dart';
+import 'package:universal_html/html.dart' as html;
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key key}) : super(key: key);
 
@@ -25,6 +28,12 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   List<CVModel> _cvList = [];
+  int touchedIndex = -1;
+  List<String> _menuList = [
+    'Admin page',
+    'Account',
+    'Logout',
+  ];
   MasterData _masterData;
   int _pageIndex = 1;
   bool _isStatusFiltered;
@@ -147,10 +156,10 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildSecondaryPage(BuildContext context) {
     List<int> draft = [];
     List<int> complete = [];
-    for(int i=0;i< _cvList.length;i++){
-      if(_cvList[i].status== false){
+    for (int i = 0; i < _cvList.length; i++) {
+      if (_cvList[i].status == false) {
         draft.add(i);
-      }else{
+      } else {
         complete.add(i);
       }
     }
@@ -163,48 +172,66 @@ class _HomeScreenState extends State<HomeScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                CustomDropdown<int>(
-                  child:  _buildTopMenu(context),
-                  onChange: (int value, int index) => print(value),
-                  dropdownButtonStyle: DropdownButtonStyle(
-                    elevation: 1,
-                    // backgroundColor: Colors.white,
-                  ),
-                  dropdownStyle: DropdownStyle(
-                    borderRadius: BorderRadius.circular(8),
-                    elevation: 6,
-                  ),
-                  items: [
-                    'item 1',
-                    'item 2',
-                    'item 3',
-                    'item 4',
-                  ]
-                      .asMap()
-                      .entries
-                      .map(
-                        (item) => DropdownItem<int>(
-                      value: item.key + 1,
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(item.value),
-                      ),
+                Container(
+                  margin: EdgeInsets.symmetric(vertical: w * 0.01),
+                  child: CustomDropdown<int>(
+                    child: _buildTopMenu(context),
+                    onChange: (int value, int index) => _handleDropdownTopUp(context, _menuList[index]),
+                    dropdownButtonStyle: DropdownButtonStyle(
+                      elevation: 1,
+                      // backgroundColor: Colors.white,
                     ),
-                  )
-                      .toList(),
+                    dropdownStyle: DropdownStyle(
+                      color: Colors.transparent,
+                      borderRadius: BorderRadius.circular(8),
+                      elevation: 6,
+                    ),
+                    items: _menuList
+                        .asMap()
+                        .entries
+                        .map(
+                          (item) => DropdownItem<int>(
+                            value: item.key + 1,
+                            child: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: item.key == 0
+                                      ? BorderRadius.only(
+                                          topLeft: Radius.circular(8),
+                                          topRight: Radius.circular(8))
+                                      : item.key + 1 ==
+                                      _menuList.length
+                                          ? BorderRadius.only(
+                                              bottomLeft: Radius.circular(8),
+                                              bottomRight: Radius.circular(8))
+                                          : BorderRadius.all(
+                                              Radius.circular(0)),
+                                  color: Color(0xff2c3a5c).withOpacity(0.8),
+                                ),
+                                padding: EdgeInsets.symmetric(
+                                    vertical: 16, horizontal: 8),
+                                child: Text(
+                                  item.value,
+                                  style: CommonStyle.white700Size22(context)
+                                      .copyWith(
+                                          fontSize: 14,
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w400),
+                                )),
+                          ),
+                        )
+                        .toList(),
+                  ),
                 ),
-                LinkText(
-                    text: 'Logout',
-                    color: Colors.red,
-                    onTapLink: () async {
-                      final pref = await SharedPreferencesService.instance;
-                      pref.removeAccessToken();
-                      navKey.currentState.pushNamedAndRemoveUntil(routeLogin, (route) => false);
-                    }),
               ],
             ),
             Expanded(
               child: Container(
+                width: w,
+                // height: MediaQuery.of(context).size.height,
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius:
+                    BorderRadius.only(topLeft: Radius.circular(40))),
                 child: Column(
                   children: [
                     Padding(
@@ -297,21 +324,46 @@ class _HomeScreenState extends State<HomeScreen> {
                         height: 1,
                         color: Colors.grey,
                       ),
-                    )
+                    ),
+ _buildChart(context)
                   ],
                 ),
-                width: w,
-                // height: MediaQuery.of(context).size.height,
-                decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius:
-                        BorderRadius.only(topLeft: Radius.circular(40))),
+
               ),
             ),
           ],
         ));
   }
 
+  Widget _buildChart(BuildContext context){
+    return Container(
+width: MediaQuery.of(context).size.width,
+      height: 500,
+      child:PieChart(
+          PieChartData(
+          centerSpaceRadius: 10,
+              pieTouchData: PieTouchData(touchCallback: (pieTouchResponse) {
+                setState(() {
+                  final desiredTouch = pieTouchResponse.touchInput is! PointerExitEvent &&
+                      pieTouchResponse.touchInput is! PointerUpEvent;
+                  if (desiredTouch && pieTouchResponse.touchedSection != null) {
+                    touchedIndex = pieTouchResponse.touchedSection.touchedSectionIndex;
+                  } else {
+                    touchedIndex = -1;
+                  }
+                });
+              }),
+              borderData: FlBorderData(
+                show: false,
+              ),
+              sectionsSpace: 0,
+          sections: showingSections()
+      ),
+          swapAnimationDuration: Duration(milliseconds: 400), // Optional
+          swapAnimationCurve: Curves.linear
+      ),
+    );
+  }
   Widget _buildMainPageHeader(BuildContext context) {
     var w = MediaQuery.of(context).size.width;
     return Container(
@@ -532,29 +584,35 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
         ),
-        _isLoading ? Container(color: Colors.white, child: CircularProgressIndicator(),)
-            :SingleChildScrollView(
-          scrollDirection: Axis.vertical,
-          physics: AlwaysScrollableScrollPhysics(),
-          child: Container(
-            height: MediaQuery.of(context).size.height / 2,
-            child: _cvList.length > 0
-                ? ListView.builder(
-                    scrollDirection: Axis.vertical,
-                    padding: EdgeInsets.only(top: 30),
-                    shrinkWrap: true,
-                    itemCount: _cvList.length,
-                    itemBuilder: (context, index) {
-                      final item = _cvList[index];
-                      return _buildCVItem(context, item, false, index);
-                    })
-                : Container(
-                    child: Text('No CV available',
-                        style: CommonStyle.grey900Size48(context).copyWith(
-                            fontSize: 20, fontWeight: FontWeight.w400)),
-                  ),
-          ),
-        ),
+        _isLoading
+            ? Container(
+                color: Colors.white,
+                child: CircularProgressIndicator(),
+              )
+            : SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                physics: AlwaysScrollableScrollPhysics(),
+                child: Container(
+                  height: MediaQuery.of(context).size.height / 2,
+                  child: _cvList.length > 0
+                      ? ListView.builder(
+                          scrollDirection: Axis.vertical,
+                          padding: EdgeInsets.only(top: 30),
+                          shrinkWrap: true,
+                          itemCount: _cvList.length,
+                          itemBuilder: (context, index) {
+                            final item = _cvList[index];
+                            return _buildCVItem(context, item, false, index);
+                          })
+                      : Container(
+                          child: Text('No CV available',
+                              style: CommonStyle.grey900Size48(context)
+                                  .copyWith(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w400)),
+                        ),
+                ),
+              ),
       ],
     );
   }
@@ -705,20 +763,38 @@ class _HomeScreenState extends State<HomeScreen> {
                             tooltip: 'Download',
                             color: Color(0xff434b65),
                             icon: Icon(Icons.download_rounded),
-                            onPressed: () {}),
+                            onPressed: ()async {
+                              // final url =
+                              // html.Url.createObjectUrlFromBlob(await myGetBlobPdfContent());
+                              // final anchor =
+                              // html.document.createElement('a') as html.AnchorElement
+                              // ..href = url
+                              // ..style.display = 'none'
+                              // ..download = 'CV_TVF_.pdf';
+                              // //${widget.cvModel.name.replaceAll(' ', '_')}
+                              // html.document.body.children.add(anchor);
+                              // anchor.click();
+                              // html.document.body.children.remove(anchor);
+                              // html.Url.revokeObjectUrl(url);
+                              downloadPdf(context, model);
+                            }),
                         IconButton(
                           onPressed: () async {
                             await showDialog(
                                 context: context,
                                 barrierDismissible: false,
                                 builder: (BuildContext context) {
-                                  return ConfirmDialog(onDeleteConfirmed: () async {
-                                    final pref =
-                                        await SharedPreferencesService.instance;
-                                    BlocProvider.of<CVBloc>(context).add(
-                                        RequestDeleteCvEvent(
-                                            pref.getAccessToken, _cvList[index].id));
-                                  },);
+                                  return ConfirmDialog(
+                                    onDeleteConfirmed: () async {
+                                      final pref =
+                                          await SharedPreferencesService
+                                              .instance;
+                                      BlocProvider.of<CVBloc>(context).add(
+                                          RequestDeleteCvEvent(
+                                              pref.getAccessToken,
+                                              _cvList[index].id));
+                                    },
+                                  );
                                 });
                           },
                           tooltip: 'Delete',
@@ -737,58 +813,33 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildTopMenu(BuildContext context) {
     var w = MediaQuery.of(context).size.width;
-    // final widgets = ['Admin page', 'Account', 'Logout']
-    //     .map((x) => DropdownMenuItem(
-    //   child: Text(
-    //     x,
-    //     style: CommonStyle.inputStyle(context),
-    //   ),
-    //   value: ['Admin page', 'Account', 'Logout'].indexOf(x),
-    // ))
-    //     .toList();
-
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: w * 0.01),
-      child: Material(
-        color: Color(0xff2c3a5c).withOpacity(0.8),
+    return Container(
+      padding: EdgeInsets.all(6),
+      decoration: BoxDecoration(
         borderRadius: BorderRadius.all(Radius.circular(100)),
-        child: InkWell(
-          borderRadius: BorderRadius.all(Radius.circular(100)),
-          onTap: () {},
-          child: Container(
-            padding: EdgeInsets.all(6),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.all(Radius.circular(100)),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Container(
-                    decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border:
-                        Border.all(color: Colors.lightBlue, width: 2)),
-                    child: CircleAvatar(
-                      child: Icon(Icons.person),
-                    )),
-                SizedBox(
-                  width: 16,
-                ),
-                LinkText(
-                    text: 'Kelvin Khanh',
-                    color: Colors.white,
-                    onTapLink: () {
-                      navKey.currentState.pushNamed(
-                        routeAdmin,
-                      );
-                    }),
-                SizedBox(
-                  width: w * 0.05,
-                )
-              ],
-            ),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          Container(
+              decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.lightBlue, width: 2)),
+              child: CircleAvatar(
+                child: Icon(Icons.person),
+              )),
+          SizedBox(
+            width: 16,
           ),
-        ),
+          LinkText(
+              text: 'Kelvin Khanh',
+              color: Colors.white,
+              onTapLink: () {
+              }),
+          SizedBox(
+            width: w * 0.05,
+          )
+        ],
       ),
     );
   }
@@ -801,44 +852,57 @@ class _HomeScreenState extends State<HomeScreen> {
       children: [
         Visibility(
           visible: !_pageIndexList[0].isSelected,
-          child: TextButton(onPressed: () {
-            setState(() {
-              _isLastSelected = false;
-              _pageIndexList.forEach((element) {
-                element.isSelected = false;
-              });
-              _pageIndexList[0].isSelected = true;
-              _fetchCVList(1);
-            });
-          }, child: Text('PREV')),
+          child: TextButton(
+              onPressed: () {
+                setState(() {
+                  _isLastSelected = false;
+                  _pageIndexList.forEach((element) {
+                    element.isSelected = false;
+                  });
+                  _pageIndexList[0].isSelected = true;
+                  _fetchCVList(1);
+                });
+              },
+              child: Text('PREV')),
         ),
         Row(
-           children:_pageIndexList.map((e) => InkWell(
-             onTap: (){
-              setState(() {
-                _isLastSelected = false;
-                _pageIndexList.forEach((element) {
-                  element.isSelected = false;
-                });
-                e.isSelected = true;
-                print('Index: ${e.index}');
-                _fetchCVList(e.index);
-              });
-             },
-             child: Container(
-               color: e.isSelected ? Colors.blue : Colors.transparent,
-               child: Padding(
-                 padding:  EdgeInsets.symmetric(vertical: 10,horizontal: 16),
-                 child: Text('${e.index}',style: TextStyle(color:e.isSelected ? Colors.white :Colors.blue,fontSize: 16),),
-               ),
-             ),
-           )).toList(),
+          children: _pageIndexList
+              .map((e) => InkWell(
+                    onTap: () {
+                      setState(() {
+                        _isLastSelected = false;
+                        _pageIndexList.forEach((element) {
+                          element.isSelected = false;
+                        });
+                        e.isSelected = true;
+                        print('Index: ${e.index}');
+                        _fetchCVList(e.index);
+                      });
+                    },
+                    child: Container(
+                      color: e.isSelected ? Colors.blue : Colors.transparent,
+                      child: Padding(
+                        padding:
+                            EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                        child: Text(
+                          '${e.index}',
+                          style: TextStyle(
+                              color: e.isSelected ? Colors.white : Colors.blue,
+                              fontSize: 16),
+                        ),
+                      ),
+                    ),
+                  ))
+              .toList(),
         ),
         Visibility(
           visible: _totalPage > 4,
           child: Padding(
-            padding:  EdgeInsets.symmetric(vertical: 10,horizontal: 16),
-            child: Text('...',style: TextStyle(color:Colors.blue,fontSize: 16),),
+            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+            child: Text(
+              '...',
+              style: TextStyle(color: Colors.blue, fontSize: 16),
+            ),
           ),
         ),
         Visibility(
@@ -856,23 +920,114 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Container(
               color: _isLastSelected ? Colors.blue : Colors.transparent,
               child: Padding(
-                padding:  EdgeInsets.symmetric(vertical: 10,horizontal: 16),
-                child: Text('$_totalPage',style: TextStyle(color: _isLastSelected ? Colors.white : Colors.blue, fontSize: 16),),
+                padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                child: Text(
+                  '$_totalPage',
+                  style: TextStyle(
+                      color: _isLastSelected ? Colors.white : Colors.blue,
+                      fontSize: 16),
+                ),
               ),
             ),
           ),
         ),
         Visibility(
           visible: _totalPage > 4,
-          child: TextButton(onPressed: () {
-            setState(() {
-              _isLastSelected = true;
-            });
-            _fetchCVList(_totalPage);
-          }, child: Text('NEXT')),
+          child: TextButton(
+              onPressed: () {
+                setState(() {
+                  _isLastSelected = true;
+                });
+                _fetchCVList(_totalPage);
+              },
+              child: Text('NEXT')),
         ),
       ],
     );
+  }
+
+  // Handle events for dropdown
+  _handleDropdownTopUp(BuildContext context, String value) {
+    switch (value) {
+      case 'Logout':
+        _handleSignOut(context);
+        break;
+      case 'Admin page':
+        _handleAdminPage(context);
+        break;
+      case 'Account':
+        _handleAccountPage(context);
+        break;
+    }
+  }
+
+  // Process handle event for Sign out
+  _handleSignOut(BuildContext context) async {
+    final pref = await SharedPreferencesService.instance;
+    pref.removeAccessToken();
+    navKey.currentState.pushNamedAndRemoveUntil(
+        routeLogin, (route) => false);
+  }
+
+  // Process handle event for transition to Admin page
+  _handleAdminPage(BuildContext context) {
+    navKey.currentState.pushNamed(
+      routeAdmin,
+    );
+  }
+
+  // Process handle event for transition to Account page
+  _handleAccountPage(BuildContext context) {
+    navKey.currentState.pushNamed(
+      routeAdmin,
+    );
+  }
+  List<PieChartSectionData> showingSections() {
+    return List.generate(4, (i) {
+      final isTouched = i == touchedIndex;
+      final fontSize = isTouched ? 25.0 : 16.0;
+      final radius = isTouched ? 145.0 : 140.0;
+      switch (i) {
+        case 0:
+          return PieChartSectionData(
+            color: const Color(0xff0293ee),
+            value: 40,
+            title: '40%',
+            radius: radius,
+            titleStyle: TextStyle(
+                fontSize: fontSize, fontWeight: FontWeight.bold, color: const Color(0xffffffff)),
+          );
+        case 1:
+          return PieChartSectionData(
+            color: const Color(0xfff8b250),
+            value: 30,
+            title: '30%',
+            radius: radius,
+            titleStyle: TextStyle(
+                fontSize: fontSize, fontWeight: FontWeight.bold, color: const Color(0xffffffff)),
+          );
+        case 2:
+          return PieChartSectionData(
+            color: const Color(0xff845bef),
+            value: 15,
+            title: '15%',
+            radius: radius,
+            titleStyle: TextStyle(
+                fontSize: fontSize, fontWeight: FontWeight.bold, color: const Color(0xffffffff)),
+          );
+        case 3:
+          return PieChartSectionData(
+            color: const Color(0xff13d38e),
+            value: 15,
+            title: '15%',
+            radius: radius,
+            titleStyle: TextStyle(
+                fontSize: fontSize, fontWeight: FontWeight.bold, color: const Color(0xffffffff)),
+          );
+        default:
+          throw Error();
+      }
+    });
   }
 
 }
@@ -880,5 +1035,6 @@ class _HomeScreenState extends State<HomeScreen> {
 class PaginationModel {
   int index;
   bool isSelected;
+
   PaginationModel({this.index, this.isSelected});
 }
