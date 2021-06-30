@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:fl_chart/fl_chart.dart';
@@ -25,7 +26,8 @@ import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'change_password_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key key}) : super(key: key);
+  final String fullName;
+  const HomeScreen({Key key, this.fullName}) : super(key: key);
 
   @override
   _HomeScreenState createState() => _HomeScreenState();
@@ -35,6 +37,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   List<CVModel> _cvList = [];
   List<int> _arrayIndexPageView = [];
   int touchedIndex = -1;
+  bool _isHover = false;
+  final _key = GlobalKey();
+  CVModel _model;
   List<String> _menuList = [
     'Admin page',
     'Account',
@@ -45,7 +50,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   int _pageIndex = 1;
   final _random = Random();
   bool _isStatusFiltered;
-  bool _isDateFiltered;
+  bool _isDateFiltered = true;
   bool _isLoading = false;
   int _totalPage = 1;
   int _totalRecords = 0;
@@ -54,53 +59,70 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   List<PaginationModel> _pageIndexList = [];
   bool _isLastSelected = false;
   AnimationController rotationController;
+  String _userNm = '';
+
   List<Legend> _legends = [
     Legend(
-        title: 'Mobile Developer',
-        percent: 0.15,
-        value: '15%',
         color: Colors.amber,
         backgroundColor: Colors.amberAccent),
     Legend(
-        title: 'Frontend Developer',
-        percent: 0.15,
-        value: '15%',
         color: Colors.red,
         backgroundColor: Colors.redAccent),
     Legend(
-        title: 'Backend Developer',
-        percent: 0.20,
-        value: '20%',
         color: Colors.green,
         backgroundColor: Colors.greenAccent),
     Legend(
-        title: 'Project Manager',
-        percent: 0.40,
-        value: '40%',
         color: Colors.purple,
         backgroundColor: Colors.purpleAccent),
     Legend(
-        title: 'Golang',
-        percent: 0.1,
-        value: '10%',
         color: Colors.indigo,
         backgroundColor: Colors.indigoAccent),
+    Legend(
+        color: Colors.purple,
+        backgroundColor: Colors.purpleAccent),
+    Legend(
+        color: Colors.lime,
+        backgroundColor: Colors.limeAccent),
+    Legend(
+        color: Colors.green,
+        backgroundColor: Colors.greenAccent),
+    Legend(
+        color: Colors.blue,
+        backgroundColor: Colors.blueAccent),
+    Legend(
+        color: Colors.teal,
+        backgroundColor: Colors.tealAccent),
+    Legend(
+        color: Colors.cyan,
+        backgroundColor: Colors.cyanAccent),
+    Legend(
+        color: Colors.deepPurple,
+        backgroundColor: Colors.deepPurpleAccent),
   ];
   bool _isChangeCurrent;
 
   bool _isChangeNew;
-
+  AnimationController _animationController;
   @override
   void initState() {
+    _getUserNm();
     _fetchMasterData();
     // Get list cv
     _fetchCVList(1);
-
+    _animationController = AnimationController(vsync: this,
+    lowerBound: 0.5,
+    duration: Duration(seconds: 3))..repeat();
     _isChangeCurrent = true;
     _isChangeNew = true;
     _pageIndexList.add(PaginationModel(index: 1, isSelected: true));
     _fetchDataPosition();
     super.initState();
+  }
+
+  // Get username
+  _getUserNm() async {
+    final pref = await SharedPreferencesService.instance;
+    _userNm = pref.getUserNm;
   }
 
   // Fetch master data to create/edit cv
@@ -124,6 +146,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   void dispose() {
     // receivePort.close();
     // isolate.kill();
+    _animationController.dispose();
     super.dispose();
   }
 
@@ -149,6 +172,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             _totalDraft = state.cvList.totalDraft;
             _totalPage = state.cvList.totalPages;
             _isLoading = false;
+            _model = state.cvList.recentCvModel;
             _cvList = state.cvList.items;
             if (_pageIndexList.isNotEmpty && _pageIndexList[0].isSelected) {
               _pageIndexList.clear();
@@ -386,6 +410,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     ),
                     //:TODO - Build chart
                     // _buildChart(context),
+                    Padding(
+                      padding: EdgeInsets.symmetric(vertical: 16.0),
+                      child: Text('Categories', style: CommonStyle.size12W400black(context),),
+                    ),
                     Wrap(
                       runAlignment: WrapAlignment.spaceAround,
                       spacing: 16,
@@ -422,7 +450,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 )),
             child: Container(
                 padding: EdgeInsets.all(26.0),
-                margin: EdgeInsets.only(left: w * 0.058),
+                margin: EdgeInsets.only(left: w * 0.058, right: w * 0.058),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -504,25 +532,27 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             ),
                           ),
                         ),
-                        Container(
-                          padding: EdgeInsets.all(5),
-                          margin:
-                              EdgeInsets.only(right: w * 0.058, left: w * 0.02),
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(20.0),
-                              color: Color(0xff2c3a5c).withOpacity(0.8)),
-                          child: ButtonCommon(
-                            buttonText: 'NEW CV',
-                            onClick: () {
-                              _handleCreateCVEvent();
-                            },
-                            color: Color(0xff5ace9f),
-                            prefixIcon: Icon(Icons.insert_drive_file_rounded,
-                                color: Colors.white),
-                            borderRadius: 20,
-                            prefixDrawablePadding: 8,
-                          ),
-                        ),
+                        SizedBox(width: 16,),
+                        _buildAnimation(),
+                        // Container(
+                        //   padding: EdgeInsets.all(5),
+                        //   margin:
+                        //       EdgeInsets.only(right: w * 0.058, left: w * 0.02),
+                        //   decoration: BoxDecoration(
+                        //       borderRadius: BorderRadius.circular(20.0),
+                        //       color: Color(0xff2c3a5c).withOpacity(0.8)),
+                        //   child: ButtonCommon(
+                        //     buttonText: 'NEW CV',
+                        //     onClick: () {
+                        //       _handleCreateCVEvent();
+                        //     },
+                        //     color: Color(0xff5ace9f),
+                        //     prefixIcon: Icon(Icons.insert_drive_file_rounded,
+                        //         color: Colors.white),
+                        //     borderRadius: 20,
+                        //     prefixDrawablePadding: 8,
+                        //   ),
+                        // ),
                       ],
                     ),
                     Container(
@@ -547,8 +577,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 height: 100,
                 child: _buildCVItem(
                     context,
-                    _cvList != null && _cvList.isNotEmpty
-                        ? _cvList.elementAt(0)
+                    _model != null
+                        ? _model
                         : CVModel(
                             position: '', email: '', status: false, name: ''),
                     true,
@@ -558,6 +588,69 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         ],
       ),
     );
+  }
+
+  _buildAnimation() {
+    return AnimatedBuilder(
+        animation: CurvedAnimation(
+            parent: _animationController, curve: Curves.fastOutSlowIn),
+        builder: (context, child) {
+          return _buildContainer(context, 100 * _animationController.value, ButtonCommon(
+            buttonText: 'NEW CV',
+            onClick: () {
+              _handleCreateCVEvent();
+            },
+            color: Color(0xff5ace9f),
+            prefixIcon: Icon(Icons.insert_drive_file_rounded,
+                color: Colors.white),
+            borderRadius: 20,
+            prefixDrawablePadding: 8,
+          ),);
+          // return Stack(
+          //   alignment: Alignment.center,
+          //   children: [
+          //     _buildContainer(context, 50 * _animationController.value, ButtonCommon(
+          //       buttonText: 'NEW CV',
+          //       onClick: () {
+          //         _handleCreateCVEvent();
+          //       },
+          //       color: Color(0xff5ace9f),
+          //       prefixIcon: Icon(Icons.insert_drive_file_rounded,
+          //           color: Colors.white),
+          //       borderRadius: 20,
+          //       prefixDrawablePadding: 8,
+          //     ),),
+          //     _buildContainer(context, 60 * _animationController.value),
+          //     _buildContainer(context, 70 * _animationController.value),
+          //     _buildContainer(context, 80 * _animationController.value),
+          //     _buildContainer(context, 90 * _animationController.value),
+          //     Align(
+          //       child:
+          //     )
+          //   ],
+          // );
+        });
+  }
+
+  _buildContainer(BuildContext context, double radius, Widget child) {
+    return Container(
+      padding: EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        shape: BoxShape.rectangle,
+        color: Colors.grey.withOpacity(1 - _animationController.value),
+        borderRadius: BorderRadius.all(Radius.circular(30))
+      ),
+      child: child,
+    );
+  }
+
+  _getSize() async {
+    if (_key.currentContext != null) {
+      final _size = _key.currentContext.size;
+      final _width = _size.width;
+      final _height = _size.height;
+      print('Width: $_width -- Height: $_height');
+    }
   }
 
   // Handle onClick create CV event
@@ -627,7 +720,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         ),
         _isLoading
             ? Container(
-                color: Colors.white,
+
                 child: CircularProgressIndicator(),
               )
             : SingleChildScrollView(
@@ -907,7 +1000,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           SizedBox(
             width: 16,
           ),
-          LinkText(text: 'Kelvin Khanh', color: Colors.white, onTapLink: () {}),
+          MouseRegion(
+            onHover: (val) => setState(() => _isHover = true),
+            onExit: (val) => setState(() => _isHover = false),
+            child: Text('$_userNm', style: CommonStyle.main700Size18(context).copyWith(
+                color: Colors.white,
+                decoration: _isHover
+                    ? TextDecoration.underline
+                    : TextDecoration.none),),
+          ),
           SizedBox(
             width: w * 0.05,
           )
@@ -1036,6 +1137,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   _handleSignOut(BuildContext context) async {
     final pref = await SharedPreferencesService.instance;
     pref.removeAccessToken();
+    pref.removeUserNm();
     navKey.currentState.pushNamedAndRemoveUntil(routeLogin, (route) => false);
   }
 
@@ -1053,36 +1155,50 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 
+  // Display legend categories
   Widget _buildLegendItem(BuildContext context, DataPosition data, int index) {
-    double total = (((data.total * _cvList.length) / 100));
+    double total = (data.total /_totalRecords);
+    double percentTxt = double.tryParse((total).toStringAsFixed(3)) * 100;
     var w = MediaQuery.of(context).size.width;
+    print('total: $total -- percentTxt: $percentTxt');
     return MouseRegion(
-      // onHover: (val) {
-      //   setState(() {
-      //     _legends.forEach((element) {
-      //       element.isHover = false;
-      //     });
-      //     data.isHover = true;
-      //   });
-      // },
-      // onExit: (val) {
-      //   setState(() {
-      //    data.isHover = false;
-      //   });
-      // },
+      onHover: (val) {
+        setState(() {
+          _dataPosition.forEach((element) {
+            element.isHover = false;
+          });
+          data.isHover = true;
+        });
+      },
+      onExit: (val) {
+        setState(() {
+         data.isHover = false;
+        });
+      },
       child: AnimatedContainer(
         duration: Duration(milliseconds: 150),
         width: w * 0.1,
         margin: EdgeInsets.symmetric(horizontal: 16),
         padding: EdgeInsets.all(8),
         decoration: BoxDecoration(
-            color: Color((Random().nextDouble() * 0xFF2FD8DE).toInt()).withOpacity(1.0),
-            borderRadius: BorderRadius.all(Radius.circular(8.0))),
+            color: data.isHover ? _legends[index].color : Colors.white,
+            borderRadius: BorderRadius.all(Radius.circular(8.0)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black26,
+              blurRadius: 2.0,
+              offset: const Offset(0.0, 2.0),
+            ),
+          ],),
+
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '${data.position}',style: CommonStyle.size12W400black(context),
+              '${data.position}',
+              style: GoogleFonts.roboto(
+                  color: data.isHover ? Colors.white : _legends[index].color,
+                  fontSize: 12),
             ),
             SizedBox(
               height: 8,
@@ -1094,18 +1210,18 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   lineWidth: 6.0,
                   percent: total,
                   center: Text(
-                    '${total}',style: CommonStyle.size12W400black(context).copyWith(fontSize: 12,fontWeight: FontWeight.w700),
+                    '$percentTxt%',style: GoogleFonts.roboto(fontSize: 9, fontWeight: FontWeight.w700, color: data.isHover ? Colors.white : _legends[index].color),
                   ),
-                  backgroundColor: Colors.white,
-                  progressColor: Color(0xFFD94E19),
+                  backgroundColor:data.isHover ? _legends[index].backgroundColor : Colors.grey.shade50,
+                  progressColor: data.isHover ? Colors.white : _legends[index].color,
                 ),
                 Spacer(),
                 Text.rich(TextSpan(children: [
-                  TextSpan(text: 'Total: ',style: CommonStyle.size12W400black(context)),
+                  TextSpan(text: 'Total: ', style: GoogleFonts.roboto(color: data.isHover ? Colors.white : _legends[index].color, fontSize: 10,)),
                   TextSpan(
                     text:
                         '${data.total}',
-                    style: CommonStyle.size10W700black(context)
+                    style: CommonStyle.size10W700black(context).copyWith(color: data.isHover ? Colors.white : _legends[index].color)
                   ),
                 ]))
               ],
@@ -1125,18 +1241,11 @@ class PaginationModel {
 }
 
 class Legend {
-  String title;
-  double percent;
-  String value;
   Color color;
   Color backgroundColor;
-  bool isHover;
 
   Legend(
-      {this.title,
-      this.percent,
-      this.value,
+      {
       this.color,
-      this.backgroundColor,
-      this.isHover = false});
+      this.backgroundColor});
 }

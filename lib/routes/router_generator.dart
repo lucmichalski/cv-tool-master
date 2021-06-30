@@ -26,8 +26,9 @@ class RouteGenerator {
               builder: (_) => LoginScreen(), settings: settings);
           break;
         case routeHome:
+          String fullname;
           return MaterialPageRoute(
-              builder: (_) => HomeScreen(), settings: settings);
+              builder: (_) => HomeScreen(fullName:fullname,), settings: settings);
           break;
         case routeAdmin:
           return MaterialPageRoute(builder: (_) => AdminPage(),settings: settings);

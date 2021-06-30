@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cv_maker/common/common_style.dart';
@@ -176,14 +178,10 @@ class _SecondScreenState extends State<SecondScreen> {
       padding: EdgeInsets.only(left: w * 0.15),
       child: Column(
         children: [
-          ListView.builder(
-              shrinkWrap: true,
-              padding: EdgeInsets.zero,
-              itemCount: widget.cvModel.educationList.length,
-              itemBuilder: (context, index) {
-                final educationItem = widget.cvModel.educationList[index];
-                return _buildEducationItem(context, educationItem, index);
-              }),
+          Column(
+            children: List.generate(widget.cvModel.educationList.length, (index) =>
+                _buildEducationItem(context, widget.cvModel.educationList[index], index)),
+          ),
           AddButton(
             isButtonText: true,
             textButton: 'ADD EDUCATION',
@@ -208,18 +206,32 @@ class _SecondScreenState extends State<SecondScreen> {
       margin: EdgeInsets.only(bottom: 8),
       child: Column(
         children: [
-          Container(
-            alignment: Alignment.topRight,
-            child: IconButton(
-                onPressed: () {
-                  setState(() {
-                    widget.cvModel.educationList.removeAt(index);
-                  });
-                },
-                icon: Icon(
-                  Icons.highlight_remove,
-                  color: Colors.red,
-                )),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              IconButton(onPressed: () {
+                setState(() {
+                  final jsonBody = json.encode(education);
+                  var educationItem = EducationList.fromJson(json.decode(jsonBody));
+                  widget.cvModel.educationList.add(educationItem);
+                });
+              }, icon: Icon(Icons.copy)),
+              Container(
+                alignment: Alignment.topRight,
+                child: IconButton(
+                    splashRadius: 20,
+                    onPressed: () {
+                      setState(() {
+                        print('Index cua tao day: $index');
+                        widget.cvModel.educationList.removeAt(index);
+                      });
+                    },
+                    icon: Icon(
+                      Icons.highlight_remove,
+                      color: Colors.red,
+                    )),
+              ),
+            ],
           ),
           SizedBox(
             height: 15.0,

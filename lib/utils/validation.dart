@@ -11,23 +11,21 @@ class Validation {
 // Check valid email
   String checkValidEmailField(BuildContext context, String email) {
     if (email.isEmpty) {
-      return 'Email không thể để trống';
-    } else if (email.length < 2) {
-      return 'Email phải có tối thiểu 3 ký tự';
+      return 'Email can not be empty';
     } else if (email.length > 30) {
-      return 'Email chỉ có tối đa 30 ký tự';
+      return 'Email\'s maximum 30 characters';
     } else if (!_isValidEmail(email) ||
         email[0] == '.' ||
         email[0] == '-' ||
         email[0] == '_') {
-      return 'Email không hợp lệ';
+      return 'Email invalid';
     } else {
       return null;
     }
   }
   String checkValidNameField(BuildContext context, String name) {
     if (name.isEmpty) {
-      return 'Name không thể để trống';
+      return 'Name can not be empty';
     } else if (name.length < 2) {
       return 'Name phải có tối thiểu 3 ký tự';
     } else if (name.length > 30) {
@@ -37,7 +35,7 @@ class Validation {
     }
   }
 
-// Check valid password
+  // Check valid password
   String checkValidPassword(BuildContext context, String password) {
     RegExp hasUpperCase = RegExp(r'.*[A-Z].*', multiLine: false);
     RegExp hasLowerCase = RegExp(r'.*[a-z].*', multiLine: false);
@@ -51,17 +49,26 @@ class Validation {
       multiLine: false,
     );
     if (password.isEmpty) {
-      return 'Mật khẩu không thể để trống';
+      return 'Password can not be empty';
     } else if (password.length < 8) {
-      return 'Mật khẩu phải tối thiểu 8 ký tự';
+      return 'Password must have at least 8 characters';
     } else if (!hasUpperCase.hasMatch(password)) {
-      return 'Mật khẩu phải có ít nhất 1 ký tự viết hoa';
+      return 'Password must have at least 1 upper case character';
     } else if (!hasLowerCase.hasMatch(password)) {
-      return 'Mật khẩu phải có ít nhất 1 ký tự viết thường';
+      return 'Password must have at least 1 normal case character';
     } else if (!hasSpecial.hasMatch(password)) {
-      return 'Mật khẩu phải có ít nhất 1 ký tự đặc biệt';
+      return 'Password must have at least 1 special character';
     } else if (!hasNumber.hasMatch(password)) {
-      return 'Mật khẩu phải có ít nhất 1 con số';
+      return 'Password must have at least 1 numeric character';
+    } else {
+      return null;
+    }
+  }
+
+  // Check password confirmed
+  String checkPasswordConfirmed(BuildContext context, String password, String pswConfirmed) {
+    if (password != pswConfirmed) {
+      return 'Password does not match';
     } else {
       return null;
     }

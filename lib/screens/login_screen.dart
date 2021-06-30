@@ -41,7 +41,8 @@ class _LoginScreenState extends State<LoginScreen> {
             showProgressBar(context, true);
           } else if (state is AuthSuccess) {
             showProgressBar(context, false);
-            navKey.currentState.pushNamedAndRemoveUntil(routeHome, (route) => false);
+            print('fullname : ${state.response.fullName}');
+            navKey.currentState.pushNamedAndRemoveUntil(routeHome,(route) => false);
             print('Success');
           } else if (state is AuthError) {
             showProgressBar(context, false);
@@ -86,8 +87,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     Expanded(child: _buildLoginColumn(context)),
 
                     Expanded(child: Container(
-                      child: Image.network('https://scontent-hkg4-1.xx.fbcdn.net/v/t1.6435-9/131154966_2885066368483408_2643795568872402372_n.jpg?_nc_cat=107&ccb=1-3&_nc_sid=973b4a&_nc_ohc=mF0oIuHH7QEAX-fgMix&_nc_oc=AQlbei58sBx34lwxMTqtq3zvyb7COzpioeHTwQTAB3jTQy2SA-'
-                          'Tpj2pWmMq8ZQG6keA&_nc_ht=scontent-hkg4-1.xx&oh=6d5005e3a3ee175dbf77e0381e658d69&oe=60E167FA',fit: BoxFit.cover,)
+                      child: Image.network('https://scontent-hkg4-1.xx.fbcdn.net/v/t1.6435-9/159842486_2954782454845132_5235132372353609174_n.jpg?_nc_cat=102&ccb=1-3&_nc_sid=973b4a&_nc_ohc=6r2QKc7YpnsAX8pBsx3&_nc_ht=scontent-hkg4-1.xx&oh=d4c024c2cc2806ea2bd1b8fc1cf3e7ff&oe=60E1245E',fit: BoxFit.cover,)
                     ),)
                   ],
                 )
@@ -117,6 +117,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 SizedBox(height: 20,),
                 TextFieldCommon(
+                  textInputAction: TextInputAction.go,
+                  onFieldSubmitted: (val) {
+                    setState(() {
+                      _requestLogin();
+                    });
+                  },
                   maxLines: 1,
                   controller: emailController,
                   label: 'Email',
@@ -125,6 +131,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   height: 20,
                 ),
                 TextFieldCommon(
+                  textInputAction: TextInputAction.go,
+                  onFieldSubmitted: (val) {
+                    setState(() {
+                      _requestLogin();
+                    });
+                  },
                 suffixIcon: IconButton(
                   onPressed: (){
                     setState(() {

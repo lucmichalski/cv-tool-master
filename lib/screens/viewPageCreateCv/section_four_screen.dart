@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cv_maker/common/common_style.dart';
@@ -185,6 +187,13 @@ class _SectionFourState extends State<SectionFour> {
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
+              IconButton(onPressed: () {
+                setState(() {
+                  final jsonBody = json.encode(project);
+                  var highlightProjectItem = HighLightProjectList.fromJson(json.decode(jsonBody));
+                  widget.cvModel.highLightProjectList.add(highlightProjectItem);
+                });
+              }, icon: Icon(Icons.copy)),
               IconButton(
                   onPressed: () {
                     setState(() {
@@ -489,6 +498,7 @@ class _SectionFourState extends State<SectionFour> {
             ),
           ),
           IconButton(
+              splashRadius: 20,
               onPressed: () {
                 setState(() {
                   responsibilities.removeAt(index);

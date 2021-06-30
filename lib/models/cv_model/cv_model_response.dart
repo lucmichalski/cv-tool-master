@@ -7,9 +7,10 @@ class ListCVResponse {
   int totalPages;
   int totalDraft;
   int totalCompleted;
+  CVModel recentCvModel;
   List<CVModel> items;
 
-  ListCVResponse({this.total, this.page, this.pageSize, this.totalPages, this.items,this.totalDraft,this.totalCompleted});
+  ListCVResponse({this.total, this.recentCvModel, this.page, this.pageSize, this.totalPages, this.items,this.totalDraft,this.totalCompleted});
 
   ListCVResponse.fromJson(Map<String, dynamic> json) {
     total = json['total'];
@@ -18,6 +19,7 @@ class ListCVResponse {
     totalCompleted = json['total_completed'];
     pageSize = json['pageSize'];
     totalPages = json['total_pages'];
+    recentCvModel = CVModel.fromJson(json['recent']);
     if (json['items'] != null) {
       items =  [];
       json['items'].forEach((v) {
@@ -29,9 +31,10 @@ class ListCVResponse {
 class DataPosition {
   String position;
   int total;
+  bool isHover = false;
 
 
-  DataPosition({this.position, this.total});
+  DataPosition({this.position, this.total, this.isHover = false});
 
   DataPosition.fromJson(Map<String, dynamic> json) {
     position = json['position'];

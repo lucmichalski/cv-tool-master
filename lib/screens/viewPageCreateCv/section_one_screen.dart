@@ -114,6 +114,7 @@ class _SectionOneScreenState extends State<SectionOneScreen> {
                       // InputTextFormfield('Full Name', _fullNameController,'Please enter your fullname'),
                       _buildGender(context),
                       TextFieldCommon(
+                        validator:(email) => Validation().checkValidPassword(context, email),
                         icon: Icon(Icons.email,size: 16,),
                         controller: _emailController,
                         label: 'Email',
@@ -178,7 +179,6 @@ class _SectionOneScreenState extends State<SectionOneScreen> {
       },
     );
   }
-
   // Create gender layout
   Widget _buildGender(BuildContext context) {
     return Row(

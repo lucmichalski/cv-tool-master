@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_cv_maker/common/common_style.dart';
 import 'package:flutter_cv_maker/common/common_ui.dart';
@@ -164,6 +166,13 @@ class _SectionThreeState extends State<SectionThree> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
+                IconButton(onPressed: () {
+                  setState(() {
+                    final jsonBody = json.encode(professional);
+                    var professionalItem = ProfessionalList.fromJson(json.decode(jsonBody));
+                    widget.cvModel.professionalList.add(professionalItem);
+                  });
+                }, icon: Icon(Icons.copy)),
                 IconButton(
                   icon: Icon(Icons.highlight_remove_sharp, color: Colors.red),
                   hoverColor: Colors.transparent,

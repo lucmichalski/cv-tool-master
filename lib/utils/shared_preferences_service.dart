@@ -6,7 +6,7 @@ class SharedPrefKeys {
   SharedPrefKeys._();
   //
   // static const String taiKhoan = 'taiKhoan';
-  // static const String ten = 'ten';
+  static const String fullNm = 'fullNm';
   // static const String email = 'email';
   static const String token = 'token';
  // static const String password = 'password';
@@ -34,13 +34,25 @@ class SharedPreferencesService {
   Future<void> saveAccessToken(String accessToken) async =>
       await _preferences.setString(SharedPrefKeys.token, accessToken);
 
-  // Remove accessToken when logout
+  // Remove User name when logout
   Future<void> removeAccessToken() async =>
       await _preferences.remove(SharedPrefKeys.token);
+
+  // Save accessToken
+  Future<void> saveUserNm(String userNm) async =>
+      await _preferences.setString(SharedPrefKeys.fullNm, userNm);
+
+  // Remove User name when logout
+  Future<void> removeUserNm() async =>
+      await _preferences.remove(SharedPrefKeys.fullNm);
 
   // Get accessToken
   String get getAccessToken =>
       _preferences.getString(SharedPrefKeys.token) ?? kEmpty;
+
+  // Get username
+  String get getUserNm =>
+      _preferences.getString(SharedPrefKeys.fullNm) ?? kEmpty;
 
   // Get accessToken
   static String get getToken =>

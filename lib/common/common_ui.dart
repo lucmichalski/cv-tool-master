@@ -22,8 +22,11 @@ class ButtonCommon extends StatefulWidget {
   final BoxBorder border;
   final double prefixDrawablePadding;
   final double suffixDrawablePadding;
+  final Key key;
 
-  ButtonCommon({this.borderRadius,
+  ButtonCommon({
+    this.key,
+    this.borderRadius,
     this.height,
     this.prefixIcon,
     this.suffixIcon,
@@ -61,6 +64,7 @@ class _ButtonCommonState extends State<ButtonCommon> {
           widget.onClick();
         },
         child: Container(
+          key: widget.key,
           width: widget.width,
           padding: EdgeInsets.symmetric(horizontal: w * 0.02, vertical: 12),
           alignment: Alignment.center,

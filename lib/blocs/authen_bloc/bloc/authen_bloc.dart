@@ -25,7 +25,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       yield AuthLoading();
       try {
         final response = await repository.signIn(event.account, event.password);
-        final sharedPrefService = await SharedPreferencesService.instance..saveAccessToken(response.token);
+        final sharedPrefService = await SharedPreferencesService.instance..saveAccessToken(response.token)..saveUserNm(response.fullName);
         yield AuthSuccess(response: response);
       } catch (e) {
         yield AuthError(message: e.toString());
