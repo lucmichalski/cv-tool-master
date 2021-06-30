@@ -19,24 +19,25 @@ class ButtonCommon extends StatefulWidget {
   final Gradient gradient;
   final double width;
   final bool isCircle;
+  final BoxBorder border;
   final double prefixDrawablePadding;
   final double suffixDrawablePadding;
 
-  ButtonCommon(
-      {this.borderRadius,
-      this.height,
-      this.prefixIcon,
-      this.suffixIcon,
-      this.width,
-      this.isCircle,
-      @required this.buttonText,
-      this.textStyle,
-      this.padding,
-      this.gradient,
-      this.color,
-      this.prefixDrawablePadding,
-      this.suffixDrawablePadding,
-      @required this.onClick});
+  ButtonCommon({this.borderRadius,
+    this.height,
+    this.prefixIcon,
+    this.suffixIcon,
+    this.width,
+    this.isCircle,
+    @required this.buttonText,
+    this.textStyle,
+    this.padding,
+    this.gradient,
+    this.border,
+    this.color,
+    this.prefixDrawablePadding,
+    this.suffixDrawablePadding,
+    @required this.onClick});
 
   @override
   _ButtonCommonState createState() => _ButtonCommonState();
@@ -64,6 +65,7 @@ class _ButtonCommonState extends State<ButtonCommon> {
           padding: EdgeInsets.symmetric(horizontal: w * 0.02, vertical: 12),
           alignment: Alignment.center,
           decoration: BoxDecoration(
+            border: widget.border,
             borderRadius: BorderRadius.all(
                 Radius.circular(this.widget.borderRadius ?? w * 0.001)),
           ),

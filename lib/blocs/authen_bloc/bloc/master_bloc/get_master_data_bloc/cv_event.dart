@@ -53,3 +53,11 @@ class RequestDeleteCvEvent extends CVEvent {
   @override
   List<Object> get props => [accessToken,id];
 }
+// get data position event
+class RequestGetDataPositionEvent extends CVEvent {
+  final String accessToken;
+  RequestGetDataPositionEvent(this.accessToken);
+
+  @override
+  List<Object> get props => [accessToken];
+}

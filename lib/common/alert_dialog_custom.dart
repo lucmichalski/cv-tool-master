@@ -87,9 +87,18 @@ void showAlertDialog(
           return AlertDialogCustom(
               title: title,
               message: msg,
-              function: () => navKey.currentState.pushNamed(
-                    routeLogin,
-                  ));
+              function: () => navKey.currentState
+                  .pushNamedAndRemoveUntil(routeLogin, (route) => false));
+        });
+  } else if (msg.toLowerCase().contains('xmlhttprequest')) {
+    await showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialogCustom(
+              title: title,
+              message: 'Server Down',
+              function: () => Navigator.pop(context));
         });
   } else {
     await showDialog(

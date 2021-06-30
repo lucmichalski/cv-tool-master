@@ -131,5 +131,32 @@ class Repository {
       throw Exception('$message');
     }
   }
-
+  Future<String> updatePassWord(String accessToken, String requestBody) async {
+    final response = await http.put(
+        Uri.tryParse(BaseUrl + RequestChangePasswordUrl),
+        headers: getHeader(accessToken),
+        body: requestBody);
+    print('UPDATE -- ${response.statusCode} - ${response.body}');
+    if (response.statusCode == 200) {
+      return json.decode(response.body)["success"];
+    } else {
+      var message = json.decode(response.body)["message"];
+      throw Exception('$message');
+    }
+  }
+  //
+  Future<List<DataPosition>> fetchTotalPosition(String accessToken) async {
+    final response = await http.get(Uri.parse(BaseUrl + RequestTotalPositionUrl),
+        headers: getHeader(accessToken)
+    );
+    print(accessToken);
+    if (response.statusCode == 200) {
+      Iterable list = json.decode(response.body);
+      return list.map((model) => DataPosition.fromJson(model)).toList();
+    } else {
+      print('sdfd');
+      var message = json.decode(response.body)["message"];
+      throw Exception('$message');
+    }
+  }
 }

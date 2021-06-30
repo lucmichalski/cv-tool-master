@@ -100,3 +100,20 @@ class DeleteCvError extends CVState {
   @override
   List<Object> get props => [message];
 }
+// get CV data position
+class GetDataPositionSuccess extends CVState {
+  final List<DataPosition> dataPosition;
+
+  GetDataPositionSuccess(this.dataPosition);
+
+  @override
+  List<Object> get props => [dataPosition];
+}
+// get data error
+class GetDataPositionError extends CVState {
+  final String message;
+
+  GetDataPositionError({this.message});
+  @override
+  List<Object> get props => [message];
+}

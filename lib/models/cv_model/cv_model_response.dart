@@ -26,3 +26,22 @@ class ListCVResponse {
     }
   }
 }
+class DataPosition {
+  String position;
+  int total;
+
+
+  DataPosition({this.position, this.total});
+
+  DataPosition.fromJson(Map<String, dynamic> json) {
+    position = json['position'];
+    total = json['total'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['position'] = this.position;
+    data['total'] = this.total;
+    return data;
+  }
+}

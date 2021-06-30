@@ -4,6 +4,7 @@ import 'package:flutter_cv_maker/routes/route_data.dart';
 import 'package:flutter_cv_maker/routes/routes.dart';
 import 'package:flutter_cv_maker/screens/adminpage/admin_page.dart';
 import 'package:flutter_cv_maker/screens/auth_screen.dart';
+import 'package:flutter_cv_maker/screens/change_password_screen.dart';
 import 'package:flutter_cv_maker/screens/create_cv_screen.dart';
 import 'package:flutter_cv_maker/screens/home_screen.dart';
 import 'package:flutter_cv_maker/screens/login_screen.dart';
@@ -17,10 +18,7 @@ class RouteGenerator {
       queryParameters: uriData.queryParameters,
       route: uriData.path,
     );
-    // if (SharedPreferencesService.getToken.isEmpty || SharedPreferencesService.getToken == null) {
-    //   return MaterialPageRoute(
-    //       builder: (_) => LoginScreen(), settings: settings);
-    // }
+
       switch (routingData.route) {
          case routeLogin:
         case '/':
@@ -38,7 +36,10 @@ class RouteGenerator {
           var data = settings.arguments;
           // Pass data to CreateCV screen
           return MaterialPageRoute(
-              builder: (_) => CreateCV(cvModel: data as CVModel,), settings: settings);
+              builder: (_) => CreateCV(cvModel: data as CVModel), settings: settings);
+          break;
+        case routeChangePass:
+          return MaterialPageRoute(builder: (_) => ChangePasswordScreen(),settings: settings);
           break;
         default:
           return MaterialPageRoute(

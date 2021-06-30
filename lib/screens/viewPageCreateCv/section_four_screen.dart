@@ -437,6 +437,7 @@ class _SectionFourState extends State<SectionFour> {
       fieldViewBuilder: (context, controller, focus, func) {
         controller.text = '';
         return TextFieldCommon(
+          maxLines: 1,
           textInputAction: TextInputAction.go,
           onFieldSubmitted: (val) {
             setState(() {

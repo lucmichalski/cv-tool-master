@@ -59,6 +59,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/image/
+    - assets/image/ic_logo_tvf.png
   #     - images/a_dot_ham.jpeg
 
   # To add assets to your application, add an assets section, like this:

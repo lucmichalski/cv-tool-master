@@ -1,4 +1,3 @@
-import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +9,6 @@ import 'package:flutter_cv_maker/models/cv_model/cv_model.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:universal_html/html.dart' as html;
-import 'package:universal_html/js.dart';
 
 class SectionFive extends StatefulWidget {
   final CVModel cvModel;
@@ -246,7 +244,7 @@ class _SectionFiveState extends State<SectionFive> {
   Widget _buildProfessional(BuildContext context) {
     return Column(
       children: widget.cvModel.technicalSummaryList
-          .map((summary) => _buildProfessionalItem(context, summary))
+          .map((summary) =>Bullet(text:summary,))
           .toList(),
     );
   }
@@ -256,26 +254,6 @@ class _SectionFiveState extends State<SectionFive> {
       children: widget.cvModel.technicalSummaryList
           .map((summary) => _buildProfessionalItemPdf(summary))
           .toList(),
-    );
-  }
-
-  Widget _buildProfessionalItem(BuildContext context, String summaryItem) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 5, horizontal: 35),
-      child: Row(
-        children: [
-          Icon(
-            Icons.circle,
-            color: Colors.black,
-            size: 8,
-          ),
-          SizedBox(width: 16.0),
-          Text(
-            summaryItem,
-            style: CommonStyle.size12W400black(context),
-          )
-        ],
-      ),
     );
   }
 

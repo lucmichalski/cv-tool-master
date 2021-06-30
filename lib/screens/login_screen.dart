@@ -85,7 +85,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   children: [
                     Expanded(child: _buildLoginColumn(context)),
 
-                    Expanded(child: Container(color: kmainColor,),)
+                    Expanded(child: Container(
+                      child: Image.network('https://scontent-hkg4-1.xx.fbcdn.net/v/t1.6435-9/131154966_2885066368483408_2643795568872402372_n.jpg?_nc_cat=107&ccb=1-3&_nc_sid=973b4a&_nc_ohc=mF0oIuHH7QEAX-fgMix&_nc_oc=AQlbei58sBx34lwxMTqtq3zvyb7COzpioeHTwQTAB3jTQy2SA-'
+                          'Tpj2pWmMq8ZQG6keA&_nc_ht=scontent-hkg4-1.xx&oh=6d5005e3a3ee175dbf77e0381e658d69&oe=60E167FA',fit: BoxFit.cover,)
+                    ),)
                   ],
                 )
               ),

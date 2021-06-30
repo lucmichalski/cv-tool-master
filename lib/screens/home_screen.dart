@@ -1,4 +1,6 @@
+import 'dart:math';
 
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -14,12 +16,13 @@ import 'package:flutter_cv_maker/common/gender_pdf.dart';
 import 'package:flutter_cv_maker/helper.dart';
 import 'package:flutter_cv_maker/models/cv_model/admin_page_model.dart';
 import 'package:flutter_cv_maker/models/cv_model/cv_model.dart';
+import 'package:flutter_cv_maker/models/cv_model/cv_model_response.dart';
 import 'package:flutter_cv_maker/routes/routes.dart';
 import 'package:flutter_cv_maker/utils/shared_preferences_service.dart';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
-import 'package:universal_html/html.dart' as html;
+
+import 'change_password_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key key}) : super(key: key);
@@ -28,16 +31,19 @@ class HomeScreen extends StatefulWidget {
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin  {
+class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   List<CVModel> _cvList = [];
+  List<int> _arrayIndexPageView = [];
   int touchedIndex = -1;
   List<String> _menuList = [
     'Admin page',
     'Account',
     'Logout',
   ];
+  List<DataPosition> _dataPosition = [];
   MasterData _masterData;
   int _pageIndex = 1;
+  final _random = Random();
   bool _isStatusFiltered;
   bool _isDateFiltered;
   bool _isLoading = false;
@@ -49,28 +55,63 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin  
   bool _isLastSelected = false;
   AnimationController rotationController;
   List<Legend> _legends = [
-    Legend(title: 'Mobile Developer', percent: 0.15, value: '15%', color: Colors.amber, backgroundColor: Colors.amberAccent),
-    Legend(title: 'Frontend Developer', percent: 0.15, value: '15%', color: Colors.red, backgroundColor: Colors.redAccent),
-    Legend(title: 'Backend Developer', percent: 0.20, value: '20%', color: Colors.green, backgroundColor: Colors.greenAccent),
-    Legend(title: 'Project Manager', percent: 0.40, value: '40%', color: Colors.purple, backgroundColor: Colors.purpleAccent),
-    Legend(title: 'Golang', percent: 0.1, value: '10%', color: Colors.indigo, backgroundColor: Colors.indigoAccent),
+    Legend(
+        title: 'Mobile Developer',
+        percent: 0.15,
+        value: '15%',
+        color: Colors.amber,
+        backgroundColor: Colors.amberAccent),
+    Legend(
+        title: 'Frontend Developer',
+        percent: 0.15,
+        value: '15%',
+        color: Colors.red,
+        backgroundColor: Colors.redAccent),
+    Legend(
+        title: 'Backend Developer',
+        percent: 0.20,
+        value: '20%',
+        color: Colors.green,
+        backgroundColor: Colors.greenAccent),
+    Legend(
+        title: 'Project Manager',
+        percent: 0.40,
+        value: '40%',
+        color: Colors.purple,
+        backgroundColor: Colors.purpleAccent),
+    Legend(
+        title: 'Golang',
+        percent: 0.1,
+        value: '10%',
+        color: Colors.indigo,
+        backgroundColor: Colors.indigoAccent),
   ];
+  bool _isChangeCurrent;
+
+  bool _isChangeNew;
 
   @override
   void initState() {
-    // rotationController = AnimationController(vsync: this, duration: Duration(seconds: 5), upperBound: pi * 2);
-    // rotationController.repeat();
-    // Get master data
     _fetchMasterData();
     // Get list cv
     _fetchCVList(1);
+
+    _isChangeCurrent = true;
+    _isChangeNew = true;
     _pageIndexList.add(PaginationModel(index: 1, isSelected: true));
+    _fetchDataPosition();
     super.initState();
   }
 
   // Fetch master data to create/edit cv
   _fetchMasterData() async {
     BlocProvider.of<CVBloc>(context).add(RequestGetCVListEvent());
+  }
+
+  _fetchDataPosition() async {
+    final pref = await SharedPreferencesService.instance;
+    BlocProvider.of<CVBloc>(context)
+        .add(RequestGetDataPositionEvent(pref.getAccessToken));
   }
 
   _fetchCVList(int index) async {
@@ -89,51 +130,56 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin  
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<CVBloc, CVState>(
-      builder: (context, state) => _buildHomePage(context),
-      listener: (context, state) {
-        if (state is CVListLoading) {
-          _isLoading = true;
-        } else if (state is GetMasterDataSuccess) {
-          _isLoading = false;
-          setState(() {
-            _masterData = state.masterData;
-          });
-        } else if (state is GetMasterDataError) {
-          _isLoading = false;
-          showAlertDialog(
-              context, 'Error', state.message, () => Navigator.pop(context));
-        } else if (state is GetCvListSuccess) {
-          _totalRecords = state.cvList.total;
-          _totalCompleted = state.cvList.totalCompleted;
-          _totalDraft = state.cvList.totalDraft;
-          _totalPage = state.cvList.totalPages;
-          _isLoading = false;
-          _cvList = state.cvList.items;
-          if (_pageIndexList.isNotEmpty && _pageIndexList[0].isSelected) {
-            _pageIndexList.clear();
-            for (int i = 1; i <= state.cvList.totalPages; i++) {
-              // if (!_pageIndexList.contains(PaginationModel(index: i, isSelected: false))) {
-              _pageIndexList.add(
-                  PaginationModel(index: i, isSelected: i == 1 ? true : false));
-              // }
+        builder: (context, state) => _buildHomePage(context),
+        listener: (context, state) {
+          if (state is CVListLoading) {
+            _isLoading = true;
+          } else if (state is GetMasterDataSuccess) {
+            _isLoading = false;
+            setState(() {
+              _masterData = state.masterData;
+            });
+          } else if (state is GetMasterDataError) {
+            _isLoading = false;
+            showAlertDialog(
+                context, 'Error', state.message, () => Navigator.pop(context));
+          } else if (state is GetCvListSuccess) {
+            _totalRecords = state.cvList.total;
+            _totalCompleted = state.cvList.totalCompleted;
+            _totalDraft = state.cvList.totalDraft;
+            _totalPage = state.cvList.totalPages;
+            _isLoading = false;
+            _cvList = state.cvList.items;
+            if (_pageIndexList.isNotEmpty && _pageIndexList[0].isSelected) {
+              _pageIndexList.clear();
+              for (int i = 1; i <= state.cvList.totalPages; i++) {
+                // if (!_pageIndexList.contains(PaginationModel(index: i, isSelected: false))) {
+                _pageIndexList.add(PaginationModel(
+                    index: i, isSelected: i == 1 ? true : false));
+                // }
+              }
             }
+          } else if (state is GetCvListError) {
+            _isLoading = false;
+            showAlertDialog(
+                context, 'Error', state.message, () => Navigator.pop(context));
+          } else if (state is DeleteCvSuccess) {
+            _isLoading = false;
+            _fetchCVList(1);
+          } else if (state is DeleteCvError) {
+            _isLoading = false;
+            showAlertDialog(
+                context, 'Error', state.message, () => Navigator.pop(context));
+          } else if (state is GetDataPositionSuccess) {
+            _dataPosition = state.dataPosition;
+          } else if (state is GetDataPositionError) {
+            print('get data not success');
           }
-        } else if (state is GetCvListError) {
-          _isLoading = false;
-          showAlertDialog(
-              context, 'Error', state.message, () => Navigator.pop(context));
-        } else if (state is DeleteCvSuccess) {
-          _isLoading = false;
-          _fetchCVList(1);
-        } else if (state is DeleteCvError) {
-          _isLoading = false;
-          showAlertDialog(
-              context, 'Error', state.message, () => Navigator.pop(context));
-        }
-      },
-      buildWhen: (context, state) =>
-          state is GetMasterDataSuccess || state is GetCvListSuccess,
-    );
+        },
+        buildWhen: (context, state) =>
+            state is GetMasterDataSuccess ||
+            state is GetCvListSuccess ||
+            state is GetDataPositionSuccess);
   }
 
   Widget _buildHomePage(BuildContext context) {
@@ -344,20 +390,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin  
                       runAlignment: WrapAlignment.spaceAround,
                       spacing: 16,
                       runSpacing: 16,
-                      children: List.generate(_legends.length, (index) => _buildLegendItem(context, _legends[index])),
+                      children: List.generate(
+                          _dataPosition.length,
+                          (index) => _buildLegendItem(
+                              context, _dataPosition[index], index)),
                     )
-                    // RotationTransition(
-                    //   turns: Tween(begin: 0.0, end: 1.0)
-                    //       .animate(rotationController),
-                    //   child: Icon(
-                    //     Icons.home,
-                    //     size: 40,
-                    //   ),
-                    // ),
-                    // OutlinedButton(onPressed: () {
-                    //   runForLoop();
-                    // }, child: Text('Bấm vào em đi')),
-                    // Text('$counter')
                   ],
                 ),
               ),
@@ -367,35 +404,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin  
   }
 
   // Create chart
-  Widget _buildChart(BuildContext context) {
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      height: 300,
-      child: PieChart(
-          PieChartData(
-              centerSpaceRadius: 1,
-              pieTouchData: PieTouchData(touchCallback: (pieTouchResponse) {
-                setState(() {
-                  final desiredTouch =
-                      pieTouchResponse.touchInput is! PointerExitEvent &&
-                          pieTouchResponse.touchInput is! PointerUpEvent;
-                  if (desiredTouch && pieTouchResponse.touchedSection != null) {
-                    touchedIndex =
-                        pieTouchResponse.touchedSection.touchedSectionIndex;
-                  } else {
-                    touchedIndex = -1;
-                  }
-                });
-              }),
-              borderData: FlBorderData(
-                show: false,
-              ),
-              sectionsSpace: 16,
-              sections: showingSections()),
-          swapAnimationDuration: Duration(milliseconds: 150), // Optional
-          swapAnimationCurve: Curves.linear),
-    );
-  }
 
   Widget _buildMainPageHeader(BuildContext context) {
     var w = MediaQuery.of(context).size.width;
@@ -665,8 +673,55 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin  
         borderRadius: BorderRadius.all(Radius.circular(12)),
         child: InkWell(
           borderRadius: BorderRadius.all(Radius.circular(12)),
-          onTap: () =>
-              navKey.currentState.pushNamed(routeCreateCV, arguments: model),
+          onTap: () {
+            print('asDFSF');
+            var professionalExp;
+            if (model.professionalList != null && model.professionalList.isNotEmpty) {
+              professionalExp = model.professionalList
+                  .firstWhere(
+                      (element) =>
+                  element.roleNm.isEmpty ||
+                      element.companyNm.isEmpty ||
+                      element.locationNm.isEmpty ||
+                      element.responsibilities.isEmpty,
+                  orElse: () => null);
+            }
+            print('asDFSF');
+            var projectHighlight;
+            if (model.highLightProjectList != null && model.highLightProjectList.isNotEmpty) {
+              projectHighlight = model.highLightProjectList
+                  .firstWhere(
+                      (element) =>
+                  element.projectNm.isEmpty ||
+                      element.position.isEmpty ||
+                      element.technologies.isEmpty ||
+                      element.responsibility.isEmpty ||
+                      element.teamSize.isEmpty ||
+                      element.projectDescription.isEmpty,
+                  orElse: () => null);
+            }
+            print('asDFSF');
+           if(model.name.isNotEmpty ||
+               model.position.isNotEmpty ||
+               model.email.isNotEmpty ||
+               model.technicalSummaryList.isNotEmpty){
+             _arrayIndexPageView.add(1);
+           }
+            print('asDFSF');
+           if(professionalExp == null ){
+             _arrayIndexPageView.add(3);
+           }
+           if(projectHighlight== null){
+             _arrayIndexPageView.add(4);
+           }
+           if(model.educationList.isEmpty){
+             _arrayIndexPageView.add(2);
+           }
+
+            print('DATALENG :${_arrayIndexPageView}');
+            navKey.currentState.pushNamed(routeCreateCV, arguments:model);
+          },
+            
           child: Container(
               decoration: BoxDecoration(),
               height: 100,
@@ -797,18 +852,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin  
                             color: Color(0xff434b65),
                             icon: Icon(Icons.download_rounded),
                             onPressed: () async {
-                              // final url =
-                              // html.Url.createObjectUrlFromBlob(await myGetBlobPdfContent());
-                              // final anchor =
-                              // html.document.createElement('a') as html.AnchorElement
-                              // ..href = url
-                              // ..style.display = 'none'
-                              // ..download = 'CV_TVF_.pdf';
-                              // //${widget.cvModel.name.replaceAll(' ', '_')}
-                              // html.document.body.children.add(anchor);
-                              // anchor.click();
-                              // html.document.body.children.remove(anchor);
-                              // html.Url.revokeObjectUrl(url);
                               downloadPdf(context, model);
                             }),
                         IconButton(
@@ -1006,91 +1049,65 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin  
   // Process handle event for transition to Account page
   _handleAccountPage(BuildContext context) {
     navKey.currentState.pushNamed(
-      routeAdmin,
+      routeChangePass,
     );
   }
 
-  List<PieChartSectionData> showingSections() {
-    return List.generate(4, (i) {
-      final bool isTouched = i == touchedIndex;
-      switch (i) {
-        case 0:
-          return _buildPieChartData(context, isTouched, Color(0xff0293ee), 40);
-        case 1:
-          return _buildPieChartData(context, isTouched, Color(0xfff8b250), 30);
-        case 2:
-          return _buildPieChartData(context, isTouched, Color(0xff845bef), 15);
-        case 3:
-          return _buildPieChartData(context, isTouched, Color(0xff13d38e), 15);
-        default:
-          throw Error();
-      }
-    });
-  }
-
-  PieChartSectionData _buildPieChartData(
-      BuildContext context, bool isTouched, Color color, double value) {
-    final fontSize = isTouched ? 25.0 : 16.0;
-    final radius = isTouched ? 145.0 : 140.0;
-    return PieChartSectionData(
-      color: color,
-      value: value,
-      title: '$value %',
-      radius: radius,
-      titleStyle: TextStyle(
-          fontSize: fontSize,
-          fontWeight: FontWeight.bold,
-          color: const Color(0xffffffff)),
-    );
-  }
-
-  Widget _buildLegendItem(BuildContext context, Legend legend,) {
+  Widget _buildLegendItem(BuildContext context, DataPosition data, int index) {
+    double total = (((data.total * _cvList.length) / 100));
     var w = MediaQuery.of(context).size.width;
     return MouseRegion(
-      onHover: (val) {
-        setState(() {
-          _legends.forEach((element) {
-            element.isHover = false;
-          });
-          legend.isHover = true;
-        });
-      },
-      onExit: (val) {
-        setState(() {
-          legend.isHover = false;
-        });
-      },
+      // onHover: (val) {
+      //   setState(() {
+      //     _legends.forEach((element) {
+      //       element.isHover = false;
+      //     });
+      //     data.isHover = true;
+      //   });
+      // },
+      // onExit: (val) {
+      //   setState(() {
+      //    data.isHover = false;
+      //   });
+      // },
       child: AnimatedContainer(
         duration: Duration(milliseconds: 150),
         width: w * 0.1,
         margin: EdgeInsets.symmetric(horizontal: 16),
         padding: EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: legend.isHover ? legend.color : Color(0xfffafafa),
-          borderRadius: BorderRadius.all(Radius.circular(8.0))
-        ),
+            color: Color((Random().nextDouble() * 0xFF2FD8DE).toInt()).withOpacity(1.0),
+            borderRadius: BorderRadius.all(Radius.circular(8.0))),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('${legend.title}', style: GoogleFonts.roboto(color: legend.isHover ? Colors.white : legend.color, fontSize: 10,)),
-            SizedBox(height: 8,),
+            Text(
+              '${data.position}',style: CommonStyle.size12W400black(context),
+            ),
+            SizedBox(
+              height: 8,
+            ),
             Row(
               children: [
                 CircularPercentIndicator(
                   radius: 50.0,
-                  lineWidth: 4.0,
-                  percent: legend.percent,
-                  center: Text('${legend.value}', style: GoogleFonts.roboto(color: legend.isHover ?  Colors.white : legend.color, fontSize: 9,)),
-                  backgroundColor: legend.backgroundColor,
-                  progressColor: Colors.white,
+                  lineWidth: 6.0,
+                  percent: total,
+                  center: Text(
+                    '${total}',style: CommonStyle.size12W400black(context).copyWith(fontSize: 12,fontWeight: FontWeight.w700),
+                  ),
+                  backgroundColor: Colors.white,
+                  progressColor: Color(0xFFD94E19),
                 ),
                 Spacer(),
-                Text.rich(TextSpan(
-                  children: [
-                    TextSpan(text: 'total: ', style: GoogleFonts.roboto(color: legend.isHover ? Colors.white : legend.color, fontSize: 9,)),
-                    TextSpan(text: '${(legend.percent * 100).toString().replaceAll('%', '')}', style: GoogleFonts.roboto(color: legend.isHover ? Colors.white : legend.color, fontSize: 20,fontWeight: FontWeight.w700)),
-                  ]
-                ))
+                Text.rich(TextSpan(children: [
+                  TextSpan(text: 'Total: ',style: CommonStyle.size12W400black(context)),
+                  TextSpan(
+                    text:
+                        '${data.total}',
+                    style: CommonStyle.size10W700black(context)
+                  ),
+                ]))
               ],
             ),
           ],
@@ -1099,7 +1116,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin  
     );
   }
 }
-
 
 class PaginationModel {
   int index;
@@ -1116,5 +1132,11 @@ class Legend {
   Color backgroundColor;
   bool isHover;
 
-  Legend({this.title, this.percent, this.value, this.color, this.backgroundColor, this.isHover = false});
+  Legend(
+      {this.title,
+      this.percent,
+      this.value,
+      this.color,
+      this.backgroundColor,
+      this.isHover = false});
 }

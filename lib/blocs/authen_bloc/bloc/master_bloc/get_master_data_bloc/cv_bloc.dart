@@ -61,6 +61,13 @@ class CVBloc extends Bloc<CVEvent, CVState> {
       }catch(e){
         yield DeleteCvError(message: e.toString());
       }
+    }else if(event is RequestGetDataPositionEvent){
+      try{
+        final response = await repository.fetchTotalPosition(event.accessToken);
+        yield GetDataPositionSuccess(response);
+      }catch(e){
+        yield GetDataPositionError(message: e.toString());
+      }
     }
   }
 }

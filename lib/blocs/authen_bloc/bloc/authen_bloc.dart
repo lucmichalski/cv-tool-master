@@ -30,6 +30,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       } catch (e) {
         yield AuthError(message: e.toString());
       }
+    }    else if (event is RequestUpdatePasswordEvent) {
+      // Loading state
+      yield AuthLoading();
+      try {
+        final response = await repository.updatePassWord(event.token, event.body);
+        String a = response.toString();
+        yield UpdatePasswordSuccess(success: response);
+      } catch (e) {
+        yield AuthError(message: e.toString());
+      }
     }
   }
 }
