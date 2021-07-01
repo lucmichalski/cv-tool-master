@@ -15,7 +15,7 @@ import 'package:flutter_cv_maker/common/confirm_dialog.dart';
 import 'package:flutter_cv_maker/common/dropdown_custom.dart';
 import 'package:flutter_cv_maker/common/gender_pdf.dart';
 import 'package:flutter_cv_maker/helper.dart';
-import 'package:flutter_cv_maker/models/cv_model/admin_page_model.dart';
+import 'package:flutter_cv_maker/models/cv_model/master_model.dart';
 import 'package:flutter_cv_maker/models/cv_model/cv_model.dart';
 import 'package:flutter_cv_maker/models/cv_model/cv_model_response.dart';
 import 'package:flutter_cv_maker/routes/routes.dart';
@@ -163,6 +163,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               _masterData = state.masterData;
             });
           } else if (state is GetMasterDataError) {
+            print('GetMasterDataError: ${state.message}');
             _isLoading = false;
             showAlertDialog(
                 context, 'Error', state.message, () => Navigator.pop(context));
@@ -184,6 +185,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               }
             }
           } else if (state is GetCvListError) {
+            print('GetCvListError: ${state.message}');
             _isLoading = false;
             showAlertDialog(
                 context, 'Error', state.message, () => Navigator.pop(context));
@@ -197,7 +199,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           } else if (state is GetDataPositionSuccess) {
             _dataPosition = state.dataPosition;
           } else if (state is GetDataPositionError) {
-            print('get data not success');
+            print('get data not error');
           }
         },
         buildWhen: (context, state) =>
@@ -414,15 +416,17 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       padding: EdgeInsets.symmetric(vertical: 16.0),
                       child: Text('Categories', style: CommonStyle.size12W400black(context),),
                     ),
-                    Wrap(
-                      runAlignment: WrapAlignment.spaceAround,
-                      spacing: 16,
-                      runSpacing: 16,
-                      children: List.generate(
-                          _dataPosition.length,
-                          (index) => _buildLegendItem(
-                              context, _dataPosition[index], index)),
-                    )
+                    _dataPosition != null && _dataPosition.isNotEmpty
+                        ? Wrap(
+                            runAlignment: WrapAlignment.spaceAround,
+                            spacing: 16,
+                            runSpacing: 16,
+                            children: List.generate(
+                                _dataPosition.length,
+                                (index) => _buildLegendItem(
+                                    context, _dataPosition[index], index)),
+                          )
+                        : Text('No item available')
                   ],
                 ),
               ),
@@ -575,14 +579,17 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     borderRadius: BorderRadius.circular(20)),
                 width: MediaQuery.of(context).size.width / 1.8,
                 height: 100,
-                child: _buildCVItem(
-                    context,
-                    _model != null
-                        ? _model
-                        : CVModel(
-                            position: '', email: '', status: false, name: ''),
-                    true,
-                    1),
+                child: _model != null
+                    ? _buildCVItem(context, _model, true, 1)
+                    : Container(
+                        alignment: Alignment.center,
+                        margin:
+                            EdgeInsets.symmetric(vertical: 0, horizontal: 0),
+                        decoration: BoxDecoration(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(12))),
+                        child: Text('No item available'),
+                      ),
                 // _buildCVItem(context, _cvList[0])
               ))
         ],
@@ -649,7 +656,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       final _size = _key.currentContext.size;
       final _width = _size.width;
       final _height = _size.height;
-      print('Width: $_width -- Height: $_height');
+      ('Width: $_width -- Height: $_height');
     }
   }
 
@@ -767,7 +774,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         child: InkWell(
           borderRadius: BorderRadius.all(Radius.circular(12)),
           onTap: () {
-            print('asDFSF');
             var professionalExp;
             if (model.professionalList != null && model.professionalList.isNotEmpty) {
               professionalExp = model.professionalList
@@ -779,7 +785,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       element.responsibilities.isEmpty,
                   orElse: () => null);
             }
-            print('asDFSF');
+            ('asDFSF');
             var projectHighlight;
             if (model.highLightProjectList != null && model.highLightProjectList.isNotEmpty) {
               projectHighlight = model.highLightProjectList
@@ -793,14 +799,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       element.projectDescription.isEmpty,
                   orElse: () => null);
             }
-            print('asDFSF');
+
            if(model.name.isNotEmpty ||
                model.position.isNotEmpty ||
                model.email.isNotEmpty ||
                model.technicalSummaryList.isNotEmpty){
              _arrayIndexPageView.add(1);
            }
-            print('asDFSF');
+
            if(professionalExp == null ){
              _arrayIndexPageView.add(3);
            }
@@ -811,7 +817,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
              _arrayIndexPageView.add(2);
            }
 
-            print('DATALENG :${_arrayIndexPageView}');
+            ('DATALENG :${_arrayIndexPageView}');
             navKey.currentState.pushNamed(routeCreateCV, arguments:model);
           },
             
@@ -1019,7 +1025,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   Widget _buildPaginationLayout(BuildContext context) {
     // if (_pageIndexList.isNotEmpty) _pageIndexList.clear();
-    if (_totalPage == null) return Container();
+    if (_totalPage == null || _totalPage == 0) return Container();
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -1160,7 +1166,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     double total = (data.total /_totalRecords);
     double percentTxt = double.tryParse((total).toStringAsFixed(3)) * 100;
     var w = MediaQuery.of(context).size.width;
-    print('total: $total -- percentTxt: $percentTxt');
+
     return MouseRegion(
       onHover: (val) {
         setState(() {

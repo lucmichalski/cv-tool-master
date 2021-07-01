@@ -19,12 +19,18 @@ class ListCVResponse {
     totalCompleted = json['total_completed'];
     pageSize = json['pageSize'];
     totalPages = json['total_pages'];
-    recentCvModel = CVModel.fromJson(json['recent']);
+    recentCvModel = json['recent'] != null ? CVModel.fromJson(json['recent']) : null;
     if (json['items'] != null) {
-      items =  [];
-      json['items'].forEach((v) {
-        items.add(new CVModel.fromJson(v));
-      });
+      items = [];
+      if (json['items'].isNotEmpty) {
+        json['items'].forEach((v) {
+          items.add(new CVModel.fromJson(v));
+        });
+      } else {
+        items = [];
+      }
+    } else {
+      items = [];
     }
   }
 }

@@ -6,7 +6,7 @@ import 'package:flutter_cv_maker/blocs/authen_bloc/bloc/master_bloc/master_bloc.
 import 'package:flutter_cv_maker/common/common_style.dart';
 import 'package:flutter_cv_maker/common/common_ui.dart';
 import 'package:flutter_cv_maker/constants/constants.dart';
-import 'package:flutter_cv_maker/models/cv_model/admin_page_model.dart';
+import 'package:flutter_cv_maker/models/cv_model/master_model.dart';
 import 'package:flutter_cv_maker/utils/shared_preferences_service.dart';
 
 class HighlightPage extends StatefulWidget {

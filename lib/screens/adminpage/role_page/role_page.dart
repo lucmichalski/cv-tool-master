@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_cv_maker/common/common_style.dart';
 import 'package:flutter_cv_maker/common/common_ui.dart';
-import 'package:flutter_cv_maker/models/cv_model/admin_page_model.dart';
+import 'package:flutter_cv_maker/models/cv_model/master_model.dart';
 
 class RolePage extends StatefulWidget {
   final MasterData masterData;

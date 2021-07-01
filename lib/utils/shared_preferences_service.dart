@@ -38,7 +38,7 @@ class SharedPreferencesService {
   Future<void> removeAccessToken() async =>
       await _preferences.remove(SharedPrefKeys.token);
 
-  // Save accessToken
+  // Save userName
   Future<void> saveUserNm(String userNm) async =>
       await _preferences.setString(SharedPrefKeys.fullNm, userNm);
 

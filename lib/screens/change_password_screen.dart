@@ -87,9 +87,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               children: [
                 Image(
                   image: AssetImage('image/ic_logo_tvf.png'),
-                  fit: BoxFit.cover,
+                  fit: BoxFit.contain,
                   height: 200,
-                  width: 500,
+                  width: MediaQuery.of(context).size.width*0.2,
                 ),
               ],
             ),
@@ -115,10 +115,26 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
           padding: EdgeInsets.symmetric(horizontal: 22.0, vertical: 16),
           child: Column(
             children: [
-              Text(
-                'Reset your password',
-                style: CommonStyle.size14W700black(context),
-              ),
+             Row(
+               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+               children: [
+                 Padding(
+                   padding:  EdgeInsets.only(left:MediaQuery.of(context).size.width *0.1),
+                   child: Text(
+                     'Reset your password',
+                     style: CommonStyle.size14W700black(context),
+                   ),
+                 ),
+                  IconButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      icon: Icon(
+                        Icons.close,
+                        color: Colors.red,
+                      )),
+                ],
+             ),
               SizedBox(
                 height: 20,
               ),

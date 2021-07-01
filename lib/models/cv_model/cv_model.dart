@@ -255,6 +255,7 @@ class HighLightProjectList {
   String uiuxdesign;
   String documentcontrol;
   String projectmanagementtool;
+  bool isExpand = false;
 
   HighLightProjectList(
       {this.projectNm,
@@ -266,7 +267,8 @@ class HighLightProjectList {
         this.communicationused,
         this.uiuxdesign,
         this.documentcontrol,
-        this.projectmanagementtool});
+        this.projectmanagementtool,
+        this.isExpand = false});
 
   HighLightProjectList.fromJson(Map<String, dynamic> json) {
     projectNm = json['projectNm'];

@@ -7,7 +7,8 @@ import 'package:flutter_cv_maker/common/alert_dialog_custom.dart';
 import 'package:flutter_cv_maker/common/common_style.dart';
 import 'package:flutter_cv_maker/common/common_ui.dart';
 import 'package:flutter_cv_maker/common/progress_bar_dialog.dart';
-import 'package:flutter_cv_maker/models/cv_model/admin_page_model.dart';
+import 'package:flutter_cv_maker/constants/constants.dart';
+import 'package:flutter_cv_maker/models/cv_model/master_model.dart';
 import 'package:flutter_cv_maker/routes/routes.dart';
 import 'package:flutter_cv_maker/screens/adminpage/role_page/company_page.dart';
 import 'package:flutter_cv_maker/screens/adminpage/role_page/project_page.dart';
@@ -49,6 +50,8 @@ class _AdminPageState extends State<AdminPage> {
 
   // page selected
   int _pageId = 0;
+  // Current ID
+  String _masterId = kEmpty;
 
   @override
   void initState() {
@@ -64,6 +67,12 @@ class _AdminPageState extends State<AdminPage> {
   }
 
   @override
+  void dispose() {
+
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return BlocConsumer<MasterBloc, MasterState>(
       builder: (context, state) => _buildUI(context),
@@ -72,6 +81,9 @@ class _AdminPageState extends State<AdminPage> {
           // showProgressBar(context, true);
         } else if (state is MasterSuccess) {
           // showProgressBar(context, false);
+          _masterId = state.msg;
+          showAlertDialog(context, 'Success', 'Add master data success!',
+                  () => Navigator.pop(context));
           print('success');
         } else if (state is MasterError) {
           //showProgressBar(context, false);
@@ -79,6 +91,7 @@ class _AdminPageState extends State<AdminPage> {
               context, 'Error', state.message, () => Navigator.pop(context));
         } else if (state is UpdateMasterSuccess) {
           // showProgressBar(context, false);
+          print('Update Success');
           showAlertDialog(context, 'Success', 'Update master data success!',
               () => Navigator.pop(context));
         } else if (state is UpdateMasterError) {
@@ -103,7 +116,7 @@ class _AdminPageState extends State<AdminPage> {
       },
       buildWhen: (context, state) =>
           state is MasterSuccess ||
-          state is UpdateMasterSuccess ||
+          // state is UpdateMasterSuccess ||
           state is GetMasterSuccess,
     );
   }
@@ -214,7 +227,7 @@ class _AdminPageState extends State<AdminPage> {
                     final String requestBody =
                         json.encoder.convert(_masterData);
                     final pref = await SharedPreferencesService.instance;
-                    if (_masterData.id == null) {
+                    if (_masterData.id == null && _masterId == kEmpty) {
                       print('Create Mode');
                       // Create mode
                       BlocProvider.of<MasterBloc>(context).add(
@@ -247,8 +260,13 @@ class _AdminPageState extends State<AdminPage> {
           children: [
             Icon(Icons.home,size: 30,color: Colors.blue,),
             SizedBox(width: 10,),
-            LinkText(text: 'Home Page',linkTextStyle: TextStyle(fontSize: 20,color: Colors.blue,fontWeight: FontWeight.w700), onTapLink: ()=> navKey.currentState.pushNamed(
-    routeHome))
+            LinkText(
+                text: 'Home Page',
+                linkTextStyle: TextStyle(
+                    fontSize: 20,
+                    color: Colors.blue,
+                    fontWeight: FontWeight.w700),
+                onTapLink: () => Navigator.pop(context))
           ],
         ),
         SizedBox(height: 30,),

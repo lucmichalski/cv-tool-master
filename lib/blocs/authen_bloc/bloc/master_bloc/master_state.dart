@@ -12,12 +12,12 @@ class MasterInitial extends MasterState {}
 class MasterLoading extends MasterState {}
 
 class MasterSuccess extends MasterState {
-  final MasterData masterData;
+  final String msg;
 
-  MasterSuccess(this.masterData);
+  MasterSuccess(this.msg);
 
   @override
-  List<Object> get props => [masterData];
+  List<Object> get props => [msg];
 }
 
 // GET
@@ -50,12 +50,12 @@ class MasterError extends MasterState {
 
 /// UPDATE
 class UpdateMasterSuccess extends MasterState {
-  final MasterData masterData;
+  final String msg;
 
-  UpdateMasterSuccess(this.masterData);
+  UpdateMasterSuccess(this.msg);
 
   @override
-  List<Object> get props => [masterData];
+  List<Object> get props => [msg];
 }
 
 class UpdateMasterError extends MasterState {

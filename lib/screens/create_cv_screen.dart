@@ -9,7 +9,7 @@ import 'package:flutter_cv_maker/common/common_style.dart';
 import 'package:flutter_cv_maker/common/common_ui.dart';
 import 'package:flutter_cv_maker/common/progress_bar_dialog.dart';
 import 'package:flutter_cv_maker/constants/constants.dart';
-import 'package:flutter_cv_maker/models/cv_model/admin_page_model.dart';
+import 'package:flutter_cv_maker/models/cv_model/master_model.dart';
 import 'package:flutter_cv_maker/models/cv_model/cv_model.dart';
 import 'package:flutter_cv_maker/routes/routes.dart';
 import 'package:flutter_cv_maker/screens/viewPageCreateCv/section_%20five_screen.dart';
@@ -140,7 +140,7 @@ class _CreateCVState extends State<CreateCV> {
           showProgressBar(context, false);
           print('create cv success');
           showAlertDialog(context, 'Success', 'Create CV  success!',
-              () => navKey.currentState.pushNamed(routeHome));
+              () => Navigator.pop(context));
         } else if (state is CreateCvError) {
           showProgressBar(context, false);
           showAlertDialog(
@@ -148,7 +148,7 @@ class _CreateCVState extends State<CreateCV> {
         } else if (state is UpdateCvSuccess) {
           showProgressBar(context, false);
           showAlertDialog(context, 'Success', 'Update CV success!',
-              () => navKey.currentState.pushNamed(routeHome));
+              () => Navigator.pop(context);
         } else if (state is UpdateCvError) {
           showProgressBar(context, false);
           showAlertDialog(
@@ -166,19 +166,14 @@ class _CreateCVState extends State<CreateCV> {
         child: Column(
           children: [
             Padding(
-              padding: EdgeInsets.symmetric(vertical: w * 0.01),
+              padding: EdgeInsets.symmetric(vertical: w * 0.02),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   SizedBox(
                     width: 16,
                   ),
-                  LinkText(
-                      text: 'Home Page',
-                      color: Colors.white,
-                      onTapLink: () {
-                        navKey.currentState.pushNamed(routeHome);
-                      }),
+
                   SizedBox(
                     width: w * 0.05,
                   )
@@ -282,11 +277,11 @@ class _CreateCVState extends State<CreateCV> {
               },
               child: Padding(
                 padding: EdgeInsets.only(
-                    left: MediaQuery.of(context).size.width * 0.02),
+                    left: MediaQuery.of(context).size.width * 0.02,top: 20),
                 child: Row(
                   children: [
                     Icon(Icons.home_filled, color: Colors.white,size: 40,),
-                    SizedBox(width: 16,),
+                    SizedBox(width: 12,),
                     Text(
                       'CV Tool',
                       style: CommonStyle.size48W700White(context),

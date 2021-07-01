@@ -33,7 +33,7 @@ class _MyAppState extends State<MyApp> {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        initialRoute: routeHome,
+        initialRoute: routeLogin,
         navigatorKey: navKey,
         onGenerateRoute: RouteGenerator.generateRoute,
       ),

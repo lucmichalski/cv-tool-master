@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter_cv_maker/constants/constants.dart';
 import 'package:flutter_cv_maker/models/auth/login_response.dart';
-import 'package:flutter_cv_maker/models/cv_model/admin_page_model.dart';
+import 'package:flutter_cv_maker/models/cv_model/master_model.dart';
 import 'package:flutter_cv_maker/models/cv_model/cv_model.dart';
 import 'package:flutter_cv_maker/models/cv_model/cv_model_response.dart';
 import 'package:flutter_cv_maker/services/api_constants.dart';
@@ -34,13 +34,15 @@ class Repository {
   }
 
   // Request add master data
-  Future<MasterData> addMasterData(String accessToken, String requestBody) async {
+  Future<String> addMasterData(String accessToken, String requestBody) async {
+    print('Add MasterData: $requestBody');
     final response = await http.post(
         Uri.tryParse(BaseUrl + RequestAddMasterUrl),
         headers: getHeader(accessToken),
         body: requestBody);
     if (response.statusCode == 200) {
-      return MasterData.fromJson(json.decode(response.body));
+      var message = json.decode(response.body)["success"];
+      return message;
     } else {
       var message = json.decode(response.body)["message"];
       throw Exception('$message');
@@ -48,14 +50,15 @@ class Repository {
   }
 
   // Request add master data
-  Future<MasterData> updateMasterData(String accessToken, String requestBody) async {
-    final response = await http.put(
+  Future<String> updateMasterData(String accessToken, String requestBody) async {
+    final response = await http.post(
         Uri.tryParse(BaseUrl + RequestUpdateMasterUrl),
         headers: getHeader(accessToken),
         body: requestBody);
     print('UPDATE -- ${response.statusCode} - ${response.body}');
     if (response.statusCode == 200) {
-      return MasterData.fromJson(json.decode(response.body));
+      var message = json.decode(response.body)["success"];
+      return message;
     } else {
       var message = json.decode(response.body)["message"];
       throw Exception('$message');
