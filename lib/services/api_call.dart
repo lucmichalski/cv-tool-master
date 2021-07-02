@@ -78,13 +78,13 @@ class Repository {
     }
   }
   // create cv
-  Future<CVModel> createCv(String accessToken, String requestBody) async {
+  Future<String> createCv(String accessToken, String requestBody) async {
     final response = await http.post(
         Uri.tryParse(BaseUrl + RequestCreateCvUrl),
         headers: getHeader(accessToken),
         body: requestBody);
     if (response.statusCode == 200) {
-      return CVModel.fromJson(json.decode(response.body));
+      return json.decode(response.body)["_id"];
     } else {
       var message = json.decode(response.body)["message"];
       throw Exception('$message');
@@ -122,14 +122,13 @@ class Repository {
   // delete data cv
   Future<bool> requestDeleteCv(String accessToken, String id) async {
     final response = await http.delete(
-      Uri.tryParse(BaseUrl + RequestUpdateCvUrl + id),
+      Uri.tryParse(BaseUrl + RequestUpdateCvUrl + '/$id'),
       headers: getHeader(accessToken),
     );
     if (response.statusCode == 200) {
-      print('URl:${BaseUrl + RequestCreateCvUrl + id}');
+      print('URl:${BaseUrl + RequestCreateCvUrl + '/$id'}');
       return true;
     } else {
-      print('URl:${BaseUrl + RequestCreateCvUrl + id}');
       var message = json.decode(response.body)["message"];
       throw Exception('$message');
     }

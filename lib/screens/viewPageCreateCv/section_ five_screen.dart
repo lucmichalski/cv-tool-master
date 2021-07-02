@@ -1,5 +1,5 @@
-
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -25,7 +25,6 @@ class SectionFive extends StatefulWidget {
 }
 
 class _SectionFiveState extends State<SectionFive> {
-
   // FONT 20 BOLD
   final styles20bold = pw.TextStyle(
     fontSize: 20,
@@ -68,61 +67,92 @@ class _SectionFiveState extends State<SectionFive> {
       font: pw.Font.timesBold());
 
   Future<html.Blob> myGetBlobPdfContent() async {
-    final imageSvg = await rootBundle.loadString('assets/image/ic_logo_tvf.svg');
+    final imageSvg =
+        await rootBundle.loadString('assets/image/ic_logo_tvf.svg');
 
     final pdf = pw.Document();
     pdf.addPage(
       pw.MultiPage(
-        build: (pw.Context context) => [
-          pw.Column(
-            crossAxisAlignment: pw.CrossAxisAlignment.start,
-            children: [
-              pw.Text(
-                  widget.cvModel.name +
-                      '${widget.cvModel.gender == 'Male' ? ' (Mr.)' : ' (Mrs.)'}',
-                  style: styles20bold),
-              pw.SizedBox(
-                height: 6,
-              ),
-              pw.Text(widget.cvModel.position, style: styles14bold),
-              pw.Padding(
-                  padding:
-                      pw.EdgeInsets.symmetric(horizontal: 35.0, vertical: 16.0),
-                  child:
-                      pw.Text('Email: ${widget.cvModel.email}', style: styles12regular)),
-             widget.cvModel.professionalList.isNotEmpty ? _buildSectionTitlePdf('Professional summary', styles16bold) :pw.Container(),
-              widget.cvModel.professionalList.isNotEmpty ?  _buildProfessionalPdf() :pw.Container(),
-        widget.cvModel.educationList.isNotEmpty  ? _buildSectionTitlePdf('Education', styles16bold) : pw.Container() ,
-              widget.cvModel.educationList.isNotEmpty  ? _buildEducationPdf() : pw.Container() ,
-              widget.cvModel.technicalSummaryList.isNotEmpty ? _buildSectionTitlePdf('Technical Skills', styles16bold) : pw.Container(),
-              widget.cvModel.technicalSummaryList.isNotEmpty ? _buildTechnicalSkillsPdf() : pw.Container(),
-              widget.cvModel.professionalList.isNotEmpty ? _buildSectionTitlePdf('Professional Experience', styles16bold) : pw.Container(),
-              widget.cvModel.professionalList.isNotEmpty ? _buildProfessionalExperiencesPdf() : pw.Container(),
-              widget.cvModel.highLightProjectList.isNotEmpty ? _buildSectionTitlePdf('Highlight Project', styles16bold) : pw.Container(),
-              widget.cvModel.highLightProjectList.isNotEmpty ? _buildHighLightProjectsPdf() : pw.Container(),
-               _buildSectionTitlePdf('Languages', styles16bold) ,
-              _buildLanguagePdf()
-            ],
-          ),
-        ],
-        header: (context) {
-          return pw.Row(
-            mainAxisAlignment: pw.MainAxisAlignment.end,
-            children: [
-              pw.SvgImage(svg: imageSvg, width: 140, height: 25, fit: pw.BoxFit.cover)
-            ]
-          );
-        },
-        footer: (context){
-          return pw.Row(
-            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-            children: [
-              pw.Text('TECHVIFY., JSC - CV - Confidential',style: styles8),
-              pw.Text('Page ${context.pageNumber} of ${context.pagesCount}',style: styles8)
-            ]
-          );
-        }
-      ),
+          build: (pw.Context context) => [
+                pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  children: [
+                    pw.Text(widget.cvModel.name + ' (${widget.cvModel.gender})',
+                        style: styles20bold),
+                    pw.SizedBox(
+                      height: 6,
+                    ),
+                    pw.Text(widget.cvModel.position, style: styles14bold),
+                    pw.Padding(
+                        padding: pw.EdgeInsets.symmetric(
+                            horizontal: 35.0, vertical: 16.0),
+                        child: pw.Text('Email: ${widget.cvModel.email}',
+                            style: styles12regular)),
+                    widget.cvModel.professionalList.isNotEmpty
+                        ? _buildSectionTitlePdf(
+                            'Professional summary', styles16bold)
+                        : pw.Container(),
+                    widget.cvModel.professionalList.isNotEmpty
+                        ? _buildProfessionalPdf()
+                        : pw.Container(),
+                    widget.cvModel.educationList.isNotEmpty
+                        ? _buildSectionTitlePdf('Education', styles16bold)
+                        : pw.Container(),
+                    widget.cvModel.educationList.isNotEmpty
+                        ? _buildEducationPdf()
+                        : pw.Container(),
+                    widget.cvModel.technicalSummaryList.isNotEmpty
+                        ? _buildSectionTitlePdf(
+                            'Technical Skills', styles16bold)
+                        : pw.Container(),
+                    widget.cvModel.technicalSummaryList.isNotEmpty
+                        ? _buildTechnicalSkillsPdf()
+                        : pw.Container(),
+                    widget.cvModel.professionalList.isNotEmpty
+                        ? _buildSectionTitlePdf(
+                            'Professional Experience', styles16bold)
+                        : pw.Container(),
+                    widget.cvModel.professionalList.isNotEmpty
+                        ? _buildProfessionalExperiencesPdf()
+                        : pw.Container(),
+                    widget.cvModel.certificateList.isNotEmpty
+                        ? _buildSectionTitlePdf('Certificates', styles16bold)
+                        : pw.Container(),
+                    widget.cvModel.certificateList.isNotEmpty
+                        ? _buildCertificatesPdf()
+                        : pw.Container(),
+                    widget.cvModel.highLightProjectList.isNotEmpty
+                        ? _buildSectionTitlePdf(
+                            'Highlight Project', styles16bold)
+                        : pw.Container(),
+                    widget.cvModel.highLightProjectList.isNotEmpty
+                        ? _buildHighLightProjectsPdf()
+                        : pw.Container(),
+                    _buildSectionTitlePdf('Languages', styles16bold),
+                    _buildLanguagePdf()
+                  ],
+                ),
+              ],
+          header: (context) {
+            return pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.end,
+                children: [
+                  pw.SvgImage(
+                      svg: imageSvg,
+                      width: 140,
+                      height: 25,
+                      fit: pw.BoxFit.cover)
+                ]);
+          },
+          footer: (context) {
+            return pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                children: [
+                  pw.Text('TECHVIFY., JSC - CV - Confidential', style: styles8),
+                  pw.Text('Page ${context.pageNumber} of ${context.pagesCount}',
+                      style: styles8)
+                ]);
+          }),
     );
     final bytes = await pdf.save();
     html.Blob blob = html.Blob([bytes], 'application/pdf');
@@ -156,7 +186,7 @@ class _SectionFiveState extends State<SectionFive> {
     return pw.Column(
       children: widget.cvModel.professionalList
           .map((professional) =>
-          _buildProfessionalExperienceItemPdf(professional))
+              _buildProfessionalExperienceItemPdf(professional))
           .toList(),
     );
   }
@@ -248,8 +278,8 @@ class _SectionFiveState extends State<SectionFive> {
     return pw.Padding(
       padding: pw.EdgeInsets.symmetric(vertical: 5, horizontal: 35),
       child: pw.Row(
-        // /skill.skillData,
-        // '${skill.skillNm}: '
+          // /skill.skillData,
+          // '${skill.skillNm}: '
           children: [
             pw.Text(
               '${skill.skillNm} :',
@@ -336,13 +366,12 @@ class _SectionFiveState extends State<SectionFive> {
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: professional.responsibilities
                   .map((responsibility) => pw.Bullet(
-                  text: responsibility,
-                  style: pw.TextStyle(
-                    fontSize: 12,
-                    color: PdfColor.fromInt(0xFF000000),
-                    font: pw.Font.times(),
-                  )
-              ))
+                      text: responsibility,
+                      style: pw.TextStyle(
+                        fontSize: 12,
+                        color: PdfColor.fromInt(0xFF000000),
+                        font: pw.Font.times(),
+                      )))
                   .toList(),
             ),
           )
@@ -367,7 +396,7 @@ class _SectionFiveState extends State<SectionFive> {
           crossAxisAlignment: pw.CrossAxisAlignment.stretch,
           children: widget.cvModel.highLightProjectList
               .map((highLightProject) =>
-              _buildHighLightProjectItemPdfT(highLightProject))
+                  _buildHighLightProjectItemPdfT(highLightProject))
               .toList(),
         )
       ],
@@ -398,24 +427,33 @@ class _SectionFiveState extends State<SectionFive> {
               0: pw.FlexColumnWidth(3),
               1: pw.FlexColumnWidth(6),
             },
-            border: pw.TableBorder.all(color: PdfColor.fromInt(0xFF000000),width: 0.5),
+            border: pw.TableBorder.all(
+                color: PdfColor.fromInt(0xFF000000), width: 0.5),
             children: [
-              if(highLightProject.projectDescription.isNotEmpty) _buildTableRowPdf(
-                  'Project Description', highLightProject.projectDescription),
-              if(highLightProject.teamSize.isNotEmpty)  _buildTableRowPdf('Team size', highLightProject.teamSize),
-              if(highLightProject.position.isNotEmpty) _buildTableRowPdf('Position', highLightProject.position),
-              if(highLightProject.responsibility.isNotEmpty) _buildTableRowPdf('Responsibility',
-                  _getDataResponsibility(highLightProject.responsibility)),
-              if(highLightProject.technologies.isNotEmpty) _buildTableRowPdf('Technology used',
-                  highLightProject.technologies.join(',').toString()),
-              if(highLightProject.communicationused.isNotEmpty) _buildTableRowPdf('Communication used ',
-                  highLightProject.communicationused),
-              if(highLightProject.uiuxdesign.isNotEmpty)  _buildTableRowPdf( 'UI&UX design ',
-                  highLightProject.uiuxdesign),
-              if(highLightProject.documentcontrol.isNotEmpty)  _buildTableRowPdf('Document Control ',
-                  highLightProject.documentcontrol),
-              if(highLightProject.projectmanagementtool.isNotEmpty) _buildTableRowPdf('Project management tool ',
-                  highLightProject.projectmanagementtool),
+              if (highLightProject.projectDescription.isNotEmpty)
+                _buildTableRowPdf(
+                    'Project Description', highLightProject.projectDescription),
+              if (highLightProject.teamSize.isNotEmpty)
+                _buildTableRowPdf('Team size', highLightProject.teamSize),
+              if (highLightProject.position.isNotEmpty)
+                _buildTableRowPdf('Position', highLightProject.position),
+              if (highLightProject.responsibility.isNotEmpty)
+                _buildTableRowPdf('Responsibility',
+                    _getDataResponsibility(highLightProject.responsibility)),
+              if (highLightProject.technologies.isNotEmpty)
+                _buildTableRowPdf('Technology used',
+                    highLightProject.technologies.join(',').toString()),
+              if (highLightProject.communicationused.isNotEmpty)
+                _buildTableRowPdf(
+                    'Communication used ', highLightProject.communicationused),
+              if (highLightProject.uiuxdesign.isNotEmpty)
+                _buildTableRowPdf('UI&UX design ', highLightProject.uiuxdesign),
+              if (highLightProject.documentcontrol.isNotEmpty)
+                _buildTableRowPdf(
+                    'Document Control ', highLightProject.documentcontrol),
+              if (highLightProject.projectmanagementtool.isNotEmpty)
+                _buildTableRowPdf('Project management tool ',
+                    highLightProject.projectmanagementtool),
             ],
           ),
         ],
@@ -477,6 +515,33 @@ class _SectionFiveState extends State<SectionFive> {
     );
   }
 
+  pw.Widget _buildCertificatesPdf() {
+    return pw.Padding(
+        padding: pw.EdgeInsets.only(left: 35),
+        child: pw.Column(
+          children: [
+            pw.Column(
+              children: List.generate(
+                  widget.cvModel.certificateList.length,
+                  (index) => pw.Row(
+                        children: [
+                          pw.Expanded(
+                            child: pw.Text(
+                                widget.cvModel.certificateList[index]
+                                    .certificateNm,
+                                style: styles12regular),
+                          ),
+                          pw.Text(
+                              widget.cvModel.certificateList[index]
+                                  .certificateYear,
+                              style: styles12regular)
+                        ],
+                      )),
+            )
+          ],
+        ));
+  }
+
   ////////////////////////////////////////
   //// BUILD PDF VIEW WIDGETS ON WEB ////
   ///////////////////////////////////////
@@ -509,14 +574,30 @@ class _SectionFiveState extends State<SectionFive> {
               ? _buildSectionTitle(context, 'Professional summary')
               : Container(),
           _buildProfessional(context),
-         widget.cvModel.educationList.isNotEmpty ? _buildSectionTitle(context, 'Education') :Container(),
-          widget.cvModel.educationList.isNotEmpty ?  _buildEducation(context) :Container(),
-         widget.cvModel.technicalSummaryList.isNotEmpty ? _buildSectionTitle(context, 'Technical Skills'):Container(),
-          widget.cvModel.technicalSummaryList.isNotEmpty ? _buildTechnicalSkills(context) :Container(),
-         widget.cvModel.professionalList.isNotEmpty ? _buildSectionTitle(context, 'Professional Experience'):Container(),
-          widget.cvModel.professionalList.isNotEmpty  ?  _buildProfessionalExperiences(context):Container(),
-          widget.cvModel.certificateList.isNotEmpty ? _buildCertificates(context) : Container(),
-        widget.cvModel.highLightProjectList.isNotEmpty ?  _buildHighLightProjects(context) : Container(),
+          widget.cvModel.educationList.isNotEmpty
+              ? _buildSectionTitle(context, 'Education')
+              : Container(),
+          widget.cvModel.educationList.isNotEmpty
+              ? _buildEducation(context)
+              : Container(),
+          widget.cvModel.technicalSummaryList.isNotEmpty
+              ? _buildSectionTitle(context, 'Technical Skills')
+              : Container(),
+          widget.cvModel.technicalSummaryList.isNotEmpty
+              ? _buildTechnicalSkills(context)
+              : Container(),
+          widget.cvModel.professionalList.isNotEmpty
+              ? _buildSectionTitle(context, 'Professional Experience')
+              : Container(),
+          widget.cvModel.professionalList.isNotEmpty
+              ? _buildProfessionalExperiences(context)
+              : Container(),
+          widget.cvModel.certificateList.isNotEmpty
+              ? _buildCertificates(context)
+              : Container(),
+          widget.cvModel.highLightProjectList.isNotEmpty
+              ? _buildHighLightProjects(context)
+              : Container(),
           _buildSectionTitle(context, 'Languages'),
           _buildLanguage(context)
         ],
@@ -559,11 +640,12 @@ class _SectionFiveState extends State<SectionFive> {
           onPressed: () async {
             final url =
                 html.Url.createObjectUrlFromBlob(await myGetBlobPdfContent());
-            final anchor =
-                html.document.createElement('a') as html.AnchorElement
-                  ..href = url
-                  ..style.display = 'none'
-                  ..download = 'CV_TVF_${widget.cvModel.name.replaceAll(' ', '_')}.pdf';
+            final anchor = html.document.createElement('a')
+                as html.AnchorElement
+              ..href = url
+              ..style.display = 'none'
+              ..download =
+                  'CV_TVF_${widget.cvModel.name.replaceAll(' ', '_')}.pdf';
             html.document.body.children.add(anchor);
             anchor.click();
             html.document.body.children.remove(anchor);
@@ -577,7 +659,9 @@ class _SectionFiveState extends State<SectionFive> {
   Widget _buildProfessional(BuildContext context) {
     return Column(
       children: widget.cvModel.technicalSummaryList
-          .map((summary) =>Bullet(text:summary,))
+          .map((summary) => Bullet(
+                text: summary,
+              ))
           .toList(),
     );
   }
@@ -699,14 +783,27 @@ class _SectionFiveState extends State<SectionFive> {
   Widget _buildCertificates(context) {
     return Column(
       children: [
-         _buildSectionTitle(context, 'Certificates'),
-        Column(
-          children: List.generate(widget.cvModel.certificateList.length, (index) => Row(
-            children: [
-              Expanded(child: Text(widget.cvModel.certificateList[index].certificateNm, style: CommonStyle.size12W400black(context)),),
-              Text(widget.cvModel.certificateList[index].certificateYear, style: CommonStyle.size12W400black(context))
-            ],
-          )),
+        _buildSectionTitle(context, 'Certificates'),
+        Padding(
+          padding: EdgeInsets.symmetric(vertical: 5, horizontal: 35),
+          child: Column(
+            children: List.generate(
+                widget.cvModel.certificateList.length,
+                (index) => Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                              widget
+                                  .cvModel.certificateList[index].certificateNm,
+                              style: CommonStyle.size12W400black(context)),
+                        ),
+                        Text(
+                            widget
+                                .cvModel.certificateList[index].certificateYear,
+                            style: CommonStyle.size12W400black(context))
+                      ],
+                    )),
+          ),
         )
       ],
     );
@@ -750,22 +847,31 @@ class _SectionFiveState extends State<SectionFive> {
             },
             border: TableBorder.all(color: Colors.black),
             children: [
-              if(highLightProject.projectDescription.isNotEmpty)_buildTableRow(context, 'Project Description',
-                  highLightProject.projectDescription) ,
-              if( highLightProject.teamSize.isNotEmpty)  _buildTableRow(context, 'Team size', highLightProject.teamSize),
-              if(highLightProject.position.isNotEmpty ) _buildTableRow(context, 'Position', highLightProject.position),
-              if(highLightProject.responsibility.isNotEmpty )_buildTableRow(context, 'Responsibility',
-                  _getDataResponsibility(highLightProject.responsibility)) ,
-              if( highLightProject.technologies.isNotEmpty ) _buildTableRow(context, 'Technology used',
-                  highLightProject.technologies.join(', ').toString()),
-              if( highLightProject.communicationused.isNotEmpty) _buildTableRow(context, 'Communication used ',
-                  highLightProject.communicationused),
-              if(highLightProject.uiuxdesign.isNotEmpty ) _buildTableRow(
-                  context, 'UI&UX design ', highLightProject.uiuxdesign),
-              if(highLightProject.documentcontrol.isNotEmpty ) _buildTableRow(context, 'Document Control ',
-                  highLightProject.documentcontrol),
-              if(highLightProject.projectmanagementtool.isNotEmpty ) _buildTableRow(context, 'Project management tool ',
-                  highLightProject.projectmanagementtool),
+              if (highLightProject.projectDescription.isNotEmpty)
+                _buildTableRow(context, 'Project Description',
+                    highLightProject.projectDescription),
+              if (highLightProject.teamSize.isNotEmpty)
+                _buildTableRow(context, 'Team size', highLightProject.teamSize),
+              if (highLightProject.position.isNotEmpty)
+                _buildTableRow(context, 'Position', highLightProject.position),
+              if (highLightProject.responsibility.isNotEmpty)
+                _buildTableRow(context, 'Responsibility',
+                    _getDataResponsibility(highLightProject.responsibility)),
+              if (highLightProject.technologies.isNotEmpty)
+                _buildTableRow(context, 'Technology used',
+                    highLightProject.technologies.join(', ').toString()),
+              if (highLightProject.communicationused.isNotEmpty)
+                _buildTableRow(context, 'Communication used ',
+                    highLightProject.communicationused),
+              if (highLightProject.uiuxdesign.isNotEmpty)
+                _buildTableRow(
+                    context, 'UI&UX design ', highLightProject.uiuxdesign),
+              if (highLightProject.documentcontrol.isNotEmpty)
+                _buildTableRow(context, 'Document Control ',
+                    highLightProject.documentcontrol),
+              if (highLightProject.projectmanagementtool.isNotEmpty)
+                _buildTableRow(context, 'Project management tool ',
+                    highLightProject.projectmanagementtool),
             ],
           ),
         ],
@@ -785,11 +891,13 @@ class _SectionFiveState extends State<SectionFive> {
     return TableRow(children: [
       Padding(
         padding: EdgeInsets.all(8.0),
-        child: Text(title ?? kEmpty, style: CommonStyle.size12W400black(context)),
+        child:
+            Text(title ?? kEmpty, style: CommonStyle.size12W400black(context)),
       ),
       Padding(
         padding: EdgeInsets.all(8.0),
-        child: Text(content ?? kEmpty, style: CommonStyle.size12W400black(context)),
+        child: Text(content ?? kEmpty,
+            style: CommonStyle.size12W400black(context)),
       ),
     ]);
   }

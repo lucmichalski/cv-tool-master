@@ -486,7 +486,7 @@ class _SecondScreenState extends State<SecondScreen> {
             isButtonText: true,
             textButton: 'ADD CERTIFICATE',
             onPressed: () => setState(() {
-              widget.cvModel.certificateList.add(CertificateList());
+              widget.cvModel.certificateList.add(CertificateList(certificateNm: '',certificateYear: DateTime.now().year.toString()));
             }),
           )
         ],

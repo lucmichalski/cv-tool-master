@@ -30,12 +30,12 @@ class GetMasterDataError extends CVState {
 }
 // create CV success
 class CreateCvSuccess extends CVState {
-  final CVModel cvModel;
+  final String cvId;
 
-  CreateCvSuccess(this.cvModel);
+  CreateCvSuccess(this.cvId);
 
   @override
-  List<Object> get props => [cvModel];
+  List<Object> get props => [cvId];
 }
 
 // create cv error

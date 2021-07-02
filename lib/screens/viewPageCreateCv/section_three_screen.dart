@@ -396,6 +396,7 @@ class _SectionThreeState extends State<SectionThree> {
           focusNode: focus,
         );
       },
+
       optionsBuilder: (TextEditingValue textEditingValue) {
         if (textEditingValue.text == '') {
           return Iterable<String>.empty();
@@ -404,6 +405,7 @@ class _SectionThreeState extends State<SectionThree> {
               .toLowerCase()
               .contains(textEditingValue.text.toLowerCase()));
         }
+
       },
       onSelected: (String selection) {
         setState(() {

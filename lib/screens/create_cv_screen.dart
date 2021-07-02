@@ -137,11 +137,11 @@ class _CreateCVState extends State<CreateCV> {
               context, 'Error', state.message, () => Navigator.pop(context));
         } else if (state is CreateCvSuccess) {
           showProgressBar(context, false);
+          print('ID after Create CV: ${state.cvId}');
+          widget.cvModel.id = state.cvId;
           print('create cv success');
           showAlertDialog(context, 'Success', 'Create CV  success!', () {
             Navigator.pop(context);
-            navKey.currentState
-                .pushNamedAndRemoveUntil(routeHome, (route) => false);
           });
         } else if (state is CreateCvError) {
           showProgressBar(context, false);
@@ -157,7 +157,8 @@ class _CreateCVState extends State<CreateCV> {
               context, 'Error', state.message, () => Navigator.pop(context));
         }
       },
-      buildWhen: (context, state) => state is GetMasterDataSuccess,
+      buildWhen: (context, state) =>
+          state is GetMasterDataSuccess || state is CreateCvSuccess,
     );
   }
 
@@ -543,9 +544,9 @@ class _CreateCVState extends State<CreateCV> {
             widget.cvModel.professionalList.isNotEmpty
                 ? _buildProfessionalExperiences(context)
                 : Container(),
-            // widget.cvModel.certificateList.isNotEmpty
-            //     ? _buildCertificates(context)
-            //     : Container(),
+            widget.cvModel.certificateList.isNotEmpty
+                ? _buildCertificates(context)
+                : Container(),
             widget.cvModel.highLightProjectList.isNotEmpty
                 ? _buildHighLightProjects(context)
                 : Container(),
@@ -564,6 +565,7 @@ class _CreateCVState extends State<CreateCV> {
     );
   }
   Widget _buildCertificates(context) {
+
     return Column(
       children: [
         _buildSectionTitle(context, 'Certificates'),
