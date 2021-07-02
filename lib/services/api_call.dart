@@ -106,14 +106,14 @@ class Repository {
   // update cv
   Future<CVModel> updateCv(String accessToken, String requestBody,String id) async {
     final response = await http.put(
-        Uri.tryParse(BaseUrl + RequestUpdateCvUrl+id),
+        Uri.tryParse(BaseUrl + RequestUpdateCvUrl + '/$id'),
         headers: getHeader(accessToken),
         body: requestBody);
+    print('Request Body UpdateCV: $requestBody');
     if (response.statusCode == 200) {
-      print('URl:${BaseUrl + RequestCreateCvUrl+id}');
+      print('StatusCd: ${response.statusCode} -- URl: ${BaseUrl + RequestUpdateCvUrl + '/$id'}');
       return CVModel.fromJson(json.decode(response.body));
     } else {
-      print('URl:${BaseUrl + RequestCreateCvUrl+id}');
       var message = json.decode(response.body)["message"];
       throw Exception('$message');
     }

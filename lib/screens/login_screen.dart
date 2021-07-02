@@ -112,7 +112,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text('CV Maker', style: CommonStyle.size48W700black(context).copyWith(color: kmainColor),),
+                    Text('CVs-Generator', style: CommonStyle.size48W700black(context).copyWith(color: kmainColor),),
                   ],
                 ),
                 SizedBox(height: 20,),

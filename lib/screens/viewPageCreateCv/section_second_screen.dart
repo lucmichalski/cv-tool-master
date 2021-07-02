@@ -532,13 +532,14 @@ class _SecondScreenState extends State<SecondScreen> {
                           initialDate: DateTime.now(),
                           selectedDate: DateTime.now(),
                           onChanged: (DateTime dateTime) {
-                            widget.cvModel.certificateList[index]
-                                .certificateYear = dateTime.year.toString();
                             setState(() {
-                              Navigator.pop(context);
+                              certificate.certificateYear = dateTime.year.toString();
+                              // widget.cvModel.certificateList[index]
+                              //     .certificateYear = dateTime.year.toString();
                             });
                             // Do something with the dateTime selected.
                             // Remember that you need to use dateTime.year to get the year
+                            Navigator.pop(context);
                           },
                         ),
                       ),

@@ -4,9 +4,11 @@ import 'package:flutter_cv_maker/blocs/main_bloc.dart';
 import 'package:flutter_cv_maker/routes/router_generator.dart';
 import 'package:flutter_cv_maker/routes/routes.dart';
 import 'package:flutter_cv_maker/utils/shared_preferences_service.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  EasyLoading.init();
   runApp(MyApp());
 }
 
@@ -33,7 +35,7 @@ class _MyAppState extends State<MyApp> {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        initialRoute: routeLogin,
+        initialRoute: routeHome,
         navigatorKey: navKey,
         onGenerateRoute: RouteGenerator.generateRoute,
       ),

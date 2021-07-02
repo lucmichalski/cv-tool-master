@@ -9,8 +9,8 @@ import 'package:flutter_cv_maker/common/common_style.dart';
 import 'package:flutter_cv_maker/common/common_ui.dart';
 import 'package:flutter_cv_maker/common/progress_bar_dialog.dart';
 import 'package:flutter_cv_maker/constants/constants.dart';
-import 'package:flutter_cv_maker/models/cv_model/master_model.dart';
 import 'package:flutter_cv_maker/models/cv_model/cv_model.dart';
+import 'package:flutter_cv_maker/models/cv_model/master_model.dart';
 import 'package:flutter_cv_maker/routes/routes.dart';
 import 'package:flutter_cv_maker/screens/viewPageCreateCv/section_%20five_screen.dart';
 import 'package:flutter_cv_maker/screens/viewPageCreateCv/section_four_screen.dart';
@@ -19,7 +19,6 @@ import 'package:flutter_cv_maker/screens/viewPageCreateCv/section_second_screen.
 import 'package:flutter_cv_maker/screens/viewPageCreateCv/section_three_screen.dart';
 import 'package:flutter_cv_maker/utils/shared_preferences_service.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:universal_html/html.dart';
 
 import '../common/common_style.dart';
 
@@ -139,8 +138,11 @@ class _CreateCVState extends State<CreateCV> {
         } else if (state is CreateCvSuccess) {
           showProgressBar(context, false);
           print('create cv success');
-          showAlertDialog(context, 'Success', 'Create CV  success!',
-              () => Navigator.pop(context));
+          showAlertDialog(context, 'Success', 'Create CV  success!', () {
+            Navigator.pop(context);
+            navKey.currentState
+                .pushNamedAndRemoveUntil(routeHome, (route) => false);
+          });
         } else if (state is CreateCvError) {
           showProgressBar(context, false);
           showAlertDialog(
@@ -148,7 +150,7 @@ class _CreateCVState extends State<CreateCV> {
         } else if (state is UpdateCvSuccess) {
           showProgressBar(context, false);
           showAlertDialog(context, 'Success', 'Update CV success!',
-              () => Navigator.pop(context);
+              () => Navigator.pop(context));
         } else if (state is UpdateCvError) {
           showProgressBar(context, false);
           showAlertDialog(
@@ -207,8 +209,8 @@ class _CreateCVState extends State<CreateCV> {
                 child: Column(
                   children: [
                     _buildMainPageHeader(context),
-                    //SizedBox(height: 5,),
-                    Expanded(child: _pageViewBuild(context)),
+                    SizedBox(height: 5,),
+                     Expanded(child: _pageViewBuild(context)),
                   ],
                 )),
             Expanded(
@@ -353,6 +355,7 @@ class _CreateCVState extends State<CreateCV> {
                         print(widget.cvModel.status);
 
                         if (widget.cvModel.id != null) {
+                          print('EDIT MODE');
                           final pref = await SharedPreferencesService.instance;
                           String requestBody = json.encoder.convert(_cvModel);
                           print(requestBody);
@@ -360,6 +363,7 @@ class _CreateCVState extends State<CreateCV> {
                               RequestUpdateCvEvent(pref.getAccessToken,
                                   requestBody, _cvModel.id));
                         } else {
+                          print('CREATE MODE');
                           final pref = await SharedPreferencesService.instance;
                           String requestBody = json.encoder.convert(_cvModel);
                           print(requestBody);
@@ -539,6 +543,9 @@ class _CreateCVState extends State<CreateCV> {
             widget.cvModel.professionalList.isNotEmpty
                 ? _buildProfessionalExperiences(context)
                 : Container(),
+            // widget.cvModel.certificateList.isNotEmpty
+            //     ? _buildCertificates(context)
+            //     : Container(),
             widget.cvModel.highLightProjectList.isNotEmpty
                 ? _buildHighLightProjects(context)
                 : Container(),
@@ -550,11 +557,31 @@ class _CreateCVState extends State<CreateCV> {
                     widget.cvModel.languages.isNotEmpty
                 ? _buildLanguage(context)
                 : Container(),
+            SizedBox(height: 20,)
           ],
         ),
       ),
     );
   }
+  Widget _buildCertificates(context) {
+    return Column(
+      children: [
+        _buildSectionTitle(context, 'Certificates'),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 36.0),
+          child: Column(
+            children: List.generate(widget.cvModel.certificateList.length, (index) => Row(
+              children: [
+                Expanded(child: Text(widget.cvModel.certificateList[index].certificateNm, style: CommonStyle.size8W400black(context)),),
+                Text(widget.cvModel.certificateList[index].certificateYear, style: CommonStyle.size8W400black(context))
+              ],
+            )),
+          ),
+        )
+      ],
+    );
+  }
+
 
   Widget _buildSectionTitle(BuildContext context, String title) {
     return Padding(
@@ -756,8 +783,8 @@ class _CreateCVState extends State<CreateCV> {
           ),
           Table(
             columnWidths: {
-              0: FlexColumnWidth(1),
-              1: FlexColumnWidth(4),
+              0: FlexColumnWidth(3),
+              1: FlexColumnWidth(6),
             },
             border: TableBorder.all(color: Colors.black),
             children: [

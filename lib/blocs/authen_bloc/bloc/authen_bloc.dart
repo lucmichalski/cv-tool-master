@@ -38,7 +38,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         String a = response.toString();
         yield UpdatePasswordSuccess(success: response);
       } catch (e) {
-        yield AuthError(message: e.toString());
+        yield UpdatePasswordError(message: e.toString());
       }
     }
   }

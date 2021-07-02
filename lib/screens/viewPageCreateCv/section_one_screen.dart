@@ -151,10 +151,7 @@ class _SectionOneScreenState extends State<SectionOneScreen> {
         return TextFieldCommon(
           icon: Icon(Icons.work,size: 16,),
           onChanged: (val) {
-            setState(() {
-              print(val);
-              widget.cvModel.position = val;
-            });
+            widget.cvModel.position = val;
           },
           controller: controller,
           focusNode: focus,

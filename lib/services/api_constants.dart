@@ -8,7 +8,7 @@ const RequestAddMasterUrl = 'summary';
 const RequestGetMasterUrl = 'summary';
 const RequestCreateCvUrl = 'sectioncv';
 const RequestGetCvUrl = 'sectioncv/paging';
-const RequestUpdateCvUrl = 'sectioncv/';
+const RequestUpdateCvUrl = 'sectioncv';
 const RequestChangePasswordUrl = 'users/change_password';
 const RequestTotalPositionUrl = 'sectioncv/total_position';
 

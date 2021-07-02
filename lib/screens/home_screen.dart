@@ -175,6 +175,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             _isLoading = false;
             _model = state.cvList.recentCvModel;
             _cvList = state.cvList.items;
+            _fetchDataPosition();
             if (_pageIndexList.isNotEmpty && _pageIndexList[0].isSelected) {
               _pageIndexList.clear();
               for (int i = 1; i <= state.cvList.totalPages; i++) {
@@ -1163,8 +1164,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   // Display legend categories
   Widget _buildLegendItem(BuildContext context, DataPosition data, int index) {
-    double total = (data.total /_totalRecords);
-    double percentTxt = double.tryParse((total).toStringAsFixed(3)) * 100;
+    double total = (data.total /_totalRecords) > 1.0 ? 0.0 : (data.total /_totalRecords);
+    // print('Data: ${double.tryParse((total * 100).toStringAsFixed(2))}');
+    double percentTxt = double.tryParse((total * 100).toStringAsFixed(2));
     var w = MediaQuery.of(context).size.width;
 
     return MouseRegion(
