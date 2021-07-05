@@ -203,6 +203,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           } else if (state is GetDataPositionError) {
             _isLoading = false;
             print('get data not error');
+          } else if (state is UpdateCvSuccess) {
+            _isLoading = false;
           }
         },
         buildWhen: (context, state) =>
@@ -413,8 +415,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         color: Colors.grey,
                       ),
                     ),
-                    //:TODO - Build chart
-                    // _buildChart(context),
                     Padding(
                       padding: EdgeInsets.symmetric(vertical: 16.0),
                       child: Text('Categories', style: CommonStyle.size12W400black(context),),
@@ -531,35 +531,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                   sizeBorder: true,
                                   isDesc: _isDateFiltered,
                                 ),
-                                // FilterCustom(
-                                //   text: 'Role',
-                                //   sizeBorder: true,
-                                // ),
                               ],
                             ),
                           ),
                         ),
                         SizedBox(width: 16,),
                         _buildAnimation(),
-                        // Container(
-                        //   padding: EdgeInsets.all(5),
-                        //   margin:
-                        //       EdgeInsets.only(right: w * 0.058, left: w * 0.02),
-                        //   decoration: BoxDecoration(
-                        //       borderRadius: BorderRadius.circular(20.0),
-                        //       color: Color(0xff2c3a5c).withOpacity(0.8)),
-                        //   child: ButtonCommon(
-                        //     buttonText: 'NEW CV',
-                        //     onClick: () {
-                        //       _handleCreateCVEvent();
-                        //     },
-                        //     color: Color(0xff5ace9f),
-                        //     prefixIcon: Icon(Icons.insert_drive_file_rounded,
-                        //         color: Colors.white),
-                        //     borderRadius: 20,
-                        //     prefixDrawablePadding: 8,
-                        //   ),
-                        // ),
                       ],
                     ),
                     Container(
@@ -616,29 +593,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             borderRadius: 20,
             prefixDrawablePadding: 8,
           ),);
-          // return Stack(
-          //   alignment: Alignment.center,
-          //   children: [
-          //     _buildContainer(context, 50 * _animationController.value, ButtonCommon(
-          //       buttonText: 'NEW CV',
-          //       onClick: () {
-          //         _handleCreateCVEvent();
-          //       },
-          //       color: Color(0xff5ace9f),
-          //       prefixIcon: Icon(Icons.insert_drive_file_rounded,
-          //           color: Colors.white),
-          //       borderRadius: 20,
-          //       prefixDrawablePadding: 8,
-          //     ),),
-          //     _buildContainer(context, 60 * _animationController.value),
-          //     _buildContainer(context, 70 * _animationController.value),
-          //     _buildContainer(context, 80 * _animationController.value),
-          //     _buildContainer(context, 90 * _animationController.value),
-          //     Align(
-          //       child:
-          //     )
-          //   ],
-          // );
         });
   }
 
@@ -695,6 +649,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   // Create list CV
   Widget _buildListCV(BuildContext context) {
+    print('Kia con buom vang: ${_isLoading}');
     var w = MediaQuery.of(context).size.width;
     return Column(
       mainAxisSize: MainAxisSize.max,
@@ -730,7 +685,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         ),
         _isLoading
             ? Container(
-
                 child: CircularProgressIndicator(),
               )
             : SingleChildScrollView(
