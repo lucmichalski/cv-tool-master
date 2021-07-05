@@ -198,8 +198,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             showAlertDialog(
                 context, 'Error', state.message, () => Navigator.pop(context));
           } else if (state is GetDataPositionSuccess) {
+            _isLoading = false;
             _dataPosition = state.dataPosition;
           } else if (state is GetDataPositionError) {
+            _isLoading = false;
             print('get data not error');
           }
         },
@@ -1165,7 +1167,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   // Display legend categories
   Widget _buildLegendItem(BuildContext context, DataPosition data, int index) {
     double total = (data.total /_totalRecords) > 1.0 ? 0.0 : (data.total /_totalRecords);
-    // print('Data: ${double.tryParse((total * 100).toStringAsFixed(2))}');
     double percentTxt = double.tryParse((total * 100).toStringAsFixed(2));
     var w = MediaQuery.of(context).size.width;
 

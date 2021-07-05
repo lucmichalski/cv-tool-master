@@ -121,10 +121,10 @@ class _SkillPageState extends State<SkillPage> {
     if (controller == null) {
       controller = TextEditingController();
     }
+    TextSelection previousSelection = controller.selection;
     controller.text = value;
+    controller.selection = previousSelection;
     _skillController[key] = controller;
-    controller.selection =
-        TextSelection.collapsed(offset: controller.text.length);
     return controller;
   }
 }

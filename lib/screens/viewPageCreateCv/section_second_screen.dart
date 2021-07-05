@@ -133,10 +133,9 @@ class _SecondScreenState extends State<SecondScreen> {
     if (controller == null) {
       controller = TextEditingController();
     }
-    // Set text
+    TextSelection previousSelection = controller.selection;
     controller.text = value;
-    // Set cursor
-    controller.selection = TextSelection.collapsed(offset: value.length);
+    controller.selection = previousSelection;
     _controllerMap[key] = controller;
     return controller;
   }
@@ -148,11 +147,9 @@ class _SecondScreenState extends State<SecondScreen> {
     if (controller == null) {
       controller = TextEditingController();
     }
-    // // Set text
+    TextSelection previousSelection = controller.selection;
     controller.text = value;
-    // Set cursor
-    controller.selection =
-        TextSelection.collapsed(offset: controller.text.length);
+    controller.selection = previousSelection;
     _controllerMapCertificate[key] = controller;
     return controller;
   }
@@ -163,11 +160,9 @@ class _SecondScreenState extends State<SecondScreen> {
     if (controller == null) {
       controller = TextEditingController();
     }
-    // // Set text
+    TextSelection previousSelection = controller.selection;
     controller.text = value;
-    // Set cursor
-    controller.selection =
-        TextSelection.collapsed(offset: controller.text.length);
+    controller.selection = previousSelection;
     _controllerMapSkill[key] = controller;
     return controller;
   }

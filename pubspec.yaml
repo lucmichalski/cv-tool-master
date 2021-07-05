@@ -71,6 +71,7 @@ flutter:
   assets:
     - assets/image/
     - assets/image/ic_logo_tvf.png
+    - assets/image/tvf.jpg
 
 #   fonts:
 #     - family: timesStyle

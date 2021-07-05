@@ -191,10 +191,10 @@ class _ProjectPageState extends State<ProjectPage> {
     if (controller == null) {
       controller = TextEditingController();
     }
+    TextSelection previousSelection = controller.selection;
     controller.text = value;
+    controller.selection = previousSelection;
     _technicalController[key] = controller;
-    controller.selection =
-        TextSelection.collapsed(offset: controller.text.length);
     return controller;
   }
 }

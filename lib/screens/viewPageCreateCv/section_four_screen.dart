@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_cv_maker/common/common_style.dart';
 import 'package:flutter_cv_maker/common/common_ui.dart';
 import 'package:flutter_cv_maker/common/expanded_section.dart';
+import 'package:flutter_cv_maker/common/option_view_builder.dart';
 import 'package:flutter_cv_maker/constants/constants.dart';
 import 'package:flutter_cv_maker/models/cv_model/master_model.dart';
 import 'package:flutter_cv_maker/models/cv_model/cv_model.dart';
@@ -479,79 +480,94 @@ class _SectionFourState extends State<SectionFour> {
   }
 
   Widget _autoCompletePosition(BuildContext context, int index) {
-    return Autocomplete<String>(
-      fieldViewBuilder: (context, controller, focus, func) {
-        controller.text = widget.cvModel.highLightProjectList[index].position;
-        controller.selection =
-            TextSelection.collapsed(offset: controller.text.length);
-        return TextFieldCommon(
-          maxLines: 1,
-          label: 'Position',
-          controller: controller,
-          onChanged: (value) {
-            widget.cvModel.highLightProjectList[index].position = value;
-          },
-          focusNode: focus,
-        );
-      },
-      optionsBuilder: (TextEditingValue textEditingValue) {
-        if (textEditingValue.text == '') {
-          return Iterable<String>.empty();
-        } else {
-          return _roleNmList.where((element) => element
-              .toLowerCase()
-              .contains(textEditingValue.text.toLowerCase()));
-        }
-      },
-      onSelected: (String selection) {
-        setState(() {
-          widget.cvModel.highLightProjectList[index].position = selection;
-          var responsibility = widget.masterData.projectMaster.firstWhere(
-              (element) => element.role == selection,
-              orElse: () => null);
-          if (responsibility != null) {
-            widget.cvModel.highLightProjectList[index].responsibility
-                .addAll(responsibility.responsibilities);
+    return LayoutBuilder(
+      builder: (context,constraint)=>
+    Autocomplete<String>(
+        fieldViewBuilder: (context, controller, focus, func) {
+          controller.text = widget.cvModel.highLightProjectList[index].position;
+          controller.selection =
+              TextSelection.collapsed(offset: controller.text.length);
+          return TextFieldCommon(
+            maxLines: 1,
+            label: 'Position',
+            controller: controller,
+            onChanged: (value) {
+              widget.cvModel.highLightProjectList[index].position = value;
+            },
+            focusNode: focus,
+          );
+        },
+      optionsViewBuilder: (context, onSelected, options) => OptionViewBuilder(
+        onSelected: onSelected,
+        constraint: constraint,
+        options: options,
+      ),
+        optionsBuilder: (TextEditingValue textEditingValue) {
+          if (textEditingValue.text == '') {
+            return Iterable<String>.empty();
+          } else {
+            return _roleNmList.where((element) => element
+                .toLowerCase()
+                .contains(textEditingValue.text.toLowerCase()));
           }
-        });
-      },
+        },
+        onSelected: (String selection) {
+          setState(() {
+            widget.cvModel.highLightProjectList[index].position = selection;
+            var responsibility = widget.masterData.projectMaster.firstWhere(
+                (element) => element.role == selection,
+                orElse: () => null);
+            if (responsibility != null) {
+              widget.cvModel.highLightProjectList[index].responsibility
+                  .addAll(responsibility.responsibilities);
+            }
+          });
+        },
+      ),
     );
   }
 
   // AutocompleteTextField UI
   Widget _autoCompleteTechnology(BuildContext context, int index) {
-    return Autocomplete<String>(
-      fieldViewBuilder: (context, controller, focus, func) {
-        controller.text = '';
-        return TextFieldCommon(
-          maxLines: 1,
-          textInputAction: TextInputAction.go,
-          onFieldSubmitted: (val) {
-            setState(() {
-              controller.text = '';
-              widget.cvModel.highLightProjectList[index].technologies.add(val);
-            });
-          },
-          controller: controller,
-          focusNode: focus,
-          label: 'Technology',
-        );
-      },
-      optionsBuilder: (TextEditingValue textEditingValue) {
-        if (textEditingValue.text == '') {
-          return Iterable<String>.empty();
-        } else {
-          return _technologiesList.where((element) => element
-              .toLowerCase()
-              .contains(textEditingValue.text.toLowerCase()));
-        }
-      },
-      onSelected: (String selection) {
-        setState(() {
-          widget.cvModel.highLightProjectList[index].technologies
-              .add(selection);
-        });
-      },
+    return LayoutBuilder(
+      builder: (context,constraint)=> Autocomplete<String>(
+        fieldViewBuilder: (context, controller, focus, func) {
+          controller.text = '';
+          return TextFieldCommon(
+            maxLines: 1,
+            textInputAction: TextInputAction.go,
+            onFieldSubmitted: (val) {
+              setState(() {
+                controller.text = '';
+                widget.cvModel.highLightProjectList[index].technologies.add(val);
+              });
+            },
+            controller: controller,
+            focusNode: focus,
+            label: 'Technology',
+          );
+        },
+        optionsViewBuilder: (context, onSelected, options) => OptionViewBuilder(
+          onSelected: onSelected,
+          constraint: constraint,
+          options: options,
+        ),
+        optionsBuilder: (TextEditingValue textEditingValue) {
+          if (textEditingValue.text == '') {
+            return Iterable<String>.empty();
+          } else {
+            return _technologiesList.where((element) => element
+                .toLowerCase()
+                .contains(textEditingValue.text.toLowerCase()));
+          }
+        },
+        onSelected: (String selection) {
+          setState(() {
+            widget.cvModel.highLightProjectList[index].technologies
+                .add(selection);
+          });
+        },
+      ),
     );
   }
 
@@ -712,9 +728,9 @@ class _SectionFourState extends State<SectionFour> {
     if (controller == null) {
       controller = TextEditingController();
     }
+    TextSelection previousSelection = controller.selection;
     controller.text = value;
-    controller.selection =
-        TextSelection.collapsed(offset: controller.text.length);
+    controller.selection = previousSelection;
     _controllerHighlightProject[key] = controller;
     return controller;
   }

@@ -87,7 +87,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     Expanded(child: _buildLoginColumn(context)),
 
                     Expanded(child: Container(
-                      child: Image.network('https://scontent-hkg4-1.xx.fbcdn.net/v/t1.6435-9/159842486_2954782454845132_5235132372353609174_n.jpg?_nc_cat=102&ccb=1-3&_nc_sid=973b4a&_nc_ohc=6r2QKc7YpnsAX8pBsx3&_nc_ht=scontent-hkg4-1.xx&oh=d4c024c2cc2806ea2bd1b8fc1cf3e7ff&oe=60E1245E',fit: BoxFit.cover,)
+                      child:  Image(image: AssetImage('image/tvf.jpg'),fit: BoxFit.cover,)
                     ),)
                   ],
                 )

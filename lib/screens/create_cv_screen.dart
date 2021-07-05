@@ -158,7 +158,7 @@ class _CreateCVState extends State<CreateCV> {
         }
       },
       buildWhen: (context, state) =>
-          state is GetMasterDataSuccess || state is CreateCvSuccess,
+          state is GetMasterDataSuccess || state is CreateCvSuccess || state is GetMasterDataSuccess,
     );
   }
 
@@ -276,7 +276,8 @@ class _CreateCVState extends State<CreateCV> {
           children: [
             InkWell(
               onTap: () {
-                navKey.currentState.pushNamedAndRemoveUntil(routeHome, (route) => false);
+                // navKey.currentState.pushNamedAndRemoveUntil(routeHome, (route) => false);
+                navKey.currentState.pop(context);
               },
               child: Padding(
                 padding: EdgeInsets.only(

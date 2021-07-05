@@ -52,6 +52,7 @@ class _AdminPageState extends State<AdminPage> {
   int _pageId = 0;
   // Current ID
   String _masterId = kEmpty;
+  bool _isInit = false;
 
   @override
   void initState() {
@@ -78,28 +79,33 @@ class _AdminPageState extends State<AdminPage> {
       builder: (context, state) => _buildUI(context),
       listener: (context, state) {
         if (state is MasterLoading) {
-          // showProgressBar(context, true);
+           showProgressBar(context, true);
         } else if (state is MasterSuccess) {
-          // showProgressBar(context, false);
+          showProgressBar(context, false);
+          _isInit = true;
           _masterId = state.msg;
           showAlertDialog(context, 'Success', 'Add master data success!',
                   () => Navigator.pop(context));
           print('success');
         } else if (state is MasterError) {
-          //showProgressBar(context, false);
+          _isInit = false;
+          showProgressBar(context, false);
           showAlertDialog(
               context, 'Error', state.message, () => Navigator.pop(context));
         } else if (state is UpdateMasterSuccess) {
-          // showProgressBar(context, false);
+          _isInit = false;
+          showProgressBar(context, false);
           print('Update Success');
           showAlertDialog(context, 'Success', 'Update master data success!',
               () => Navigator.pop(context));
         } else if (state is UpdateMasterError) {
-          // showProgressBar(context, false);
+          _isInit = false;
+          showProgressBar(context, false);
           showAlertDialog(
               context, 'Error', state.message, () => Navigator.pop(context));
         } else if (state is GetMasterSuccess) {
-          // showProgressBar(context, false);
+          _isInit = false;
+          showProgressBar(context, false);
           if (state.masterData != null) {
             _masterData = state.masterData;
             if (_masterData.companyMaster == null ||
@@ -109,7 +115,8 @@ class _AdminPageState extends State<AdminPage> {
             }
           }
         } else if (state is GetMasterError) {
-          //showProgressBar(context, false);
+          _isInit = false;
+          showProgressBar(context, false);
           showAlertDialog(
               context, 'Error', state.message, () => Navigator.pop(context));
         }
@@ -152,6 +159,7 @@ class _AdminPageState extends State<AdminPage> {
       case ROLE_PAGE_ID:
         screen = RolePage(
           masterData: _masterData,
+          isInit: _isInit,
           onPress: () {
             setState(() {
               _pageId = SKILL_PAGE_ID;

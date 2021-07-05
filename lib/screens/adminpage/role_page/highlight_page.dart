@@ -127,11 +127,9 @@ class _HighlightPageState extends State<HighlightPage> {
     if (controller == null) {
       controller = TextEditingController();
     }
-    // // Set text
+    TextSelection previousSelection = controller.selection;
     controller.text = value;
-    // Set cursor
-    controller.selection =
-        TextSelection.collapsed(offset: controller.text.length);
+    controller.selection = previousSelection;
     _highlightController[key] = controller;
     return controller;
   }

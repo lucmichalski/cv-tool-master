@@ -8,7 +8,6 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  EasyLoading.init();
   runApp(MyApp());
 }
 
@@ -38,6 +37,7 @@ class _MyAppState extends State<MyApp> {
         initialRoute: routeHome,
         navigatorKey: navKey,
         onGenerateRoute: RouteGenerator.generateRoute,
+        builder: EasyLoading.init(),
       ),
     );
   }

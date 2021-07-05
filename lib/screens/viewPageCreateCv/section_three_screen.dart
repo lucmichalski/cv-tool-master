@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_cv_maker/common/common_style.dart';
 import 'package:flutter_cv_maker/common/common_ui.dart';
+import 'package:flutter_cv_maker/common/option_view_builder.dart';
 import 'package:flutter_cv_maker/constants/constants.dart';
 import 'package:flutter_cv_maker/models/cv_model/master_model.dart';
 import 'package:flutter_cv_maker/models/cv_model/cv_model.dart';
@@ -381,41 +382,48 @@ class _SectionThreeState extends State<SectionThree> {
   }
 
   Widget _buildAutoComplete(BuildContext context, int index) {
-    return Autocomplete<String>(
-      fieldViewBuilder: (context, controller, focus, func) {
-        controller.text = widget.cvModel.professionalList[index].roleNm;
-        controller.selection =
-            TextSelection.collapsed(offset: controller.text.length);
-        return TextFieldCommon(
-          maxLines: 1,
-          label: 'Role',
-          controller: controller,
-          onChanged: (value) {
-              widget.cvModel.professionalList[index].roleNm = value;
-          },
-          focusNode: focus,
-        );
-      },
-
-      optionsBuilder: (TextEditingValue textEditingValue) {
-        if (textEditingValue.text == '') {
-          return Iterable<String>.empty();
-        } else {
-          return _roleNmList.where((element) => element
-              .toLowerCase()
-              .contains(textEditingValue.text.toLowerCase()));
-        }
-
-      },
-      onSelected: (String selection) {
-        setState(() {
-          widget.cvModel.professionalList[index].roleNm = selection;
-          var responsibility = _companyMaster.firstWhere((element) => element.role == selection, orElse: () => null);
-          if (responsibility != null) {
-            widget.cvModel.professionalList[index].responsibilities.addAll(responsibility.responsibilities);
+    return LayoutBuilder(
+      builder: (context,constrains)=>
+       Autocomplete<String>(
+        fieldViewBuilder: (context, controller, focus, func) {
+          controller.text = widget.cvModel.professionalList[index].roleNm;
+          controller.selection =
+              TextSelection.collapsed(offset: controller.text.length);
+          return TextFieldCommon(
+            maxLines: 1,
+            label: 'Role',
+            controller: controller,
+            onChanged: (value) {
+                widget.cvModel.professionalList[index].roleNm = value;
+            },
+            focusNode: focus,
+          );
+        },
+        optionsViewBuilder: (context, onSelected, options) => OptionViewBuilder(
+          onSelected: onSelected,
+          constraint: constrains,
+          options: options,
+        ),
+        optionsBuilder: (TextEditingValue textEditingValue) {
+          if (textEditingValue.text == '') {
+            return Iterable<String>.empty();
+          } else {
+            return _roleNmList.where((element) => element
+                .toLowerCase()
+                .contains(textEditingValue.text.toLowerCase()));
           }
-        });
-      },
+
+        },
+        onSelected: (String selection) {
+          setState(() {
+            widget.cvModel.professionalList[index].roleNm = selection;
+            var responsibility = _companyMaster.firstWhere((element) => element.role == selection, orElse: () => null);
+            if (responsibility != null) {
+              widget.cvModel.professionalList[index].responsibilities.addAll(responsibility.responsibilities);
+            }
+          });
+        },
+      ),
     );
   }
 
@@ -457,9 +465,9 @@ class _SectionThreeState extends State<SectionThree> {
     if (controller == null) {
       controller = TextEditingController();
     }
+    TextSelection previousSelection = controller.selection;
     controller.text = value;
-    controller.selection =
-        TextSelection.collapsed(offset: controller.text.length);
+    controller.selection = previousSelection;
     _controllerProfessional[key] = controller;
     return controller;
   }

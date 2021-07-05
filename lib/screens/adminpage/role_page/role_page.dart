@@ -6,8 +6,9 @@ import 'package:flutter_cv_maker/models/cv_model/master_model.dart';
 class RolePage extends StatefulWidget {
   final MasterData masterData;
   final Function onPress;
+  final bool isInit;
 
-  RolePage({this.masterData, this.onPress});
+  RolePage({this.masterData, this.onPress, this.isInit});
 
   @override
   _RolePageState createState() => _RolePageState();
@@ -354,10 +355,10 @@ class _RolePageState extends State<RolePage> {
     if (controller == null) {
       controller = TextEditingController();
     }
+    TextSelection previousSelection = controller.selection;
     controller.text = value;
+    controller.selection = previousSelection;
     _technicalController[key] = controller;
-    controller.selection =
-        TextSelection.collapsed(offset: controller.text.length);
     return controller;
   }
 }
