@@ -9,6 +9,10 @@ class CustomDropdown<T> extends StatefulWidget {
   /// It will pass back the value and the index of the option.
   final void Function(T, int) onChange;
 
+  final Function(T, int) onClicked;
+
+  final Color backgroundColor;
+
   /// list of DropdownItems
   final List<DropdownItem<T>> items;
   final DropdownStyle dropdownStyle;
@@ -24,7 +28,9 @@ class CustomDropdown<T> extends StatefulWidget {
   final bool leadingIcon;
   CustomDropdown({
     Key key,
-    this.hideIcon = false,
+    this.backgroundColor,
+    this.onClicked,
+    this.hideIcon = true,
     @required this.child,
     @required this.items,
     this.dropdownStyle = const DropdownStyle(),
@@ -74,7 +80,7 @@ class _CustomDropdownState<T> extends State<CustomDropdown<T>>
         width: style.width,
         height: style.height,
         decoration: BoxDecoration(
-          color: Color(0xff2c3a5c).withOpacity(0.8),
+          color: widget.backgroundColor ?? Color(0xff2c3a5c).withOpacity(0.8),
           borderRadius: BorderRadius.all(Radius.circular(100)),
         ),
         child: OutlinedButton(
@@ -82,7 +88,7 @@ class _CustomDropdownState<T> extends State<CustomDropdown<T>>
           style: OutlinedButton.styleFrom(
             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
             padding: EdgeInsets.zero,
-            backgroundColor: style.backgroundColor,
+            // backgroundColor: style.backgroundColor,
             elevation: style.elevation,
             primary: style.primaryColor,
             shape: RoundedRectangleBorder(side: BorderSide(
@@ -105,11 +111,11 @@ class _CustomDropdownState<T> extends State<CustomDropdown<T>>
               // ] else ...[
               //   widget.items[_currentIndex],
               // ],
-              // if (!widget.hideIcon)
-              //   RotationTransition(
-              //     turns: _rotateAnimation,
-              //     child: widget.icon ?? Icon(Icons.arrow_drop_down_sharp),
-              //   ),
+              if (!widget.hideIcon)
+                RotationTransition(
+                  turns: _rotateAnimation,
+                  child: widget.icon ?? Icon(Icons.arrow_drop_down_sharp),
+                ),
             ],
           ),
         ),
@@ -166,8 +172,9 @@ class _CustomDropdownState<T> extends State<CustomDropdown<T>>
                           shrinkWrap: true,
                           children: widget.items.asMap().entries.map((item) {
                             return InkWell(
+                              excludeFromSemantics: true,
                               borderRadius: BorderRadius.all(Radius.circular(8)),
-                              onTap: () {
+                              onTap: widget.onClicked != null ? widget.onClicked(item.value.value, item.key) : () {
                                 setState(() => _currentIndex = item.key);
                                 widget.onChange(item.value.value, item.key);
                                 _toggleDropdown();

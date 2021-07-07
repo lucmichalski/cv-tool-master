@@ -14,6 +14,7 @@ import 'package:flutter_cv_maker/common/common_ui.dart';
 import 'package:flutter_cv_maker/common/confirm_dialog.dart';
 import 'package:flutter_cv_maker/common/dropdown_custom.dart';
 import 'package:flutter_cv_maker/common/gender_pdf.dart';
+import 'package:flutter_cv_maker/constants/constants.dart';
 import 'package:flutter_cv_maker/helper.dart';
 import 'package:flutter_cv_maker/models/cv_model/master_model.dart';
 import 'package:flutter_cv_maker/models/cv_model/cv_model.dart';
@@ -27,6 +28,7 @@ import 'change_password_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final String fullName;
+
   const HomeScreen({Key key, this.fullName}) : super(key: key);
 
   @override
@@ -35,12 +37,14 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   int _pageIdx = 1;
+  bool   _isCheckeds ;
   List<CVModel> _cvList = [];
   List<int> _arrayIndexPageView = [];
   int touchedIndex = -1;
   bool _isHover = false;
   final _key = GlobalKey();
   CVModel _model;
+  int _badgeCount;
   List<String> _menuList = [
     'Admin page',
     'Account',
@@ -61,6 +65,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   bool _isLastSelected = false;
   AnimationController rotationController;
   String _userNm = '';
+
   List<PieChartSectionData> showingSections() {
     return List.generate(2, (i) {
       final isTouched = i == touchedIndex;
@@ -70,15 +75,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         case 0:
           return PieChartSectionData(
             color: const Color(0xfff8b250),
-            value: _totalDraft.toDouble() ,
+            value: _totalDraft.toDouble(),
             title: '$_totalDraft',
             radius: radius,
             badgePositionPercentageOffset: .98,
           );
         case 1:
           return PieChartSectionData(
-            color:  Colors.green,
-            value:_totalCompleted.toDouble(),
+            color: Colors.green,
+            value: _totalCompleted.toDouble(),
             title: '$_totalCompleted',
             radius: radius,
             badgePositionPercentageOffset: .98,
@@ -88,58 +93,44 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       }
     });
   }
+
   List<Legend> _legends = [
-    Legend(
-        color: Colors.amber,
-        backgroundColor: Colors.amberAccent),
-    Legend(
-        color: Colors.red,
-        backgroundColor: Colors.redAccent),
-    Legend(
-        color: Colors.green,
-        backgroundColor: Colors.greenAccent),
-    Legend(
-        color: Colors.purple,
-        backgroundColor: Colors.purpleAccent),
-    Legend(
-        color: Colors.indigo,
-        backgroundColor: Colors.indigoAccent),
-    Legend(
-        color: Colors.purple,
-        backgroundColor: Colors.purpleAccent),
-    Legend(
-        color: Colors.lime,
-        backgroundColor: Colors.limeAccent),
-    Legend(
-        color: Colors.green,
-        backgroundColor: Colors.greenAccent),
-    Legend(
-        color: Colors.blue,
-        backgroundColor: Colors.blueAccent),
-    Legend(
-        color: Colors.teal,
-        backgroundColor: Colors.tealAccent),
-    Legend(
-        color: Colors.cyan,
-        backgroundColor: Colors.cyanAccent),
-    Legend(
-        color: Colors.deepPurple,
-        backgroundColor: Colors.deepPurpleAccent),
+    Legend(color: Colors.amber, backgroundColor: Colors.amberAccent),
+    Legend(color: Colors.red, backgroundColor: Colors.redAccent),
+    Legend(color: Colors.green, backgroundColor: Colors.greenAccent),
+    Legend(color: Colors.purple, backgroundColor: Colors.purpleAccent),
+    Legend(color: Colors.indigo, backgroundColor: Colors.indigoAccent),
+    Legend(color: Colors.purple, backgroundColor: Colors.purpleAccent),
+    Legend(color: Colors.lime, backgroundColor: Colors.limeAccent),
+    Legend(color: Colors.green, backgroundColor: Colors.greenAccent),
+    Legend(color: Colors.blue, backgroundColor: Colors.blueAccent),
+    Legend(color: Colors.teal, backgroundColor: Colors.tealAccent),
+    Legend(color: Colors.cyan, backgroundColor: Colors.cyanAccent),
+    Legend(color: Colors.deepPurple, backgroundColor: Colors.deepPurpleAccent),
   ];
 
   bool _isChangeCurrent;
 
   bool _isChangeNew;
   AnimationController _animationController;
+  AnimationController _rotateParentController;
+  Animation<double> _rotateAnimation;
+
   @override
   void initState() {
+    _isCheckeds = false;
     _getUserNm();
     _fetchMasterData();
     // Get list cv
     _fetchCVList(_pageIdx);
-    _animationController = AnimationController(vsync: this,
-    lowerBound: 0.5,
-    duration: Duration(seconds: 3))..repeat();
+    _rotateParentController = AnimationController(vsync: this, duration: Duration(milliseconds: 200));
+    _animationController = AnimationController(
+        vsync: this, lowerBound: 0.5, duration: Duration(seconds: 3))
+      ..repeat();
+    _rotateAnimation = Tween(begin: 0.0, end: 0.5).animate(CurvedAnimation(
+      parent: _rotateParentController,
+      curve: Curves.easeInOut,
+    ));
     _isChangeCurrent = true;
     _isChangeNew = true;
     _pageIndexList.add(PaginationModel(index: 1, isSelected: true));
@@ -237,6 +228,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             print('get data not error');
           } else if (state is UpdateCvSuccess) {
             _isLoading = false;
+            _fetchCVList(1);
             _fetchDataPosition();
           } else if (state is CreateCvSuccess) {
             _isLoading = false;
@@ -372,8 +364,22 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       padding: EdgeInsets.all(8.0),
                       child: Divider(height: 1, color: Colors.grey),
                     ),
+                    //:TODO
+                    InkWell(
+                      onTap: () {},
+                      child: Row(
+                        children: [
+                          Checkbox(value: _isCheckeds, onChanged: (value){
+                            setState(() {
+                              _isCheckeds = !_isCheckeds;
+                            });
+                          }),
+                          Text('sadasda')
+                        ],
+                      ),
+                    ),
                     Padding(
-                      padding:  EdgeInsets.symmetric(horizontal: 18.0),
+                      padding: EdgeInsets.symmetric(horizontal: 18.0),
                       child: Row(
                         children: [
                           Expanded(
@@ -385,12 +391,21 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                   aspectRatio: 1,
                                   child: PieChart(
                                     PieChartData(
-                                        pieTouchData: PieTouchData(touchCallback: (pieTouchResponse) {
+                                        pieTouchData: PieTouchData(
+                                            touchCallback: (pieTouchResponse) {
                                           setState(() {
-                                            final desiredTouch = pieTouchResponse.touchInput is! PointerExitEvent &&
-                                                pieTouchResponse.touchInput is! PointerUpEvent;
-                                            if (desiredTouch && pieTouchResponse.touchedSection != null) {
-                                              touchedIndex = pieTouchResponse.touchedSection.touchedSectionIndex;
+                                            final desiredTouch =
+                                                pieTouchResponse.touchInput
+                                                        is! PointerExitEvent &&
+                                                    pieTouchResponse.touchInput
+                                                        is! PointerUpEvent;
+                                            if (desiredTouch &&
+                                                pieTouchResponse
+                                                        .touchedSection !=
+                                                    null) {
+                                              touchedIndex = pieTouchResponse
+                                                  .touchedSection
+                                                  .touchedSectionIndex;
                                             } else {
                                               touchedIndex = -1;
                                             }
@@ -418,30 +433,43 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                     Container(
                                       decoration: BoxDecoration(
                                           color: Colors.green,
-                                        borderRadius: BorderRadius.circular(5)
-                                      ),
+                                          borderRadius:
+                                              BorderRadius.circular(5)),
                                       width: 60,
                                       height: 20,
                                     ),
-                                    SizedBox(width: 10,),
-                                    Text('Completed',style: CommonStyle.size10W700black(context).copyWith(fontSize: 12),)
+                                    SizedBox(
+                                      width: 10,
+                                    ),
+                                    Text(
+                                      'Completed',
+                                      style:
+                                          CommonStyle.size10W700black(context)
+                                              .copyWith(fontSize: 12),
+                                    )
                                   ],
                                 ),
                               ),
-                              SizedBox(height: 10,),
+                              SizedBox(
+                                height: 10,
+                              ),
                               Row(
                                 children: [
                                   Container(
                                     margin: EdgeInsets.only(left: 24),
                                     decoration: BoxDecoration(
                                         color: Color(0xfff8b250),
-                                        borderRadius: BorderRadius.circular(5)
-                                    ),
+                                        borderRadius: BorderRadius.circular(5)),
                                     width: 60,
                                     height: 20,
                                   ),
-                                  SizedBox(width: 10,),
-                                  Text('Draft',style: CommonStyle.size10W700black(context).copyWith(fontSize: 12))
+                                  SizedBox(
+                                    width: 10,
+                                  ),
+                                  Text('Draft',
+                                      style:
+                                          CommonStyle.size10W700black(context)
+                                              .copyWith(fontSize: 12))
                                 ],
                               ),
                             ],
@@ -449,76 +477,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         ],
                       ),
                     ),
-                    // Row(
-                    //   children: [
-                    //     Expanded(
-                    //         child: Column(
-                    //       children: [
-                    //         Icon(Icons.summarize, color: Colors.pink),
-                    //         SizedBox(
-                    //           height: 5,
-                    //         ),
-                    //         Text.rich(TextSpan(children: [
-                    //           TextSpan(
-                    //               text: '$_totalRecords ',
-                    //               style:
-                    //                   CommonStyle.size16W400hintTitle(context)
-                    //                       .copyWith(
-                    //                           fontWeight: FontWeight.w700)),
-                    //           TextSpan(
-                    //               text: 'Total',
-                    //               style: CommonStyle.grey400Size22(context)
-                    //                   .copyWith(fontSize: 10)),
-                    //         ]))
-                    //       ],
-                    //     )),
-                    //     Expanded(
-                    //         child: Column(
-                    //       children: [
-                    //         Icon(
-                    //           Icons.timelapse,
-                    //           color: Colors.amber,
-                    //         ),
-                    //         SizedBox(
-                    //           height: 5,
-                    //         ),
-                    //         Text.rich(TextSpan(children: [
-                    //           TextSpan(
-                    //               text: '$_totalDraft ',
-                    //               style:
-                    //                   CommonStyle.size16W400hintTitle(context)
-                    //                       .copyWith(
-                    //                           fontWeight: FontWeight.w700)),
-                    //           TextSpan(
-                    //               text: 'Draft',
-                    //               style: CommonStyle.grey400Size22(context)
-                    //                   .copyWith(fontSize: 10)),
-                    //         ]))
-                    //       ],
-                    //     )),
-                    //     Expanded(
-                    //         child: Column(
-                    //       children: [
-                    //         Icon(Icons.check_circle, color: Colors.greenAccent),
-                    //         SizedBox(
-                    //           height: 5,
-                    //         ),
-                    //         Text.rich(TextSpan(children: [
-                    //           TextSpan(
-                    //               text: '$_totalCompleted ',
-                    //               style:
-                    //                   CommonStyle.size16W400hintTitle(context)
-                    //                       .copyWith(
-                    //                           fontWeight: FontWeight.w700)),
-                    //           TextSpan(
-                    //               text: 'Completed',
-                    //               style: CommonStyle.grey400Size22(context)
-                    //                   .copyWith(fontSize: 10)),
-                    //         ]))
-                    //       ],
-                    //     )),
-                    //   ],
-                    // ),
                     SizedBox(
                       height: 26,
                     ),
@@ -531,11 +489,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     ),
                     Padding(
                       padding: EdgeInsets.symmetric(vertical: 16.0),
-                      child: Text('Categories', style: CommonStyle.size12W400black(context),),
+                      child: Text(
+                        'Categories',
+                        style: CommonStyle.size12W400black(context),
+                      ),
                     ),
                     _dataPosition != null && _dataPosition.isNotEmpty
                         ? SingleChildScrollView(
-                          child: Wrap(
+                            child: Wrap(
                               runAlignment: WrapAlignment.spaceAround,
                               spacing: 16,
                               runSpacing: 16,
@@ -544,7 +505,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                   (index) => _buildLegendItem(
                                       context, _dataPosition[index], index)),
                             ),
-                        )
+                          )
                         : Text('No item available')
                   ],
                 ),
@@ -647,11 +608,18 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                   sizeBorder: true,
                                   isDesc: _isDateFiltered,
                                 ),
+                                // Expanded(
+                                //   child: Container(
+                                //       child: _buildDropDownFilter(context)),
+                                // )
+                                _buildFilterPosition(context)
                               ],
                             ),
                           ),
                         ),
-                        SizedBox(width: 16,),
+                        SizedBox(
+                          width: 16,
+                        ),
                         _buildAnimation(),
                       ],
                     ),
@@ -692,23 +660,155 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       ),
     );
   }
+  bool _firstValue = false;
+  bool _secValue = false;
+  Widget _buildDropDownFilter(BuildContext context) {
+    return DropdownButtonHideUnderline(
+      child: DropdownButton(
+        items: [
+          DropdownMenuItem(
+            value: 0,
+            child: Row(
+              children: <Widget>[
+                StatefulBuilder(
+                    builder: (BuildContext context, StateSetter stateSetter) {
+                  return Checkbox(
+                    onChanged: (bool value) {
+                      stateSetter(() {
+                        _firstValue = value;
+                      });
+                    },
+                    value: _firstValue,
+                  );
+                }),
+                Text('First'),
+              ],
+            ),
+          ),
+          DropdownMenuItem(
+            value: 1,
+            child: Row(
+              children: <Widget>[
+                StatefulBuilder(
+                    builder: (BuildContext context, StateSetter stateSetter) {
+                      return Checkbox(
+                        onChanged: (bool value) {
+                          stateSetter(() {
+                            _secValue = value;
+                          });
+                        },
+                        value: _secValue,
+                      );
+                    }),
+                Text('Second'),
+              ],
+            ),
+          )
+        ],
+        onChanged: (value) {
+        },
+        hint: Text('Select value'),
+      ),
+    );
+  }
+  Widget _buildFilterPosition(BuildContext context) {
+    if (_masterData == null || _masterData.summary == null || _masterData.summary.isEmpty) return Container();
+    var w = MediaQuery.of(context).size.width;
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 8),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.white, width: 1),
+        borderRadius: BorderRadius.all(Radius.circular(20))
+      ),
+      child: CustomDropdown<int>(
+        backgroundColor: Color(0xff111242),
+        icon: Icon(Icons.arrow_drop_down, color: Colors.white,),
+          hideIcon: false,
+          child: _buildPositionFilterItem(context),
+          onChange: (int value, int index) {
+            setState(() {
+              _masterData.summary[index].isChecked = !_masterData.summary[index].isChecked;
+            });
+          },
+          dropdownButtonStyle: DropdownButtonStyle(
+            elevation: 1,
+            // backgroundColor: Colors.white,
+          ),
+          dropdownStyle: DropdownStyle(
+            color: Colors.transparent,
+            borderRadius: BorderRadius.circular(8),
+            elevation: 6,
+          ),
+          items: List.generate(
+              _masterData.summary.length,
+              (index) => DropdownItem<int>(
+                    value: index,
+                    child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: index == 0
+                              ? BorderRadius.only(
+                                  topLeft: Radius.circular(8),
+                                  topRight: Radius.circular(8))
+                              : index + 1 == _masterData.summary.length
+                                  ? BorderRadius.only(
+                                      bottomLeft: Radius.circular(8),
+                                      bottomRight: Radius.circular(8))
+                                  : BorderRadius.all(Radius.circular(0)),
+                          color: Color(0xff2c3a5c).withOpacity(0.8),
+                        ),
+                        padding:
+                            EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+                        child: Row(
+                          children: [
+                            StatefulBuilder(
+                              builder: (BuildContext context, StateSetter stateSetter) {
+                                return Checkbox(
+                                    value: _masterData.summary[index].isChecked ?? false,
+                                    hoverColor: Colors.grey,
+                                    onChanged: (val) =>
+                                        stateSetter(() {
+                                          _masterData.summary[index].isChecked = val;
+                                        }));
+                              }),
+                            SizedBox(
+                              width: 16,
+                            ),
+                            Text(
+                              _masterData.summary[index].role ?? kEmpty,
+                              style: CommonStyle.white700Size22(context)
+                                  .copyWith(
+                                      fontSize: 14,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w400),
+                            ),
+                          ],
+                        )),
+                  ))
+
+          ),
+    );
+  }
 
   _buildAnimation() {
     return AnimatedBuilder(
         animation: CurvedAnimation(
             parent: _animationController, curve: Curves.fastOutSlowIn),
         builder: (context, child) {
-          return _buildContainer(context, 100 * _animationController.value, ButtonCommon(
-            buttonText: 'NEW CV',
-            onClick: () {
-              _handleCreateCVEvent();
-            },
-            color: Color(0xff5ace9f),
-            prefixIcon: Icon(Icons.insert_drive_file_rounded,
-                color: Colors.white),
-            borderRadius: 20,
-            prefixDrawablePadding: 8,
-          ),);
+          return _buildContainer(
+            context,
+            100 * _animationController.value,
+            ButtonCommon(
+              buttonText: 'NEW CV',
+              onClick: () {
+                _handleCreateCVEvent();
+              },
+              color: Color(0xff5ace9f),
+              prefixIcon:
+                  Icon(Icons.insert_drive_file_rounded, color: Colors.white),
+              borderRadius: 20,
+              prefixDrawablePadding: 8,
+            ),
+          );
         });
   }
 
@@ -716,10 +816,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     return Container(
       padding: EdgeInsets.all(8),
       decoration: BoxDecoration(
-        shape: BoxShape.rectangle,
-        color: Colors.grey.withOpacity(1 - _animationController.value),
-        borderRadius: BorderRadius.all(Radius.circular(30))
-      ),
+          shape: BoxShape.rectangle,
+          color: Colors.grey.withOpacity(1 - _animationController.value),
+          borderRadius: BorderRadius.all(Radius.circular(30))),
       child: child,
     );
   }
@@ -855,22 +954,22 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           borderRadius: BorderRadius.all(Radius.circular(12)),
           onTap: () {
             var professionalExp;
-            if (model.professionalList != null && model.professionalList.isNotEmpty) {
-              professionalExp = model.professionalList
-                  .firstWhere(
-                      (element) =>
-                  element.roleNm.isEmpty ||
+            if (model.professionalList != null &&
+                model.professionalList.isNotEmpty) {
+              professionalExp = model.professionalList.firstWhere(
+                  (element) =>
+                      element.roleNm.isEmpty ||
                       element.companyNm.isEmpty ||
                       element.locationNm.isEmpty ||
                       element.responsibilities.isEmpty,
                   orElse: () => null);
             }
             var projectHighlight;
-            if (model.highLightProjectList != null && model.highLightProjectList.isNotEmpty) {
-              projectHighlight = model.highLightProjectList
-                  .firstWhere(
-                      (element) =>
-                  element.projectNm.isEmpty ||
+            if (model.highLightProjectList != null &&
+                model.highLightProjectList.isNotEmpty) {
+              projectHighlight = model.highLightProjectList.firstWhere(
+                  (element) =>
+                      element.projectNm.isEmpty ||
                       element.position.isEmpty ||
                       element.technologies.isEmpty ||
                       element.responsibility.isEmpty ||
@@ -879,25 +978,24 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   orElse: () => null);
             }
 
-           if(model.name.isNotEmpty ||
-               model.position.isNotEmpty ||
-               model.email.isNotEmpty ||
-               model.technicalSummaryList.isNotEmpty){
-             _arrayIndexPageView.add(1);
-           }
+            if (model.name.isNotEmpty ||
+                model.position.isNotEmpty ||
+                model.email.isNotEmpty ||
+                model.technicalSummaryList.isNotEmpty) {
+              _arrayIndexPageView.add(1);
+            }
 
-           if(professionalExp == null ){
-             _arrayIndexPageView.add(3);
-           }
-           if(projectHighlight== null){
-             _arrayIndexPageView.add(4);
-           }
-           if(model.educationList.isEmpty){
-             _arrayIndexPageView.add(2);
-           }
-            navKey.currentState.pushNamed(routeCreateCV, arguments:model);
+            if (professionalExp == null) {
+              _arrayIndexPageView.add(3);
+            }
+            if (projectHighlight == null) {
+              _arrayIndexPageView.add(4);
+            }
+            if (model.educationList.isEmpty) {
+              _arrayIndexPageView.add(2);
+            }
+            navKey.currentState.pushNamed(routeCreateCV, arguments: model);
           },
-            
           child: Container(
               decoration: BoxDecoration(),
               height: 100,
@@ -927,9 +1025,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text('${getDateStr(model.strCreatedDate, DateType.date)}',
+                              Text(
+                                  '${getDateStr(model.strCreatedDate, DateType.date)}',
                                   style: CommonStyle.size10xam(context)),
-                              Text('${getDateStr(model.strCreatedDate, DateType.time)}',
+                              Text(
+                                  '${getDateStr(model.strCreatedDate, DateType.time)}',
                                   style: CommonStyle.size12W400xam(context)),
                             ],
                           ),
@@ -1061,6 +1161,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 
+  Widget _buildPositionFilterItem(BuildContext context) {
+    var w = MediaQuery.of(context).size.width;
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: w * 0.04),
+      child: Text('CV Position', style: TextStyle(color: Colors.white),),
+    );
+  }
+
   Widget _buildTopMenu(BuildContext context) {
     var w = MediaQuery.of(context).size.width;
     return Container(
@@ -1084,11 +1192,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           MouseRegion(
             onHover: (val) => setState(() => _isHover = true),
             onExit: (val) => setState(() => _isHover = false),
-            child: Text('$_userNm', style: CommonStyle.main700Size18(context).copyWith(
-                color: Colors.white,
-                decoration: _isHover
-                    ? TextDecoration.underline
-                    : TextDecoration.none),),
+            child: Text(
+              '$_userNm',
+              style: CommonStyle.main700Size18(context).copyWith(
+                  color: Colors.white,
+                  decoration: _isHover
+                      ? TextDecoration.underline
+                      : TextDecoration.none),
+            ),
           ),
           SizedBox(
             width: w * 0.05,
@@ -1098,64 +1209,81 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildPaginationLayouts(BuildContext context){
-
+  Widget _buildPaginationLayouts(BuildContext context) {
     return IntrinsicHeight(
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(5),
-          border: Border.all(width: 1,color:Colors.grey)
-        ),
-            // padding: EdgeInsets.symmetric(vertical: 4),
-        margin: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width*0.21),
+            borderRadius: BorderRadius.circular(5),
+            border: Border.all(width: 1, color: Colors.grey)),
+        // padding: EdgeInsets.symmetric(vertical: 4),
+        margin: EdgeInsets.symmetric(
+            horizontal: MediaQuery.of(context).size.width * 0.21),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Expanded(
               child: Padding(
                 padding: EdgeInsets.only(bottom: 5),
-                child: IconButton(onPressed: (){
-          setState(() {
-                _pageIdx--;
-                if(_pageIdx <1){
-                  _pageIdx =1;
-                }
-                _fetchCVList(_pageIdx);
-          });
-                }, icon: Icon(Icons.chevron_left,size: 30,color: Colors.redAccent,),
+                child: IconButton(
+                  onPressed: () {
+                    setState(() {
+                      _pageIdx--;
+                      if (_pageIdx < 1) {
+                        _pageIdx = 1;
+                      }
+                      _fetchCVList(_pageIdx);
+                    });
+                  },
+                  icon: Icon(
+                    Icons.chevron_left,
+                    size: 30,
+                    color: Colors.redAccent,
+                  ),
                   splashColor: Colors.transparent,
                   highlightColor: Colors.transparent,
-                  hoverColor:Colors.transparent ,
+                  hoverColor: Colors.transparent,
                 ),
               ),
             ),
-            VerticalDivider(width: 1,color: Colors.grey,),
+            VerticalDivider(
+              width: 1,
+              color: Colors.grey,
+            ),
             Expanded(
               child: Text(
-                '${_pageIdx < _pageIndexList.length ? _pageIdx : _pageIndexList
-                    .length } of ${_pageIndexList.length}',
+                '${_pageIdx < _pageIndexList.length ? _pageIdx : _pageIndexList.length} of ${_pageIndexList.length}',
                 textAlign: TextAlign.center,
-                style: CommonStyle.size16W400hintTitle(context),),
+                style: CommonStyle.size16W400hintTitle(context),
+              ),
             ),
-            VerticalDivider(width: 1,color: Colors.grey,),
+            VerticalDivider(
+              width: 1,
+              color: Colors.grey,
+            ),
             Expanded(
               child: Padding(
                 padding: EdgeInsets.only(bottom: 5),
-                child: IconButton(onPressed: (){
-                  setState(() {
-                    _pageIdx++;
-                    if(_pageIdx > _pageIndexList.length){
-                      _pageIdx = _pageIndexList.length;
-                    }
-                    _fetchCVList(_pageIdx);
-                  });
-                }, icon: Icon(Icons.chevron_right,size: 30,color: Colors.redAccent,),
+                child: IconButton(
+                  onPressed: () {
+                    setState(() {
+                      _pageIdx++;
+                      if (_pageIdx > _pageIndexList.length) {
+                        _pageIdx = _pageIndexList.length;
+                      }
+                      _fetchCVList(_pageIdx);
+                    });
+                  },
+                  icon: Icon(
+                    Icons.chevron_right,
+                    size: 30,
+                    color: Colors.redAccent,
+                  ),
                   splashColor: Colors.transparent,
                   highlightColor: Colors.transparent,
-                  hoverColor:Colors.transparent ,),
+                  hoverColor: Colors.transparent,
+                ),
               ),
             ),
-
           ],
         ),
       ),
@@ -1184,7 +1312,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               child: Text('PREV')),
         ),
         Row(
-          children: _pageIndexList.take(3)
+          children: _pageIndexList
+              .take(3)
               .map((e) => InkWell(
                     onTap: () {
                       setState(() {
@@ -1302,7 +1431,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   // Display legend categories
   Widget _buildLegendItem(BuildContext context, DataPosition data, int index) {
-    double total = (data.total /_totalRecords) > 1.0 ? 0.0 : (data.total /_totalRecords);
+    double total =
+        (data.total / _totalRecords) > 1.0 ? 0.0 : (data.total / _totalRecords);
     double percentTxt = double.tryParse((total * 100).toStringAsFixed(2));
     var w = MediaQuery.of(context).size.width;
 
@@ -1317,7 +1447,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       },
       onExit: (val) {
         setState(() {
-         data.isHover = false;
+          data.isHover = false;
         });
       },
       child: AnimatedContainer(
@@ -1326,16 +1456,16 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         margin: EdgeInsets.symmetric(horizontal: 16),
         padding: EdgeInsets.all(8),
         decoration: BoxDecoration(
-            color: data.isHover ? _legends[index].color : Colors.white,
-            borderRadius: BorderRadius.all(Radius.circular(8.0)),
+          color: data.isHover ? _legends[index].color : Colors.white,
+          borderRadius: BorderRadius.all(Radius.circular(8.0)),
           boxShadow: [
             BoxShadow(
               color: Colors.black26,
               blurRadius: 2.0,
               offset: const Offset(0.0, 2.0),
             ),
-          ],),
-
+          ],
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -1355,19 +1485,35 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   lineWidth: 6.0,
                   percent: total,
                   center: Text(
-                    '$percentTxt%',style: GoogleFonts.roboto(fontSize: 9, fontWeight: FontWeight.w700, color: data.isHover ? Colors.white : _legends[index].color),
+                    '$percentTxt%',
+                    style: GoogleFonts.roboto(
+                        fontSize: 9,
+                        fontWeight: FontWeight.w700,
+                        color: data.isHover
+                            ? Colors.white
+                            : _legends[index].color),
                   ),
-                  backgroundColor:data.isHover ? _legends[index].backgroundColor : Colors.grey.shade50,
-                  progressColor: data.isHover ? Colors.white : _legends[index].color,
+                  backgroundColor: data.isHover
+                      ? _legends[index].backgroundColor
+                      : Colors.grey.shade50,
+                  progressColor:
+                      data.isHover ? Colors.white : _legends[index].color,
                 ),
                 Spacer(),
                 Text.rich(TextSpan(children: [
-                  TextSpan(text: 'Total: ', style: GoogleFonts.roboto(color: data.isHover ? Colors.white : _legends[index].color, fontSize: 10,)),
                   TextSpan(
-                    text:
-                        '${data.total}',
-                    style: CommonStyle.size10W700black(context).copyWith(color: data.isHover ? Colors.white : _legends[index].color)
-                  ),
+                      text: 'Total: ',
+                      style: GoogleFonts.roboto(
+                        color:
+                            data.isHover ? Colors.white : _legends[index].color,
+                        fontSize: 10,
+                      )),
+                  TextSpan(
+                      text: '${data.total}',
+                      style: CommonStyle.size10W700black(context).copyWith(
+                          color: data.isHover
+                              ? Colors.white
+                              : _legends[index].color)),
                 ]))
               ],
             ),
@@ -1389,21 +1535,19 @@ class Legend {
   Color color;
   Color backgroundColor;
 
-  Legend(
-      {
-      this.color,
-      this.backgroundColor});
+  Legend({this.color, this.backgroundColor});
 }
+
 class _Badge extends StatelessWidget {
   final String svgAsset;
   final double size;
   final Color borderColor;
 
   const _Badge(
-      this.svgAsset, {
-        this.size,
-        this.borderColor,
-      }) ;
+    this.svgAsset, {
+    this.size,
+    this.borderColor,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -1412,7 +1556,7 @@ class _Badge extends StatelessWidget {
       width: size,
       height: size,
       padding: EdgeInsets.all(size * .15),
-      child:Text(''),
+      child: Text(''),
     );
   }
 }

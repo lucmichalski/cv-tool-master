@@ -8,6 +8,7 @@ import 'package:flutter_cv_maker/screens/change_password_screen.dart';
 import 'package:flutter_cv_maker/screens/create_cv_screen.dart';
 import 'package:flutter_cv_maker/screens/home_screen.dart';
 import 'package:flutter_cv_maker/screens/login_screen.dart';
+import 'package:flutter_cv_maker/screens/not_found_screen.dart';
 import 'package:flutter_cv_maker/utils/shared_preferences_service.dart';
 
 class RouteGenerator {
@@ -44,7 +45,7 @@ class RouteGenerator {
           break;
         default:
           return MaterialPageRoute(
-              builder: (_) => LoginScreen(), settings: settings);
+              builder: (_) => NotFoundScreen(), settings: settings);
           break;
       }
     }

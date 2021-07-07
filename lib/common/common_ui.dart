@@ -24,23 +24,23 @@ class ButtonCommon extends StatefulWidget {
   final double suffixDrawablePadding;
   final Key key;
 
-  ButtonCommon({
-    this.key,
-    this.borderRadius,
-    this.height,
-    this.prefixIcon,
-    this.suffixIcon,
-    this.width,
-    this.isCircle,
-    @required this.buttonText,
-    this.textStyle,
-    this.padding,
-    this.gradient,
-    this.border,
-    this.color,
-    this.prefixDrawablePadding,
-    this.suffixDrawablePadding,
-    @required this.onClick});
+  ButtonCommon(
+      {this.key,
+      this.borderRadius,
+      this.height,
+      this.prefixIcon,
+      this.suffixIcon,
+      this.width,
+      this.isCircle,
+      @required this.buttonText,
+      this.textStyle,
+      this.padding,
+      this.gradient,
+      this.border,
+      this.color,
+      this.prefixDrawablePadding,
+      this.suffixDrawablePadding,
+      @required this.onClick});
 
   @override
   _ButtonCommonState createState() => _ButtonCommonState();
@@ -392,15 +392,14 @@ class TextFieldCommon extends StatelessWidget {
       this.contentPadding,
       this.onFieldSubmitted,
       this.icon,
-        this.suffixIcon,
+      this.suffixIcon,
       this.onChanged(String value)});
 
   @override
   Widget build(BuildContext context) {
     var w = MediaQuery.of(context).size.width;
     return Container(
-      child:
-      TextFormField(
+      child: TextFormField(
         onFieldSubmitted: onFieldSubmitted,
         maxLines: maxLines,
         onChanged: onChanged,
@@ -486,6 +485,7 @@ class RichTextCommon extends StatelessWidget {
     ]));
   }
 }
+
 class RichTextCommonPreview extends StatelessWidget {
   final String boldText;
   final String regularText;
@@ -540,6 +540,7 @@ class Bullet extends StatelessWidget {
     );
   }
 }
+
 class BulletPreview extends StatelessWidget {
   final String text;
   final bool isFill;
@@ -638,13 +639,21 @@ class _DeleteButtonState extends State<DeleteButton> {
 
 class FilterCustom extends StatefulWidget {
   final String text;
+  final double padding;
   final IconData icon;
   final bool sizeBorder;
   final Function onclick;
   final bool isDesc;
+  final int badgeCount;
 
   const FilterCustom(
-      {this.text, this.icon, this.onclick, this.sizeBorder = false, this.isDesc});
+      {this.text,
+      this.padding = 0.0,
+      this.icon,
+      this.onclick,
+      this.sizeBorder = false,
+      this.isDesc,
+      this.badgeCount});
 
   @override
   _FilterCustomState createState() => _FilterCustomState();
@@ -658,24 +667,38 @@ class _FilterCustomState extends State<FilterCustom> {
       color: Colors.transparent,
       child: InkWell(
         customBorder: RoundedRectangleBorder(
-          borderRadius:
-          BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(20),
         ),
-        onTap:widget.onclick,
+        onTap: widget.onclick,
         child: Container(
           height: 35,
-          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+          padding: EdgeInsets.symmetric(horizontal:20 + (widget.padding ?? 0.0), vertical: 5),
           alignment: Alignment.center,
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20.0),
-              border: Border.all(width: widget.sizeBorder ? 1 : 0.5, color: Colors.white)),
+              border: Border.all(
+                  width: widget.sizeBorder ? 1 : 0.5, color: Colors.white)),
           child: Row(
             children: [
               Text(
                 widget.text,
                 style: TextStyle(color: Colors.white, fontSize: 14),
               ),
-              SizedBox(width: 4,),
+              SizedBox(
+                width: 4,
+              ),
+              widget.badgeCount == null
+                  ? Container()
+                  : Container(
+                      color: Colors.red,
+                      padding: EdgeInsets.all(3),
+                      decoration: BoxDecoration(shape: BoxShape.circle),
+                      child: Text(
+                        '${widget.badgeCount}',
+                        style: CommonStyle.size48W700White(context).copyWith(
+                            fontWeight: FontWeight.w400, fontSize: 10),
+                      ),
+                    ),
               widget.isDesc == null
                   ? Container()
                   : !widget.isDesc

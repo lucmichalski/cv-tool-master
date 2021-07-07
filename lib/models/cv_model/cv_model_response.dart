@@ -38,9 +38,11 @@ class DataPosition {
   String position;
   int total;
   bool isHover = false;
+  // For filter only
+  bool isChecked = false;
 
 
-  DataPosition({this.position, this.total, this.isHover = false});
+  DataPosition({this.position, this.total, this.isHover = false, this.isChecked = false});
 
   DataPosition.fromJson(Map<String, dynamic> json) {
     position = json['position'];

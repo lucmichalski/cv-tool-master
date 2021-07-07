@@ -60,8 +60,9 @@ class MasterData {
 class Summary {
   String role;
   List<Levels> levels;
+  bool isChecked;
 
-  Summary({this.role, this.levels});
+  Summary({this.role, this.levels, this.isChecked = false});
 
   Summary.fromJson(Map<String, dynamic> json) {
     role = json['role'];

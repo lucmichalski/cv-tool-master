@@ -181,7 +181,6 @@ class _CreateCVState extends State<CreateCV> {
                   SizedBox(
                     width: 16,
                   ),
-
                   SizedBox(
                     width: w * 0.05,
                   )
@@ -192,7 +191,6 @@ class _CreateCVState extends State<CreateCV> {
               child: Container(
                 child: _buildPreview(context),
                 width: w,
-                // height: MediaQuery.of(context).size.height,
                 decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius:
@@ -281,7 +279,6 @@ class _CreateCVState extends State<CreateCV> {
           children: [
             InkWell(
               onTap: () {
-                // navKey.currentState.pushNamedAndRemoveUntil(routeHome, (route) => false);
                 navKey.currentState.pop(context);
               },
               child: Padding(
@@ -519,13 +516,13 @@ class _CreateCVState extends State<CreateCV> {
               child: Text(
                 widget.cvModel.position.toUpperCase() ?? kEmpty,
                 style: GoogleFonts.caladea(fontSize: 16, color: Colors.black)
-                // CommonStyle.size10W700black(context).copyWith(fontSize: 12),
               ),
             ),
+            widget.cvModel.email.isNotEmpty ?
             Padding(
                 padding: EdgeInsets.symmetric(horizontal: 40.0, vertical: 10.0),
                 child: Text('Email: ${widget.cvModel.email}',
-                    style: CommonStyle.size8W400black(context))),
+                    style: CommonStyle.size8W400black(context))) :Container(),
             widget.cvModel.technicalSummaryList.isNotEmpty
                 ? _buildSectionTitle(context, 'Professional summary')
                 : Container(),
@@ -590,7 +587,6 @@ class _CreateCVState extends State<CreateCV> {
     );
   }
 
-
   Widget _buildSectionTitle(BuildContext context, String title) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 10),
@@ -635,7 +631,6 @@ class _CreateCVState extends State<CreateCV> {
       ),
     );
   }
-
   // Build Education list
   Widget _buildEducation(BuildContext context) {
     return Column(
@@ -758,6 +753,10 @@ class _CreateCVState extends State<CreateCV> {
 
   // Build highlight project
   Widget _buildHighLightProjects(BuildContext context) {
+    print('sjdfklsdkfde ${widget.cvModel.highLightProjectList.first.projectNm}');
+    if (widget.cvModel.highLightProjectList.isEmpty ||
+        widget.cvModel.highLightProjectList.first.projectNm.isEmpty)
+      return Container();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
