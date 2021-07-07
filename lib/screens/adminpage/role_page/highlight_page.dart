@@ -32,46 +32,48 @@ class _HighlightPageState extends State<HighlightPage> {
   @override
   Widget build(BuildContext context) {
     var w = MediaQuery.of(context).size.width;
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: w * 0.1),
-      child: Column(
-        children: [
-          Padding(
-            padding: EdgeInsets.only(top: 30, bottom: 15),
-            child: HorizontalLine('Technical'),
-          ),
-          Container(
-            margin: EdgeInsets.symmetric(vertical: 16),
-            padding: EdgeInsets.all(16),
-            decoration: BoxDecoration(
-                color: Color(0xFFedf4ff),
-                border: Border.all(color: Color(0xffccdfff), width: 1)),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.text_snippet_outlined,
-                  color: kmainColor,
-                ),
-                SizedBox(
-                  width: 8,
-                ),
-                Text('Example: NodeJS, Java, C#,...',
-                    style: CommonStyle.size16W400hintTitle(context)
-                        .copyWith(color: Color(0xff5869a2)))
-              ],
+    return SingleChildScrollView(
+      child: Container(
+        margin: EdgeInsets.symmetric(horizontal: w * 0.1),
+        child: Column(
+          children: [
+            Padding(
+              padding: EdgeInsets.only(top: 30, bottom: 15),
+              child: HorizontalLine('Technical'),
             ),
-          ),
-          _buildTechnicalList(context),
-          AddButton(
-            isButtonText: true,
-            textButton: 'ADD TECHNICAL USED',
-            onPressed: () {
-              setState(() {
-                widget.masterData.technicalUsed.add('');
-              });
-            },
-          ),
-        ],
+            Container(
+              margin: EdgeInsets.symmetric(vertical: 16),
+              padding: EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                  color: Color(0xFFedf4ff),
+                  border: Border.all(color: Color(0xffccdfff), width: 1)),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.text_snippet_outlined,
+                    color: kmainColor,
+                  ),
+                  SizedBox(
+                    width: 8,
+                  ),
+                  Text('Example: NodeJS, Java, C#,...',
+                      style: CommonStyle.size16W400hintTitle(context)
+                          .copyWith(color: Color(0xff5869a2)))
+                ],
+              ),
+            ),
+            _buildTechnicalList(context),
+            AddButton(
+              isButtonText: true,
+              textButton: 'ADD TECHNICAL USED',
+              onPressed: () {
+                setState(() {
+                  widget.masterData.technicalUsed.add('');
+                });
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

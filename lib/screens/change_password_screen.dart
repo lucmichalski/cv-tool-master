@@ -6,6 +6,7 @@ import 'package:flutter_cv_maker/blocs/authen_bloc/bloc/authen_bloc.dart';
 import 'package:flutter_cv_maker/common/alert_dialog_custom.dart';
 import 'package:flutter_cv_maker/common/common_style.dart';
 import 'package:flutter_cv_maker/common/common_ui.dart';
+import 'package:flutter_cv_maker/common/progress_bar_dialog.dart';
 import 'package:flutter_cv_maker/constants/constants.dart';
 import 'package:flutter_cv_maker/routes/routes.dart';
 import 'package:flutter_cv_maker/utils/shared_preferences_service.dart';
@@ -58,6 +59,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     return BlocConsumer<AuthBloc, AuthState>(
         builder: (context, state) => _buildChangePass(context),
         listener: (context, state) {
+          if(state is AuthLoading ){
+            showProgressBar(context, true);
+          }
           if (state is UpdatePasswordSuccess) {
             // Remove user's data
             _removeUserData();

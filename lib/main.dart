@@ -34,7 +34,7 @@ class _MyAppState extends State<MyApp> {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        initialRoute: routeLogin,
+        initialRoute: routeHome,
         navigatorKey: navKey,
         onGenerateRoute: RouteGenerator.generateRoute,
         builder: EasyLoading.init(),

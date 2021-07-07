@@ -14,6 +14,7 @@ class CVModel {
   List<HighLightProjectList> highLightProjectList;
   List<Languages> languages;
   String createdDate;
+  String strCreatedDate;
 
   CVModel(
       {this.id,
@@ -30,7 +31,9 @@ class CVModel {
       this.professionalList,
       this.highLightProjectList,
       this.languages,
-      this.createdDate});
+      this.createdDate,
+      this.strCreatedDate
+      });
 
   CVModel.fromJson(Map<String, dynamic> json) {
     id = json['_id'] as String;
@@ -46,6 +49,7 @@ class CVModel {
       });
     }
     createdDate = json['createdDate'];
+    strCreatedDate = json['strCreatedDate'];
     technicalSummaryList = json['technicalSummaryList'].cast<String>();
     if (json['educationList'] != null) {
       educationList =  [];

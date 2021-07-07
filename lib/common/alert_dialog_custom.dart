@@ -21,7 +21,7 @@ class AlertDialogCustom extends StatelessWidget {
         child: Dialog(
           insetPadding: EdgeInsets.symmetric(horizontal: w * 0.35),
           shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(w * 0.01)),
           backgroundColor: Colors.transparent.withOpacity(0.8),
           child: _dialogContent(context),
         ));
@@ -79,18 +79,19 @@ class AlertDialogCustom extends StatelessWidget {
 
 void showAlertDialog(
     BuildContext context, String title, String msg, Function func) async {
-  if (msg.contains('token')) {
+  var message = msg.contains('Exception: ') ? msg.replaceAll('Exception: ', '') : msg;
+  if (message.contains('token')) {
     await showDialog(
         context: context,
         barrierDismissible: false,
         builder: (BuildContext context) {
           return AlertDialogCustom(
               title: title,
-              message: msg,
+              message: message,
               function: () => navKey.currentState
                   .pushNamedAndRemoveUntil(routeLogin, (route) => false));
         });
-  } else if (msg.toLowerCase().contains('xmlhttprequest')) {
+  } else if (message.toLowerCase().contains('xmlhttprequest')) {
     await showDialog(
         context: context,
         barrierDismissible: false,
@@ -105,7 +106,7 @@ void showAlertDialog(
         context: context,
         barrierDismissible: false,
         builder: (BuildContext context) {
-          return AlertDialogCustom(title: title, message: msg, function: func);
+          return AlertDialogCustom(title: title, message: message, function: func);
         });
   }
   // msg.contains('Socket')

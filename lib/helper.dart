@@ -2,6 +2,12 @@ import 'package:flutter_cv_maker/constants/constants.dart';
 import 'package:intl/intl.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
+
+enum DateType {
+  date,
+  time
+}
+
 String monthYear(DateTime date) {
   if (date != null) {
     String formattedDate = DateFormat('MMM-yyyy').format(date);
@@ -19,13 +25,25 @@ String ddMMMyyyy(DateTime date) {
 }
 
 String hhMM(String value) {
-
+  print('$value');
   if (value != null) {
-    final f = new DateFormat('yyyy-MM-ddTHH:mm:ss').parse(value);
+    final f = new DateFormat('HH:mm:ss a').parse(value);
     String formattedDate = DateFormat('hh:mm a').format(f);
     return formattedDate;
   }
   return kEmpty;
+}
+
+
+String getDateStr(String value, DateType type) {
+  if (value != null && value.contains(', ')) {
+    if (type == DateType.date) {
+      return value.split(', ')[0];
+    } else {
+      return value.split(', ')[1];
+    }
+  }
+  return type == DateType.date ? 'dd/MM/yyyy' : 'HH:mm';
 }
 
 String getDate(String value) {

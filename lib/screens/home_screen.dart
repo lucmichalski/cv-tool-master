@@ -34,6 +34,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
+  int _pageIdx = 1;
   List<CVModel> _cvList = [];
   List<int> _arrayIndexPageView = [];
   int touchedIndex = -1;
@@ -60,7 +61,33 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   bool _isLastSelected = false;
   AnimationController rotationController;
   String _userNm = '';
-
+  List<PieChartSectionData> showingSections() {
+    return List.generate(2, (i) {
+      final isTouched = i == touchedIndex;
+      final radius = isTouched ? 110.0 : 100.0;
+      final widgetSize = isTouched ? 55.0 : 40.0;
+      switch (i) {
+        case 0:
+          return PieChartSectionData(
+            color: const Color(0xfff8b250),
+            value: _totalDraft.toDouble() ,
+            title: '$_totalDraft',
+            radius: radius,
+            badgePositionPercentageOffset: .98,
+          );
+        case 1:
+          return PieChartSectionData(
+            color:  Colors.green,
+            value:_totalCompleted.toDouble(),
+            title: '$_totalCompleted',
+            radius: radius,
+            badgePositionPercentageOffset: .98,
+          );
+        default:
+          throw 'Oh no';
+      }
+    });
+  }
   List<Legend> _legends = [
     Legend(
         color: Colors.amber,
@@ -99,6 +126,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         color: Colors.deepPurple,
         backgroundColor: Colors.deepPurpleAccent),
   ];
+
   bool _isChangeCurrent;
 
   bool _isChangeNew;
@@ -108,7 +136,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     _getUserNm();
     _fetchMasterData();
     // Get list cv
-    _fetchCVList(1);
+    _fetchCVList(_pageIdx);
     _animationController = AnimationController(vsync: this,
     lowerBound: 0.5,
     duration: Duration(seconds: 3))..repeat();
@@ -144,8 +172,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   @override
   void dispose() {
-    // receivePort.close();
-    // isolate.kill();
     _animationController.dispose();
     super.dispose();
   }
@@ -176,13 +202,18 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             _model = state.cvList.recentCvModel;
             _cvList = state.cvList.items;
             _fetchDataPosition();
-            if (_pageIndexList.isNotEmpty && _pageIndexList[0].isSelected) {
+            if (_pageIndexList.isNotEmpty) {
               _pageIndexList.clear();
-              for (int i = 1; i <= state.cvList.totalPages; i++) {
-                // if (!_pageIndexList.contains(PaginationModel(index: i, isSelected: false))) {
-                _pageIndexList.add(PaginationModel(
-                    index: i, isSelected: i == 1 ? true : false));
-                // }
+              if (_totalPage > 1) {
+                for (int i = 1; i <= state.cvList.totalPages; i++) {
+                  print(i);
+                  // if (!_pageIndexList.contains(PaginationModel(index: i, isSelected: false))) {
+                  _pageIndexList.add(PaginationModel(
+                      index: i, isSelected: i == 1 ? true : false));
+                  // }
+                }
+              } else {
+                _pageIndexList.add(PaginationModel(index: 1, isSelected: true));
               }
             }
           } else if (state is GetCvListError) {
@@ -193,6 +224,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           } else if (state is DeleteCvSuccess) {
             _isLoading = false;
             _fetchCVList(1);
+            _fetchDataPosition();
           } else if (state is DeleteCvError) {
             _isLoading = false;
             showAlertDialog(
@@ -205,12 +237,17 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             print('get data not error');
           } else if (state is UpdateCvSuccess) {
             _isLoading = false;
+            _fetchDataPosition();
+          } else if (state is CreateCvSuccess) {
+            _isLoading = false;
+            _fetchCVList(1);
           }
         },
         buildWhen: (context, state) =>
             state is GetMasterDataSuccess ||
             state is GetCvListSuccess ||
-            state is GetDataPositionSuccess);
+            state is GetDataPositionSuccess ||
+            state is CreateCvSuccess);
   }
 
   Widget _buildHomePage(BuildContext context) {
@@ -335,78 +372,155 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       padding: EdgeInsets.all(8.0),
                       child: Divider(height: 1, color: Colors.grey),
                     ),
-                    Row(
-                      children: [
-                        Expanded(
-                            child: Column(
-                          children: [
-                            Icon(Icons.summarize, color: Colors.pink),
-                            SizedBox(
-                              height: 5,
+                    Padding(
+                      padding:  EdgeInsets.symmetric(horizontal: 18.0),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: AspectRatio(
+                              aspectRatio: 1.3,
+                              child: Card(
+                                color: Colors.white,
+                                child: AspectRatio(
+                                  aspectRatio: 1,
+                                  child: PieChart(
+                                    PieChartData(
+                                        pieTouchData: PieTouchData(touchCallback: (pieTouchResponse) {
+                                          setState(() {
+                                            final desiredTouch = pieTouchResponse.touchInput is! PointerExitEvent &&
+                                                pieTouchResponse.touchInput is! PointerUpEvent;
+                                            if (desiredTouch && pieTouchResponse.touchedSection != null) {
+                                              touchedIndex = pieTouchResponse.touchedSection.touchedSectionIndex;
+                                            } else {
+                                              touchedIndex = -1;
+                                            }
+                                          });
+                                        }),
+                                        borderData: FlBorderData(
+                                          show: false,
+                                        ),
+                                        sectionsSpace: 0,
+                                        centerSpaceRadius: 0,
+                                        sections: showingSections()),
+                                  ),
+                                ),
+                              ),
                             ),
-                            Text.rich(TextSpan(children: [
-                              TextSpan(
-                                  text: '$_totalRecords ',
-                                  style:
-                                      CommonStyle.size16W400hintTitle(context)
-                                          .copyWith(
-                                              fontWeight: FontWeight.w700)),
-                              TextSpan(
-                                  text: 'Total',
-                                  style: CommonStyle.grey400Size22(context)
-                                      .copyWith(fontSize: 10)),
-                            ]))
-                          ],
-                        )),
-                        Expanded(
-                            child: Column(
-                          children: [
-                            Icon(
-                              Icons.timelapse,
-                              color: Colors.amber,
-                            ),
-                            SizedBox(
-                              height: 5,
-                            ),
-                            Text.rich(TextSpan(children: [
-                              TextSpan(
-                                  text: '$_totalDraft ',
-                                  style:
-                                      CommonStyle.size16W400hintTitle(context)
-                                          .copyWith(
-                                              fontWeight: FontWeight.w700)),
-                              TextSpan(
-                                  text: 'Draft',
-                                  style: CommonStyle.grey400Size22(context)
-                                      .copyWith(fontSize: 10)),
-                            ]))
-                          ],
-                        )),
-                        Expanded(
-                            child: Column(
-                          children: [
-                            Icon(Icons.check_circle, color: Colors.greenAccent),
-                            SizedBox(
-                              height: 5,
-                            ),
-                            Text.rich(TextSpan(children: [
-                              TextSpan(
-                                  text: '$_totalCompleted ',
-                                  style:
-                                      CommonStyle.size16W400hintTitle(context)
-                                          .copyWith(
-                                              fontWeight: FontWeight.w700)),
-                              TextSpan(
-                                  text: 'Completed',
-                                  style: CommonStyle.grey400Size22(context)
-                                      .copyWith(fontSize: 10)),
-                            ]))
-                          ],
-                        )),
-                      ],
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                margin: EdgeInsets.only(left: 24),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      decoration: BoxDecoration(
+                                          color: Colors.green,
+                                        borderRadius: BorderRadius.circular(5)
+                                      ),
+                                      width: 60,
+                                      height: 20,
+                                    ),
+                                    SizedBox(width: 10,),
+                                    Text('Completed',style: CommonStyle.size10W700black(context).copyWith(fontSize: 12),)
+                                  ],
+                                ),
+                              ),
+                              SizedBox(height: 10,),
+                              Row(
+                                children: [
+                                  Container(
+                                    margin: EdgeInsets.only(left: 24),
+                                    decoration: BoxDecoration(
+                                        color: Color(0xfff8b250),
+                                        borderRadius: BorderRadius.circular(5)
+                                    ),
+                                    width: 60,
+                                    height: 20,
+                                  ),
+                                  SizedBox(width: 10,),
+                                  Text('Draft',style: CommonStyle.size10W700black(context).copyWith(fontSize: 12))
+                                ],
+                              ),
+                            ],
+                          )
+                        ],
+                      ),
                     ),
+                    // Row(
+                    //   children: [
+                    //     Expanded(
+                    //         child: Column(
+                    //       children: [
+                    //         Icon(Icons.summarize, color: Colors.pink),
+                    //         SizedBox(
+                    //           height: 5,
+                    //         ),
+                    //         Text.rich(TextSpan(children: [
+                    //           TextSpan(
+                    //               text: '$_totalRecords ',
+                    //               style:
+                    //                   CommonStyle.size16W400hintTitle(context)
+                    //                       .copyWith(
+                    //                           fontWeight: FontWeight.w700)),
+                    //           TextSpan(
+                    //               text: 'Total',
+                    //               style: CommonStyle.grey400Size22(context)
+                    //                   .copyWith(fontSize: 10)),
+                    //         ]))
+                    //       ],
+                    //     )),
+                    //     Expanded(
+                    //         child: Column(
+                    //       children: [
+                    //         Icon(
+                    //           Icons.timelapse,
+                    //           color: Colors.amber,
+                    //         ),
+                    //         SizedBox(
+                    //           height: 5,
+                    //         ),
+                    //         Text.rich(TextSpan(children: [
+                    //           TextSpan(
+                    //               text: '$_totalDraft ',
+                    //               style:
+                    //                   CommonStyle.size16W400hintTitle(context)
+                    //                       .copyWith(
+                    //                           fontWeight: FontWeight.w700)),
+                    //           TextSpan(
+                    //               text: 'Draft',
+                    //               style: CommonStyle.grey400Size22(context)
+                    //                   .copyWith(fontSize: 10)),
+                    //         ]))
+                    //       ],
+                    //     )),
+                    //     Expanded(
+                    //         child: Column(
+                    //       children: [
+                    //         Icon(Icons.check_circle, color: Colors.greenAccent),
+                    //         SizedBox(
+                    //           height: 5,
+                    //         ),
+                    //         Text.rich(TextSpan(children: [
+                    //           TextSpan(
+                    //               text: '$_totalCompleted ',
+                    //               style:
+                    //                   CommonStyle.size16W400hintTitle(context)
+                    //                       .copyWith(
+                    //                           fontWeight: FontWeight.w700)),
+                    //           TextSpan(
+                    //               text: 'Completed',
+                    //               style: CommonStyle.grey400Size22(context)
+                    //                   .copyWith(fontSize: 10)),
+                    //         ]))
+                    //       ],
+                    //     )),
+                    //   ],
+                    // ),
                     SizedBox(
-                      height: 16,
+                      height: 26,
                     ),
                     Padding(
                       padding: EdgeInsets.all(8.0),
@@ -420,15 +534,17 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       child: Text('Categories', style: CommonStyle.size12W400black(context),),
                     ),
                     _dataPosition != null && _dataPosition.isNotEmpty
-                        ? Wrap(
-                            runAlignment: WrapAlignment.spaceAround,
-                            spacing: 16,
-                            runSpacing: 16,
-                            children: List.generate(
-                                _dataPosition.length,
-                                (index) => _buildLegendItem(
-                                    context, _dataPosition[index], index)),
-                          )
+                        ? SingleChildScrollView(
+                          child: Wrap(
+                              runAlignment: WrapAlignment.spaceAround,
+                              spacing: 16,
+                              runSpacing: 16,
+                              children: List.generate(
+                                  _dataPosition.length,
+                                  (index) => _buildLegendItem(
+                                      context, _dataPosition[index], index)),
+                            ),
+                        )
                         : Text('No item available')
                   ],
                 ),
@@ -649,7 +765,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   // Create list CV
   Widget _buildListCV(BuildContext context) {
-    print('Kia con buom vang: ${_isLoading}');
     var w = MediaQuery.of(context).size.width;
     return Column(
       mainAxisSize: MainAxisSize.max,
@@ -657,9 +772,17 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         SizedBox(
           height: 5,
         ),
+
         Padding(
           padding: EdgeInsets.symmetric(horizontal: w * 0.078),
-          child: _buildPaginationLayout(context),
+          child: _buildPaginationLayouts(context),
+        ),
+        // Padding(
+        //   padding: EdgeInsets.symmetric(horizontal: w * 0.078),
+        //   child: _buildPaginationLayout(context),
+        // ),
+        SizedBox(
+          height: 10,
         ),
         Padding(
           padding: EdgeInsets.symmetric(horizontal: w * 0.078),
@@ -669,7 +792,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           ),
         ),
         SizedBox(
-          height: 10,
+          height: 5,
         ),
         Padding(
           padding: EdgeInsets.symmetric(horizontal: w * 0.078),
@@ -742,7 +865,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       element.responsibilities.isEmpty,
                   orElse: () => null);
             }
-            ('asDFSF');
             var projectHighlight;
             if (model.highLightProjectList != null && model.highLightProjectList.isNotEmpty) {
               projectHighlight = model.highLightProjectList
@@ -773,8 +895,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
            if(model.educationList.isEmpty){
              _arrayIndexPageView.add(2);
            }
-
-            ('DATALENG :${_arrayIndexPageView}');
             navKey.currentState.pushNamed(routeCreateCV, arguments:model);
           },
             
@@ -807,12 +927,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text(
-                                '${hhMM(model.createdDate)}',
-                                style: CommonStyle.size12W400xam(context),
-                              ),
-                              Text('${getDate(model.createdDate)}',
-                                  style: CommonStyle.size10xam(context))
+                              Text('${getDateStr(model.strCreatedDate, DateType.date)}',
+                                  style: CommonStyle.size10xam(context)),
+                              Text('${getDateStr(model.strCreatedDate, DateType.time)}',
+                                  style: CommonStyle.size12W400xam(context)),
                             ],
                           ),
                         ],
@@ -961,7 +1079,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 child: Icon(Icons.person),
               )),
           SizedBox(
-            width: 16,
+            width: 10,
           ),
           MouseRegion(
             onHover: (val) => setState(() => _isHover = true),
@@ -980,14 +1098,78 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 
+  Widget _buildPaginationLayouts(BuildContext context){
+
+    return IntrinsicHeight(
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(5),
+          border: Border.all(width: 1,color:Colors.grey)
+        ),
+            // padding: EdgeInsets.symmetric(vertical: 4),
+        margin: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width*0.21),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Expanded(
+              child: Padding(
+                padding: EdgeInsets.only(bottom: 5),
+                child: IconButton(onPressed: (){
+          setState(() {
+                _pageIdx--;
+                if(_pageIdx <1){
+                  _pageIdx =1;
+                }
+                _fetchCVList(_pageIdx);
+          });
+                }, icon: Icon(Icons.chevron_left,size: 30,color: Colors.redAccent,),
+                  splashColor: Colors.transparent,
+                  highlightColor: Colors.transparent,
+                  hoverColor:Colors.transparent ,
+                ),
+              ),
+            ),
+            VerticalDivider(width: 1,color: Colors.grey,),
+            Expanded(
+              child: Text(
+                '${_pageIdx < _pageIndexList.length ? _pageIdx : _pageIndexList
+                    .length } of ${_pageIndexList.length}',
+                textAlign: TextAlign.center,
+                style: CommonStyle.size16W400hintTitle(context),),
+            ),
+            VerticalDivider(width: 1,color: Colors.grey,),
+            Expanded(
+              child: Padding(
+                padding: EdgeInsets.only(bottom: 5),
+                child: IconButton(onPressed: (){
+                  setState(() {
+                    _pageIdx++;
+                    if(_pageIdx > _pageIndexList.length){
+                      _pageIdx = _pageIndexList.length;
+                    }
+                    _fetchCVList(_pageIdx);
+                  });
+                }, icon: Icon(Icons.chevron_right,size: 30,color: Colors.redAccent,),
+                  splashColor: Colors.transparent,
+                  highlightColor: Colors.transparent,
+                  hoverColor:Colors.transparent ,),
+              ),
+            ),
+
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildPaginationLayout(BuildContext context) {
-    // if (_pageIndexList.isNotEmpty) _pageIndexList.clear();
     if (_totalPage == null || _totalPage == 0) return Container();
+    print(' total page :$_totalPage');
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Visibility(
-          visible: !_pageIndexList[0].isSelected,
+          visible: _totalPage > 1 && !_pageIndexList[0].isSelected,
           child: TextButton(
               onPressed: () {
                 setState(() {
@@ -1002,7 +1184,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               child: Text('PREV')),
         ),
         Row(
-          children: _pageIndexList
+          children: _pageIndexList.take(3)
               .map((e) => InkWell(
                     onTap: () {
                       setState(() {
@@ -1211,4 +1393,26 @@ class Legend {
       {
       this.color,
       this.backgroundColor});
+}
+class _Badge extends StatelessWidget {
+  final String svgAsset;
+  final double size;
+  final Color borderColor;
+
+  const _Badge(
+      this.svgAsset, {
+        this.size,
+        this.borderColor,
+      }) ;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedContainer(
+      duration: PieChart.defaultDuration,
+      width: size,
+      height: size,
+      padding: EdgeInsets.all(size * .15),
+      child:Text(''),
+    );
+  }
 }

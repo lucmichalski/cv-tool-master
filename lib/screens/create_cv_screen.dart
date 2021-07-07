@@ -156,6 +156,11 @@ class _CreateCVState extends State<CreateCV> {
           showAlertDialog(
               context, 'Error', state.message, () => Navigator.pop(context));
         }
+        else if(state is GetDataPositionSuccess){
+          showProgressBar(context, false);
+        }else if(state is GetDataPositionError){
+          showProgressBar(context, false);
+        }
       },
       buildWhen: (context, state) =>
           state is GetMasterDataSuccess || state is CreateCvSuccess || state is GetMasterDataSuccess,
