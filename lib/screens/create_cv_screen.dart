@@ -168,8 +168,8 @@ class _CreateCVState extends State<CreateCV> {
           _cvModel = state.cvModel;
         } else if (state is GetCVByIdError) {
           showProgressBar(context, false);
-          showAlertDialog(
-              context, 'Error', state.message, () => Navigator.pop(context));
+          navKey.currentState.pushNamedAndRemoveUntil(routeNotFound, (route) => false);
+          // navKey.currentState.pushNamedAndRemoveUntil(routeNotFound);
         }
       },
       buildWhen: (context, state) =>
