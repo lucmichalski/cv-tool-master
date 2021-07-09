@@ -28,8 +28,9 @@ class RequestGetCVModel extends CVEvent {
   final int pageIndex;
   final bool status;
   final bool createdDate;
+  final List<String> positions;
 
-  const RequestGetCVModel(this.accessToken, this.pageIndex, this.status, this.createdDate);
+  const RequestGetCVModel(this.accessToken, this.pageIndex, this.status, this.createdDate,this.positions);
 
   @override
   List<Object> get props => [accessToken, pageIndex, status, createdDate];
@@ -53,6 +54,17 @@ class RequestDeleteCvEvent extends CVEvent {
   @override
   List<Object> get props => [accessToken,id];
 }
+
+// delete cv event
+class RequestGetCvByIdEvent extends CVEvent {
+  final String accessToken;
+  final String id;
+  RequestGetCvByIdEvent(this.accessToken,this.id);
+
+  @override
+  List<Object> get props => [accessToken,id];
+}
+
 // get data position event
 class RequestGetDataPositionEvent extends CVEvent {
   final String accessToken;

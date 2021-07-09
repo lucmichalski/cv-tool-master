@@ -40,7 +40,7 @@ class CVBloc extends Bloc<CVEvent, CVState> {
     } else if (event is RequestGetCVModel) {
       try {
         final response = await repository.fetchDataCV(event.accessToken,
-            event.pageIndex, event.status, event.createdDate);
+            event.pageIndex, event.status, event.createdDate, event.positions);
         yield GetCvListSuccess(response);
       } catch (e) {
         yield GetCvListError(message: e.toString());
@@ -52,6 +52,14 @@ class CVBloc extends Bloc<CVEvent, CVState> {
         yield UpdateCvSuccess(response);
       } catch (e) {
         yield UpdateCvError(message: e.toString());
+      }
+    } else if (event is RequestGetCvByIdEvent) {
+      try {
+        final response =
+            await repository.getCVById(event.accessToken, event.id);
+        yield GetCVByIdSuccess(response);
+      } catch (e) {
+        yield GetCVByIdError(message: e.toString());
       }
     } else if (event is RequestDeleteCvEvent) {
       try {

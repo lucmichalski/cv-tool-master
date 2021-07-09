@@ -5,6 +5,7 @@ import 'package:flutter_cv_maker/common/common_style.dart';
 import 'package:flutter_cv_maker/common/common_ui.dart';
 import 'package:flutter_cv_maker/constants/constants.dart';
 import 'package:flutter_cv_maker/routes/routes.dart';
+import 'package:flutter_cv_maker/utils/shared_preferences_service.dart';
 
 class AlertDialogCustom extends StatelessWidget {
   final String title;
@@ -88,8 +89,13 @@ void showAlertDialog(
           return AlertDialogCustom(
               title: title,
               message: message,
-              function: () => navKey.currentState
-                  .pushNamedAndRemoveUntil(routeLogin, (route) => false));
+              function: () async {
+                final pref = await SharedPreferencesService.instance;
+                pref.removeAccessToken();
+                pref.removeUserNm();
+                navKey.currentState
+                  .pushNamedAndRemoveUntil(routeLogin, (route) => false);
+              });
         });
   } else if (message.toLowerCase().contains('xmlhttprequest')) {
     await showDialog(

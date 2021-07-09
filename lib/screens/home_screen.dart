@@ -27,9 +27,8 @@ import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'change_password_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  final String fullName;
 
-  const HomeScreen({Key key, this.fullName}) : super(key: key);
+  const HomeScreen({Key key}) : super(key: key);
 
   @override
   _HomeScreenState createState() => _HomeScreenState();
@@ -38,6 +37,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   int _pageIdx = 1;
   bool   _isCheckeds ;
+  List<String> _listRole = [];
   List<CVModel> _cvList = [];
   List<int> _arrayIndexPageView = [];
   int touchedIndex = -1;
@@ -158,7 +158,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   _fetchCVList(int index) async {
     final pref = await SharedPreferencesService.instance;
     BlocProvider.of<CVBloc>(context).add(RequestGetCVModel(
-        pref.getAccessToken, index, _isStatusFiltered, _isDateFiltered));
+        pref.getAccessToken, index, _isStatusFiltered, _isDateFiltered, _listRole));
   }
 
   @override
@@ -190,7 +190,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             _totalDraft = state.cvList.totalDraft;
             _totalPage = state.cvList.totalPages;
             _isLoading = false;
-            _model = state.cvList.recentCvModel;
+            _model = state.cvList.recentCvModel ;
             _cvList = state.cvList.items;
             _fetchDataPosition();
             if (_pageIndexList.isNotEmpty) {
@@ -233,6 +233,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           } else if (state is CreateCvSuccess) {
             _isLoading = false;
             _fetchCVList(1);
+          } else if (state is GetCVByIdSuccess) {
+            _isLoading = false;
+          } else if (state is GetCVByIdError) {
+            _isLoading = false;
           }
         },
         buildWhen: (context, state) =>
@@ -284,7 +288,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     }
     var w = MediaQuery.of(context).size.width;
     return Container(
+      decoration: BoxDecoration(
         color: Color(0xFF000034),
+        border: Border.all(width: 0,color: Colors.transparent),
+      ),
+
         // padding: EdgeInsets.only(top: w * 0.05),F'F
         child: Column(
           children: [
@@ -365,19 +373,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       child: Divider(height: 1, color: Colors.grey),
                     ),
                     //:TODO
-                    InkWell(
-                      onTap: () {},
-                      child: Row(
-                        children: [
-                          Checkbox(value: _isCheckeds, onChanged: (value){
-                            setState(() {
-                              _isCheckeds = !_isCheckeds;
-                            });
-                          }),
-                          Text('sadasda')
-                        ],
-                      ),
-                    ),
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 18.0),
                       child: Row(
@@ -520,12 +515,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   Widget _buildMainPageHeader(BuildContext context) {
     var w = MediaQuery.of(context).size.width;
     return Container(
+      decoration: BoxDecoration(
+        border: Border.all(width: 0,color: Colors.transparent),
+      ),
       child: Stack(
         alignment: Alignment.topCenter,
         clipBehavior: Clip.none,
         children: [
           Container(
-            height: MediaQuery.of(context).size.height / 3.5,
+            height: MediaQuery.of(context).size.height / 3.4,
             decoration: BoxDecoration(
                 color: Color(0xFF000034),
                 borderRadius: BorderRadius.only(
@@ -554,66 +552,75 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(25)),
                                 color: Color(0xff111242)),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                Text(
-                                  'Filter',
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                FilterCustom(
-                                  onclick: () {
-                                    setState(() {
-                                      _isStatusFiltered = null;
-                                      _isDateFiltered = null;
-                                      _fetchCVList(1);
-                                    });
-                                  },
-                                  text: 'All',
-                                  sizeBorder: true,
-                                ),
-                                FilterCustom(
-                                  onclick: () {
-                                    setState(() {
-                                      if (_isStatusFiltered == null) {
-                                        _isStatusFiltered = false;
-                                      } else {
-                                        _isStatusFiltered = !_isStatusFiltered;
-                                      }
-                                      _fetchCVList(1);
-                                    });
-                                  },
-                                  text: _isStatusFiltered == null
-                                      ? 'Status'
-                                      : _isStatusFiltered
-                                          ? 'Completed'
-                                          : 'Draft',
-                                  sizeBorder: true,
-                                ),
-                                FilterCustom(
-                                  onclick: () {
-                                    setState(() {
-                                      if (_isDateFiltered == null) {
-                                        _isDateFiltered = false;
-                                      } else {
-                                        _isDateFiltered = !_isDateFiltered;
-                                      }
-                                      _fetchCVList(1);
-                                    });
-                                  },
-                                  text: 'Created Date',
-                                  sizeBorder: true,
-                                  isDesc: _isDateFiltered,
-                                ),
-                                // Expanded(
-                                //   child: Container(
-                                //       child: _buildDropDownFilter(context)),
-                                // )
-                                _buildFilterPosition(context)
-                              ],
+                            child: IntrinsicHeight(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                children: [
+                                  Text(
+                                    'Filter',
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  FilterCustom(
+                                    onclick: () {
+                                      setState(() {
+                                        if (_listRole.isNotEmpty){
+                                          _masterData.summary.forEach((element) { element.isChecked=false;});
+                                          _listRole.clear();
+                                        }
+
+                                        _isStatusFiltered = null;
+                                        _isDateFiltered = null;
+                                        _fetchCVList(1);
+                                      });
+                                    },
+                                    text: 'Clear Filter',
+                                    sizeBorder: true,
+                                  ),
+                                  FilterCustom(
+                                    onclick: () {
+                                      setState(() {
+
+                                        if (_masterData.summary.isNotEmpty) {
+                                          _masterData.summary.forEach((element) {
+                                            element.isChecked = false;
+                                          });
+                                        }
+                                        if (_isStatusFiltered == null) {
+                                          _isStatusFiltered = false;
+                                        } else {
+                                          _isStatusFiltered = !_isStatusFiltered;
+                                        }
+                                        _fetchCVList(1);
+                                      });
+                                    },
+                                    text: _isStatusFiltered == null
+                                        ? 'Status'
+                                        : _isStatusFiltered
+                                            ? 'Completed'
+                                            : 'Draft',
+                                    sizeBorder: true,
+                                  ),
+                                  FilterCustom(
+                                    onclick: () {
+                                      setState(() {
+                                        if (_isDateFiltered == null) {
+                                          _isDateFiltered = false;
+                                        } else {
+                                          _isDateFiltered = !_isDateFiltered;
+                                        }
+                                        _fetchCVList(1);
+                                      });
+                                    },
+                                    text: 'Created Date',
+                                    sizeBorder: true,
+                                    isDesc: _isDateFiltered,
+                                  ),
+                                  _buildFilterPosition(context)
+                                ],
+                              ),
                             ),
                           ),
                         ),
@@ -624,7 +631,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       ],
                     ),
                     Container(
-                      padding: EdgeInsets.only(top: 16.0),
+                      padding: EdgeInsets.only(top: 16.0,bottom: 26.0),
                       child: Text(
                         'Recent Add',
                         style: CommonStyle.size48W700White(context)
@@ -634,8 +641,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   ],
                 )),
           ),
+          SizedBox(height: 20,),
           Positioned(
-              top: MediaQuery.of(context).size.height / 4.3,
+              top: MediaQuery.of(context).size.height / 4.08,
               child: Container(
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
@@ -644,7 +652,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 width: MediaQuery.of(context).size.width / 1.8,
                 height: 100,
                 child: _model != null
-                    ? _buildCVItem(context, _model, true, 1)
+                   ? _buildCVItem(context, _model, true,1)
                     : Container(
                         alignment: Alignment.center,
                         margin:
@@ -654,63 +662,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                 BorderRadius.all(Radius.circular(12))),
                         child: Text('No item available'),
                       ),
-                // _buildCVItem(context, _cvList[0])
-              ))
-        ],
-      ),
-    );
-  }
-  bool _firstValue = false;
-  bool _secValue = false;
-  Widget _buildDropDownFilter(BuildContext context) {
-    return DropdownButtonHideUnderline(
-      child: DropdownButton(
-        items: [
-          DropdownMenuItem(
-            value: 0,
-            child: Row(
-              children: <Widget>[
-                StatefulBuilder(
-                    builder: (BuildContext context, StateSetter stateSetter) {
-                  return Checkbox(
-                    onChanged: (bool value) {
-                      stateSetter(() {
-                        _firstValue = value;
-                      });
-                    },
-                    value: _firstValue,
-                  );
-                }),
-                Text('First'),
-              ],
-            ),
-          ),
-          DropdownMenuItem(
-            value: 1,
-            child: Row(
-              children: <Widget>[
-                StatefulBuilder(
-                    builder: (BuildContext context, StateSetter stateSetter) {
-                      return Checkbox(
-                        onChanged: (bool value) {
-                          stateSetter(() {
-                            _secValue = value;
-                          });
-                        },
-                        value: _secValue,
-                      );
-                    }),
-                Text('Second'),
-              ],
-            ),
+
+              )
           )
         ],
-        onChanged: (value) {
-        },
-        hint: Text('Select value'),
       ),
     );
   }
+
   Widget _buildFilterPosition(BuildContext context) {
     if (_masterData == null || _masterData.summary == null || _masterData.summary.isEmpty) return Container();
     var w = MediaQuery.of(context).size.width;
@@ -724,11 +683,26 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         backgroundColor: Color(0xff111242),
         icon: Icon(Icons.arrow_drop_down, color: Colors.white,),
           hideIcon: false,
-          child: _buildPositionFilterItem(context),
+          child: Row(
+            children: [
+              _listRole.isNotEmpty ?  Container(
+                alignment: Alignment.center,
+                width: 20,
+                height: 20,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white,
+                ),
+                child: Text('${_listRole.length}',style: TextStyle(color: Colors.black),),
+              ) : Container(width: 20,height: 20,),
+              _buildPositionFilterItem(context),
+            ],
+          ),
           onChange: (int value, int index) {
             setState(() {
               _masterData.summary[index].isChecked = !_masterData.summary[index].isChecked;
             });
+            _fetchCVList(1);
           },
           dropdownButtonStyle: DropdownButtonStyle(
             elevation: 1,
@@ -765,11 +739,20 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                 return Checkbox(
                                     value: _masterData.summary[index].isChecked ?? false,
                                     hoverColor: Colors.grey,
-                                    onChanged: (val) =>
-                                        stateSetter(() {
-                                          _masterData.summary[index].isChecked = val;
-                                        }));
-                              }),
+                                    onChanged: (val) => stateSetter(() {
+                                      _masterData.summary[index].isChecked =
+                                          val;
+                                      if (val) {
+                                        _listRole.add(
+                                            _masterData.summary[index].role);
+                                      } else {
+                                        _listRole.remove(_masterData.summary[index].role);
+                                        // _listRole.removeAt(index);
+                                      }
+                                      print(_listRole);
+                                      _fetchCVList(1);
+                                    }));
+                            }),
                             SizedBox(
                               width: 16,
                             ),
@@ -777,12 +760,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                               _masterData.summary[index].role ?? kEmpty,
                               style: CommonStyle.white700Size22(context)
                                   .copyWith(
-                                      fontSize: 14,
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w400),
+                                  fontSize: 14,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w400),
                             ),
                           ],
                         )),
+
                   ))
 
           ),
@@ -858,7 +842,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         professionalList: [],
         certificateList: [],
         gender: 'Mr.');
-
     navKey.currentState.pushNamed(routeCreateCV, arguments: model);
   }
 
@@ -913,7 +896,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 scrollDirection: Axis.vertical,
                 physics: AlwaysScrollableScrollPhysics(),
                 child: Container(
-                  height: MediaQuery.of(context).size.height / 2,
+                  height: MediaQuery.of(context).size.height / 2.1,
                   child: _cvList.length > 0
                       ? ListView.builder(
                           scrollDirection: Axis.vertical,
@@ -953,48 +936,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         child: InkWell(
           borderRadius: BorderRadius.all(Radius.circular(12)),
           onTap: () {
-            var professionalExp;
-            if (model.professionalList != null &&
-                model.professionalList.isNotEmpty) {
-              professionalExp = model.professionalList.firstWhere(
-                  (element) =>
-                      element.roleNm.isEmpty ||
-                      element.companyNm.isEmpty ||
-                      element.locationNm.isEmpty ||
-                      element.responsibilities.isEmpty,
-                  orElse: () => null);
-            }
-            var projectHighlight;
-            if (model.highLightProjectList != null &&
-                model.highLightProjectList.isNotEmpty) {
-              projectHighlight = model.highLightProjectList.firstWhere(
-                  (element) =>
-                      element.projectNm.isEmpty ||
-                      element.position.isEmpty ||
-                      element.technologies.isEmpty ||
-                      element.responsibility.isEmpty ||
-                      element.teamSize.isEmpty ||
-                      element.projectDescription.isEmpty,
-                  orElse: () => null);
-            }
-
-            if (model.name.isNotEmpty ||
-                model.position.isNotEmpty ||
-                model.email.isNotEmpty ||
-                model.technicalSummaryList.isNotEmpty) {
-              _arrayIndexPageView.add(1);
-            }
-
-            if (professionalExp == null) {
-              _arrayIndexPageView.add(3);
-            }
-            if (projectHighlight == null) {
-              _arrayIndexPageView.add(4);
-            }
-            if (model.educationList.isEmpty) {
-              _arrayIndexPageView.add(2);
-            }
-            navKey.currentState.pushNamed(routeCreateCV, arguments: model);
+            var routeName =
+            Uri(path: routeCreateCV, queryParameters: {'id': model.id})
+                .toString();
+            navKey.currentState.pushNamed(routeName);
           },
           child: Container(
               decoration: BoxDecoration(),
@@ -1141,8 +1086,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                               .instance;
                                       BlocProvider.of<CVBloc>(context).add(
                                           RequestDeleteCvEvent(
-                                              pref.getAccessToken,
-                                              _cvList[index].id));
+                                              pref.getAccessToken, model.id));
                                     },
                                   );
                                 });
@@ -1165,7 +1109,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     var w = MediaQuery.of(context).size.width;
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: w * 0.04),
-      child: Text('CV Position', style: TextStyle(color: Colors.white),),
+        child:  Text('CV Position', style: TextStyle(color: Colors.white),),
     );
   }
 

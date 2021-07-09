@@ -23,10 +23,9 @@ import 'package:google_fonts/google_fonts.dart';
 import '../common/common_style.dart';
 
 class CreateCV extends StatefulWidget {
-  final CVModel cvModel;
-  final int pageINdex;
+  final String id ;
 
-  const CreateCV({this.cvModel, this.pageINdex});
+  const CreateCV({this.id});
 
   @override
   _CreateCVState createState() => _CreateCVState();
@@ -97,7 +96,8 @@ class _CreateCVState extends State<CreateCV> {
   @override
   void initState() {
     _fetchMasterData();
-    if (widget.cvModel == null) {
+    _fetchCVById();
+    if (_cvModel == null) {
       _cvModel = CVModel(
           name: '',
           email: '',
@@ -105,9 +105,7 @@ class _CreateCVState extends State<CreateCV> {
           technicalSummaryList: [],
           status: false,
           gender: 'Male');
-    } else {
-      _cvModel = widget.cvModel;
-    }
+    } 
     _addItemsSteps();
     _pageController = PageController(initialPage: 0);
     super.initState();
@@ -116,6 +114,11 @@ class _CreateCVState extends State<CreateCV> {
   // Fetch master data to create/edit cv
   _fetchMasterData() async {
     BlocProvider.of<CVBloc>(context).add(RequestGetCVListEvent());
+  }
+
+  // Fetch cv model by id
+  _fetchCVById() async {
+    BlocProvider.of<CVBloc>(context).add(RequestGetCvByIdEvent(SharedPreferencesService.getToken, widget.id));
   }
 
   @override
@@ -138,7 +141,7 @@ class _CreateCVState extends State<CreateCV> {
         } else if (state is CreateCvSuccess) {
           showProgressBar(context, false);
           print('ID after Create CV: ${state.cvId}');
-          widget.cvModel.id = state.cvId;
+          _cvModel.id = state.cvId;
           print('create cv success');
           showAlertDialog(context, 'Success', 'Create CV  success!', () {
             Navigator.pop(context);
@@ -160,10 +163,20 @@ class _CreateCVState extends State<CreateCV> {
           showProgressBar(context, false);
         }else if(state is GetDataPositionError){
           showProgressBar(context, false);
+        } else if (state is GetCVByIdSuccess) {
+          showProgressBar(context, false);
+          _cvModel = state.cvModel;
+        } else if (state is GetCVByIdError) {
+          showProgressBar(context, false);
+          showAlertDialog(
+              context, 'Error', state.message, () => Navigator.pop(context));
         }
       },
       buildWhen: (context, state) =>
-          state is GetMasterDataSuccess || state is CreateCvSuccess || state is GetMasterDataSuccess,
+          state is GetMasterDataSuccess ||
+          state is CreateCvSuccess ||
+          state is GetMasterDataSuccess ||
+          state is GetCVByIdSuccess,
     );
   }
 
@@ -237,6 +250,7 @@ class _CreateCVState extends State<CreateCV> {
           cvModel: _cvModel,
           pageController: _pageController,
           masterData: masterData,
+          gender: _cvModel.gender,
         ),
         SecondScreen(
           pageController: _pageController,
@@ -316,8 +330,8 @@ class _CreateCVState extends State<CreateCV> {
                       buttonText: 'SAVE CV',
                       onClick: () async {
                         var professionalExp;
-                        if (widget.cvModel.professionalList != null && widget.cvModel.professionalList.isNotEmpty) {
-                          professionalExp = widget.cvModel.professionalList
+                        if (_cvModel.professionalList != null && _cvModel.professionalList.isNotEmpty) {
+                          professionalExp = _cvModel.professionalList
                               .firstWhere(
                                   (element) =>
                               element.roleNm.isEmpty ||
@@ -327,8 +341,8 @@ class _CreateCVState extends State<CreateCV> {
                               orElse: () => null);
                         }
                         var projectHighlight;
-                        if (widget.cvModel.highLightProjectList != null && widget.cvModel.highLightProjectList.isNotEmpty) {
-                          projectHighlight = widget.cvModel.highLightProjectList
+                        if (_cvModel.highLightProjectList != null && _cvModel.highLightProjectList.isNotEmpty) {
+                          projectHighlight = _cvModel.highLightProjectList
                               .firstWhere(
                                   (element) =>
                                   element.projectNm.isEmpty ||
@@ -340,25 +354,25 @@ class _CreateCVState extends State<CreateCV> {
                               orElse: () => null);
                         }
 
-                        if (widget.cvModel.name.isNotEmpty &&
-                            widget.cvModel.position.isNotEmpty &&
-                            widget.cvModel.email.isNotEmpty &&
-                            widget.cvModel.technicalSummaryList.isNotEmpty &&
+                        if (_cvModel.name.isNotEmpty &&
+                            _cvModel.position.isNotEmpty &&
+                            _cvModel.email.isNotEmpty &&
+                            _cvModel.technicalSummaryList.isNotEmpty &&
                             professionalExp == null &&
                             projectHighlight== null &&
-                            widget.cvModel.highLightProjectList.isNotEmpty &&
-                            widget.cvModel.educationList.isNotEmpty) {
+                            _cvModel.highLightProjectList.isNotEmpty &&
+                            _cvModel.educationList.isNotEmpty) {
                           setState(() {
-                            widget.cvModel.status = true;
+                            _cvModel.status = true;
                           });
                         } else {
                           setState(() {
-                            widget.cvModel.status = false;
+                            _cvModel.status = false;
                           });
                         }
-                        print(widget.cvModel.status);
+                        print(_cvModel.status);
 
-                        if (widget.cvModel.id != null) {
+                        if (_cvModel.id != null) {
                           print('EDIT MODE');
                           final pref = await SharedPreferencesService.instance;
                           String requestBody = json.encoder.convert(_cvModel);
@@ -491,6 +505,7 @@ class _CreateCVState extends State<CreateCV> {
   }
 
   _buildPreview(BuildContext context) {
+    if (_cvModel == null) return Container();
     return SingleChildScrollView(
       child: Container(
         padding: EdgeInsets.symmetric(
@@ -504,7 +519,7 @@ class _CreateCVState extends State<CreateCV> {
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 40.0),
               child: Text(
-                widget.cvModel.name + ' (${widget.cvModel.gender})',
+                _cvModel != null ? _cvModel.name : '' + ' (${_cvModel.gender})',
                 style: CommonStyle.size10W700black(context).copyWith(fontSize: 20),
               ),
             ),
@@ -514,51 +529,53 @@ class _CreateCVState extends State<CreateCV> {
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 40.0),
               child: Text(
-                widget.cvModel.position.toUpperCase() ?? kEmpty,
+                _cvModel.position.toUpperCase() ?? kEmpty,
                 style: GoogleFonts.caladea(fontSize: 16, color: Colors.black)
               ),
             ),
-            widget.cvModel.email.isNotEmpty ?
-            Padding(
-                padding: EdgeInsets.symmetric(horizontal: 40.0, vertical: 10.0),
-                child: Text('Email: ${widget.cvModel.email}',
-                    style: CommonStyle.size8W400black(context))) :Container(),
-            widget.cvModel.technicalSummaryList.isNotEmpty
+            _cvModel.email != null && _cvModel.email.isNotEmpty
+                ? Padding(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 40.0, vertical: 10.0),
+                    child: Text('Email: ${_cvModel.email}',
+                        style: CommonStyle.size8W400black(context)))
+                : Container(),
+            _cvModel.technicalSummaryList != null && _cvModel.technicalSummaryList.isNotEmpty
                 ? _buildSectionTitle(context, 'Professional summary')
                 : Container(),
-            widget.cvModel.technicalSummaryList.isNotEmpty
+            _cvModel.technicalSummaryList != null && _cvModel.technicalSummaryList.isNotEmpty
                 ? _buildProfessional(context)
                 : Container(),
-            widget.cvModel.educationList.isNotEmpty
+            _cvModel.educationList != null && _cvModel.educationList.isNotEmpty
                 ? _buildSectionTitle(context, 'Education')
                 : Container(),
-            widget.cvModel.educationList.isNotEmpty
+            _cvModel.educationList != null && _cvModel.educationList.isNotEmpty
                 ? _buildEducation(context)
                 : Container(),
-            widget.cvModel.technicalSummaryList.isNotEmpty
+            _cvModel.technicalSummaryList != null && _cvModel.technicalSummaryList.isNotEmpty
                 ? _buildSectionTitle(context, 'Technical Skills')
                 : Container(),
-            widget.cvModel.technicalSummaryList.isNotEmpty
+            _cvModel.technicalSummaryList != null && _cvModel.technicalSummaryList.isNotEmpty
                 ? _buildTechnicalSkills(context)
                 : Container(),
-            widget.cvModel.professionalList.isNotEmpty
+            _cvModel.professionalList != null && _cvModel.professionalList.isNotEmpty
                 ? _buildSectionTitle(context, 'Professional Experience')
                 : Container(),
-            widget.cvModel.professionalList.isNotEmpty
+            _cvModel.professionalList != null && _cvModel.professionalList.isNotEmpty
                 ? _buildProfessionalExperiences(context)
                 : Container(),
-            widget.cvModel.certificateList.isNotEmpty
+            _cvModel.certificateList != null && _cvModel.certificateList.isNotEmpty
                 ? _buildCertificates(context)
                 : Container(),
-            widget.cvModel.highLightProjectList.isNotEmpty
+            _cvModel.highLightProjectList != null && _cvModel.highLightProjectList.isNotEmpty
                 ? _buildHighLightProjects(context)
                 : Container(),
-            widget.cvModel.languages != null &&
-                    widget.cvModel.languages.isNotEmpty
+            _cvModel.languages != null &&
+                    _cvModel.languages.isNotEmpty
                 ? _buildSectionTitle(context, 'Languages')
                 : Container(),
-            widget.cvModel.languages != null &&
-                    widget.cvModel.languages.isNotEmpty
+            _cvModel.languages != null &&
+                    _cvModel.languages.isNotEmpty
                 ? _buildLanguage(context)
                 : Container(),
             SizedBox(height: 20,)
@@ -575,10 +592,10 @@ class _CreateCVState extends State<CreateCV> {
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 36.0),
           child: Column(
-            children: List.generate(widget.cvModel.certificateList.length, (index) => Row(
+            children: List.generate(_cvModel.certificateList.length, (index) => Row(
               children: [
-                Expanded(child: Text(widget.cvModel.certificateList[index].certificateNm, style: CommonStyle.size8W400black(context)),),
-                Text(widget.cvModel.certificateList[index].certificateYear, style: CommonStyle.size8W400black(context))
+                Expanded(child: Text(_cvModel.certificateList[index].certificateNm, style: CommonStyle.size8W400black(context)),),
+                Text(_cvModel.certificateList[index].certificateYear, style: CommonStyle.size8W400black(context))
               ],
             )),
           ),
@@ -605,7 +622,7 @@ class _CreateCVState extends State<CreateCV> {
 
   Widget _buildProfessional(BuildContext context) {
     return Column(
-      children: widget.cvModel.technicalSummaryList
+      children: _cvModel.technicalSummaryList
           .map((summary) => _buildProfessionalItem(context, summary))
           .toList(),
     );
@@ -634,7 +651,7 @@ class _CreateCVState extends State<CreateCV> {
   // Build Education list
   Widget _buildEducation(BuildContext context) {
     return Column(
-      children: widget.cvModel.educationList
+      children: _cvModel.educationList
           .map((education) => _buildEducationItem(context, education))
           .toList(),
     );
@@ -664,7 +681,7 @@ class _CreateCVState extends State<CreateCV> {
   // Build Technical skill list
   Widget _buildTechnicalSkills(BuildContext context) {
     return Column(
-      children: widget.cvModel.skills
+      children: _cvModel.skills
           .map((skill) => _buildTechnicalSkillItem(context, skill))
           .toList(),
     );
@@ -679,7 +696,7 @@ class _CreateCVState extends State<CreateCV> {
           Text.rich(TextSpan(children: [
             TextSpan(
                 text: '${skill.skillNm}: ',
-                style: CommonStyle.size8W400black(context)),
+                style: CommonStyle.size8W400black(context).copyWith(fontWeight: FontWeight.w700)),
             TextSpan(
                 text: skill.skillData,
                 style: CommonStyle.size8W400black(context)),
@@ -691,7 +708,7 @@ class _CreateCVState extends State<CreateCV> {
 
   Widget _buildProfessionalExperiences(BuildContext context) {
     return Column(
-      children: widget.cvModel.professionalList
+      children: _cvModel.professionalList
           .map((professional) =>
               _buildProfessionalExperienceItem(context, professional))
           .toList(),
@@ -708,15 +725,28 @@ class _CreateCVState extends State<CreateCV> {
         children: [
           Row(
             children: [
-              RichTextCommonPreview(
-                boldText: '${professional.companyNm}, ',
-                regularText: professional.locationNm,
-                size: 6,
+              Expanded(
+                flex: 2,
+                child: Text(
+                  '${professional.companyNm}',
+                  style: CommonStyle.size8W400black(context).copyWith(fontWeight: FontWeight.w700),
+                ),
               ),
-              Spacer(),
-              Text(
-                '${professional.startDate} - ${professional.endDate}',
-                style: CommonStyle.size8W400black(context),
+              Expanded(
+                flex: 1,
+                child: Text(
+                  '${professional.locationNm}',
+                  textAlign: TextAlign.center,
+                  style: CommonStyle.size8W400black(context),
+                ),
+              ),
+              Expanded(
+                flex: 2,
+                child: Text(
+                  '${professional.startDate} - ${professional.endDate}',
+                  textAlign: TextAlign.right,
+                  style: CommonStyle.size8W400black(context),
+                ),
               )
             ],
           ),
@@ -728,8 +758,8 @@ class _CreateCVState extends State<CreateCV> {
           ),
           SizedBox(height: 4.0),
           Text(
-            'Responsibilities:'.toUpperCase(),
-            style: CommonStyle.size10W700black(context).copyWith(fontSize: 12),
+            'Responsibilities:',
+            style: CommonStyle.size10W700black(context).copyWith(fontSize: 10),
           ),
           SizedBox(
             height: 8.0,
@@ -753,9 +783,9 @@ class _CreateCVState extends State<CreateCV> {
 
   // Build highlight project
   Widget _buildHighLightProjects(BuildContext context) {
-    print('sjdfklsdkfde ${widget.cvModel.highLightProjectList.first.projectNm}');
-    if (widget.cvModel.highLightProjectList.isEmpty ||
-        widget.cvModel.highLightProjectList.first.projectNm.isEmpty)
+    print('sjdfklsdkfde ${_cvModel.highLightProjectList.first.projectNm}');
+    if (_cvModel.highLightProjectList.isEmpty ||
+        _cvModel.highLightProjectList.first.projectNm.isEmpty)
       return Container();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -763,7 +793,7 @@ class _CreateCVState extends State<CreateCV> {
         _buildSectionTitle(context, 'Highlight Project'),
         Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: widget.cvModel.highLightProjectList
+          children: _cvModel.highLightProjectList
               .map((highLightProject) =>
                   _buildHighLightProjectItem(context, highLightProject))
               .toList(),
@@ -844,7 +874,7 @@ class _CreateCVState extends State<CreateCV> {
   // Build language project
   Widget _buildLanguage(BuildContext context) {
     return Column(
-      children: widget.cvModel.languages
+      children: _cvModel.languages
           .map((language) => _buildLanguageItem(context, language))
           .toList(),
     );

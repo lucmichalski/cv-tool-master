@@ -20,6 +20,7 @@ class Repository {
   Future<LoginResponse> signIn(String username, String password) async {
     Map data = {"email": username, "password": password};
     // Update lai url theo du an moi
+    print("BaseUrl + LoginURL :${BaseUrl + LoginURL}");
     final response = await http.post(Uri.tryParse(BaseUrl + LoginURL),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
@@ -91,13 +92,16 @@ class Repository {
     }
   }
   // get cv
-  Future<ListCVResponse> fetchDataCV(String accessToken, int pageIndex, bool status, bool createdDate) async {
-    print('URL GET CV: ${BaseUrl + RequestGetCvUrl + '/$pageIndex' +'?status=$status' + '&createddate=$createdDate'}');
-    final response = await http.get(Uri.parse(BaseUrl + RequestGetCvUrl + '/$pageIndex' +'?status=${status ?? kEmpty}' + '&createddate=${createdDate ?? kEmpty}'),
+  Future<ListCVResponse> fetchDataCV(String accessToken, int pageIndex, bool status, bool createdDate, List<String> positions) async {
+    print('URL GET CV: ${BaseUrl + RequestGetCvUrl + '/$pageIndex' +'?status=$status' + '&createddate=$createdDate' + '&positions=$positions'}');
+    final response = await http.get(Uri.parse(BaseUrl + RequestGetCvUrl + '/$pageIndex' +'?status=${status ?? kEmpty}' + '&createddate=${createdDate ?? kEmpty}' + '&positions=${positions.isEmpty ? kEmpty : positions}'),
         headers: getHeader(accessToken)
     );
+    print(response);
     if (response.statusCode == 200) {
+
       return ListCVResponse.fromJson(json.decode(response.body));
+
     } else {
       var message = json.decode(response.body)["message"];
       throw Exception('$message');
@@ -112,6 +116,20 @@ class Repository {
     print('Request Body UpdateCV: $requestBody');
     if (response.statusCode == 200) {
       print('StatusCd: ${response.statusCode} -- URl: ${BaseUrl + RequestUpdateCvUrl + '/$id'}');
+      return CVModel.fromJson(json.decode(response.body));
+    } else {
+      var message = json.decode(response.body)["message"];
+      throw Exception('$message');
+    }
+  }
+
+  // Get CV by Id
+  Future<CVModel> getCVById(String accessToken, String id) async {
+    final response = await http.get(
+        Uri.tryParse(BaseUrl + RequestGetCVByIdUrl + '/$id'),
+        headers: getHeader(accessToken));
+    if (response.statusCode == 200) {
+      print('StatusCd: ${response.statusCode} -- URl: ${BaseUrl + RequestGetCVByIdUrl + '/$id'}');
       return CVModel.fromJson(json.decode(response.body));
     } else {
       var message = json.decode(response.body)["message"];

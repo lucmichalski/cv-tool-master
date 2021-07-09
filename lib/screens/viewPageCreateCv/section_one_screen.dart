@@ -14,9 +14,10 @@ class SectionOneScreen extends StatefulWidget {
   final Function onSaved;
   final PageController pageController;
   final MasterData masterData;
+  final String gender;
 
   SectionOneScreen(
-      {this.cvModel, this.onSaved, this.pageController, this.masterData});
+      {this.cvModel, this.onSaved, this.pageController, this.masterData, this.gender});
 
   @override
   _SectionOneScreenState createState() => _SectionOneScreenState();
@@ -44,28 +45,40 @@ class _SectionOneScreenState extends State<SectionOneScreen> {
 
   @override
   void initState() {
+    setState(() {
+
+    });
+    super.initState();
     // Get CV Model
     _cvModel = widget.cvModel;
+    _initializationData();
     if (widget.masterData != null && _roleNmSelected == null) {
       widget.masterData.summary.forEach((role) {
         _listRoleNm.add(role.role);
       });
     }
-    _initializationData();
-    super.initState();
   }
 
   // Fill data when in edit mode
   _initializationData() {
-    _fullNameController.text = _cvModel.name ?? kEmpty;
-    _emailController.text = _cvModel.email ?? kEmpty;
-    _positionController.text = _cvModel.position ?? kEmpty;
+    print('NameCV: ${widget.cvModel.name}');
+    _fullNameController.text = widget.cvModel.name ?? kEmpty;
+    _emailController.text = widget.cvModel.email ?? kEmpty;
+    _positionController.text = widget.cvModel.position ?? kEmpty;
     if (widget.cvModel.gender == null || widget.cvModel.gender.isEmpty) {
       widget.cvModel.gender = 'Mr.';
     } else {
       _genderSelected = widget.cvModel.gender;
     }
     // Get data for Technical Summary
+  }
+
+  @override
+  void dispose() {
+    _fullNameController.dispose();
+    _emailController.dispose();
+    _positionController.dispose();
+    super.dispose();
   }
 
   @override
@@ -82,75 +95,78 @@ class _SectionOneScreenState extends State<SectionOneScreen> {
       child: Scaffold(
         backgroundColor: Colors.white,
         resizeToAvoidBottomInset: true,
-        body: Form(
-          key: _formKey,
-          child: SingleChildScrollView(
-            padding: EdgeInsets.symmetric(horizontal: sizeWith * 0.02),
-            child: Container(
-              width: MediaQuery.of(context).size.width,
-              //  margin: EdgeInsets.symmetric(horizontal: sizeWith * 0.2),
-              child: Column(
-                children: [
-                  SizedBox(
-                    height: 30,
-                  ),
-                  HorizontalLine('INFORMATION'),
-                  SizedBox(
-                    height: 30,
-                  ),
-                  Container(
-                    width: MediaQuery.of(context).size.width,
-                    margin: EdgeInsets.only(right: sizeWith / 12),
-                    padding: EdgeInsets.only(left: sizeWith / 6),
-                    child: Column(
-                      children: [
-                        TextFieldCommon(
-                          icon: Icon(
-                            Icons.person,
-                            size: 16,
-                          ),
-                          onChanged: (value) {
-                            _cvModel.name = value;
-                          },
-                          controller: _fullNameController,
-                          label: 'Full Name',
-                          validator: (name) =>
-                              Validation().checkValidNameField(context, name),
+        body: SingleChildScrollView(
+          padding: EdgeInsets.symmetric(horizontal: sizeWith * 0.02),
+          child: Container(
+            width: MediaQuery.of(context).size.width,
+            //  margin: EdgeInsets.symmetric(horizontal: sizeWith * 0.2),
+            child: Column(
+              children: [
+                SizedBox(
+                  height: 30,
+                ),
+                HorizontalLine('INFORMATION'),
+                SizedBox(
+                  height: 30,
+                ),
+                Container(
+                  width: MediaQuery.of(context).size.width,
+                  margin: EdgeInsets.only(right: sizeWith / 12),
+                  padding: EdgeInsets.only(left: sizeWith / 6),
+                  child: Column(
+                    children: [
+                      TextFieldCommon(
+                        icon: Icon(
+                          Icons.person,
+                          size: 16,
                         ),
-                        // InputTextFormfield('Full Name', _fullNameController,'Please enter your fullname'),
-                        _buildGender(context),
-                        TextFieldCommon(
-                          validator: (email) =>
-                              Validation().checkValidPassword(context, email),
-                          icon: Icon(
-                            Icons.email,
-                            size: 16,
-                          ),
-                          controller: _emailController,
-                          label: 'Email',
-                          onChanged: (val) {
-                            _cvModel.email = val;
-                          },
+                        onChanged: (value) {
+                          widget.cvModel.name = value;
+                        },
+                        controller: _generateController('fullNm', widget.cvModel.name),
+                        label: 'Full Name',
+                        // validator: (name) =>
+                        //     Validation().checkValidNameField(context, name),
+                      ),
+                      _buildGender(context),
+                      TextFieldCommon(
+                        // validator: (email) =>
+                        //     Validation().checkValidPassword(context, email),
+                        icon: Icon(
+                          Icons.email,
+                          size: 16,
                         ),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        _buildAutoComplete(context),
-                      ],
-                    ),
+                        controller: _generateController('email', widget.cvModel.email),
+                        label: 'Email',
+                        onChanged: (val) {
+                          widget.cvModel.email = val;
+                        },
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      _buildAutoComplete(context),
+                    ],
                   ),
-                  SizedBox(
-                    height: 40,
-                  ),
-                  HorizontalLine('TECHNICAL SUMMARY'),
-                  _buildListSummary(context),
-                ],
-              ),
+                ),
+                SizedBox(
+                  height: 40,
+                ),
+                HorizontalLine('TECHNICAL SUMMARY'),
+                _buildListSummary(context),
+              ],
             ),
           ),
         ),
       ),
     );
+  }
+
+  TextEditingController _getValue() {
+    TextSelection previousSelection = _fullNameController.selection;
+    _fullNameController.text = widget.cvModel.name;
+    _fullNameController.selection = previousSelection;
+    return _fullNameController;
   }
 
   Widget _buildAutoComplete(BuildContext context) {
@@ -197,9 +213,10 @@ class _SectionOneScreenState extends State<SectionOneScreen> {
       ),
     );
   }
-
+bool _isInit = true;
   // Create gender layout
   Widget _buildGender(BuildContext context) {
+    if (_isInit) _genderSelected = widget.cvModel.gender;
     return Row(
       children: kGenders
           .map((gender) => Expanded(
@@ -213,6 +230,7 @@ class _SectionOneScreenState extends State<SectionOneScreen> {
                     groupValue: _genderSelected,
                     onChanged: (val) {
                       setState(() {
+                        _isInit = false;
                         _genderSelected = val;
                         widget.cvModel.gender = val;
                       });

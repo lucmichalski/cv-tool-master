@@ -8,6 +8,7 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await SharedPreferencesService.instance;
   runApp(MyApp());
 }
 
@@ -34,7 +35,7 @@ class _MyAppState extends State<MyApp> {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        initialRoute: routeHome,
+        initialRoute: routeLogin,
         navigatorKey: navKey,
         onGenerateRoute: RouteGenerator.generateRoute,
         builder: EasyLoading.init(),

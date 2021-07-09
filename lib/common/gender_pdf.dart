@@ -35,9 +35,6 @@ Future<html.Blob> myGetBlobPdfContent(BuildContext context, CVModel cvModel) asy
   pdf.addPage(
     pw.MultiPage(
         build: (pw.Context context) => [
-          pw.Column(
-            crossAxisAlignment: pw.CrossAxisAlignment.start,
-            children: [
               pw.Text(
                   cvModel.name +
                       '${cvModel.gender == ' (Mr.)' ? ' (Mrs.)' : ' (Ms.)'}',
@@ -48,24 +45,43 @@ Future<html.Blob> myGetBlobPdfContent(BuildContext context, CVModel cvModel) asy
               pw.Text(cvModel.position, style: styles14bold),
               pw.Padding(
                   padding:
-                  pw.EdgeInsets.symmetric(horizontal: 35.0, vertical: 16.0),
+                      pw.EdgeInsets.symmetric(horizontal: 35.0, vertical: 16.0),
                   child:
-                  pw.Text('Email: ${cvModel.email}', style: styles12bold)),
-              cvModel.professionalList.isNotEmpty ? _buildSectionTitlePdf('Professional summary', styles16bold) :pw.Container(),
-              cvModel.professionalList.isNotEmpty ?  _buildProfessionalPdf(cvModel) :pw.Container(),
-              cvModel.educationList.isNotEmpty  ? _buildSectionTitlePdf('Education', styles16bold) : pw.Container() ,
-              cvModel.educationList.isNotEmpty  ? _buildEducationPdf(cvModel) : pw.Container() ,
-              cvModel.technicalSummaryList.isNotEmpty ? _buildSectionTitlePdf('Technical Skills', styles16bold) : pw.Container(),
-              cvModel.technicalSummaryList.isNotEmpty ? _buildTechnicalSkillsPdf(cvModel) : pw.Container(),
-              cvModel.professionalList.isNotEmpty ? _buildSectionTitlePdf('Professional Experience', styles16bold) : pw.Container(),
-              cvModel.professionalList.isNotEmpty ? _buildProfessionalExperiencesPdf(cvModel) : pw.Container(),
-              cvModel.highLightProjectList.isNotEmpty ? _buildSectionTitlePdf('Highlight Project', styles16bold) : pw.Container(),
-              cvModel.highLightProjectList.isNotEmpty ? _buildHighLightProjectsPdf(cvModel) : pw.Container(),
-              _buildSectionTitlePdf('Languages', styles16bold) ,
+                      pw.Text('Email: ${cvModel.email}', style: styles12bold)),
+              cvModel.professionalList.isNotEmpty
+                  ? _buildSectionTitlePdf('Professional summary', styles16bold)
+                  : pw.Container(),
+              cvModel.professionalList.isNotEmpty
+                  ? _buildProfessionalPdf(cvModel)
+                  : pw.Container(),
+              cvModel.educationList.isNotEmpty
+                  ? _buildSectionTitlePdf('Education', styles16bold)
+                  : pw.Container(),
+              cvModel.educationList.isNotEmpty
+                  ? _buildEducationPdf(cvModel)
+                  : pw.Container(),
+              cvModel.technicalSummaryList.isNotEmpty
+                  ? _buildSectionTitlePdf('Technical Skills', styles16bold)
+                  : pw.Container(),
+              cvModel.technicalSummaryList.isNotEmpty
+                  ? _buildTechnicalSkillsPdf(cvModel)
+                  : pw.Container(),
+              cvModel.professionalList.isNotEmpty
+                  ? _buildSectionTitlePdf(
+                      'Professional Experience', styles16bold)
+                  : pw.Container(),
+              cvModel.professionalList.isNotEmpty
+                  ? _buildProfessionalExperiencesPdf(cvModel)
+                  : pw.Container(),
+              cvModel.highLightProjectList.isNotEmpty
+                  ? _buildSectionTitlePdf('Highlight Project', styles16bold)
+                  : pw.Container(),
+              cvModel.highLightProjectList.isNotEmpty
+                  ? _buildHighLightProjectsPdf(cvModel)
+                  : pw.Container(),
+              _buildSectionTitlePdf('Languages', styles16bold),
               _buildLanguagePdf(cvModel)
             ],
-          ),
-        ],
         header: (context) {
           return pw.Row(
               mainAxisAlignment: pw.MainAxisAlignment.end,
@@ -235,29 +251,38 @@ pw.Widget _buildProfessionalExperienceItemPdf(ProfessionalList professional) {
         pw.Row(
           mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
           children: [
-            pw.Text(
-              '${professional.companyNm}'.toUpperCase(),
-              style: pw.TextStyle(
-                fontSize: 12,
-                color: PdfColor.fromInt(0xFF000000),
-                font: pw.Font.timesBold(),
+            pw.Expanded(
+              flex: 2,
+              child:pw.Text(
+                '${professional.companyNm}'.toUpperCase(),textAlign: pw.TextAlign.left,
+                style: pw.TextStyle(
+                  fontSize: 12,
+                  color: PdfColor.fromInt(0xFF000000),
+                  font: pw.Font.timesBold(),
+                ),
               ),
             ),
-            pw.Text(
-              '${professional.locationNm} ',
-              style: pw.TextStyle(
-                fontSize: 12,
-                color: PdfColor.fromInt(0xFF000000),
-                font: pw.Font.times(),
+            pw.Expanded(
+              flex: 1,
+              child:     pw.Text(
+                '${professional.locationNm} ',textAlign: pw.TextAlign.center,
+                style: pw.TextStyle(
+                  fontSize: 12,
+                  color: PdfColor.fromInt(0xFF000000),
+                  font: pw.Font.times(),
+                ),
               ),
             ),
-            pw.Text(
-              '${professional.startDate} - ${professional.endDate}',
-              style: pw.TextStyle(
-                fontSize: 12,
-                color: PdfColor.fromInt(0xFF000000),
-                font: pw.Font.times(),
-              ),
+            pw.Expanded(
+                flex: 2,
+                child:  pw.Text(
+                  '${professional.startDate} - ${professional.endDate}',textAlign: pw.TextAlign.center,
+                  style: pw.TextStyle(
+                    fontSize: 12,
+                    color: PdfColor.fromInt(0xFF000000),
+                    font: pw.Font.times(),
+                  ),
+                )
             )
           ],
         ),
@@ -316,15 +341,10 @@ pw.Widget _buildProfessionalExperienceItemPdf(ProfessionalList professional) {
 pw.Widget _buildHighLightProjectsPdf(CVModel cvModel) {
   return pw.Column(
     crossAxisAlignment: pw.CrossAxisAlignment.stretch,
-    children: [
-      pw.Column(
-        crossAxisAlignment: pw.CrossAxisAlignment.stretch,
-        children: cvModel.highLightProjectList
-            .map((highLightProject) =>
+    children: cvModel.highLightProjectList
+        .map((highLightProject) =>
             _buildHighLightProjectItemPdfT(highLightProject))
-            .toList(),
-      )
-    ],
+        .toList(),
   );
 }
 

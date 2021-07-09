@@ -7,7 +7,7 @@ class ListCVResponse {
   int totalPages;
   int totalDraft;
   int totalCompleted;
-  CVModel recentCvModel;
+ CVModel recentCvModel;
   List<CVModel> items;
 
   ListCVResponse({this.total, this.recentCvModel, this.page, this.pageSize, this.totalPages, this.items,this.totalDraft,this.totalCompleted});

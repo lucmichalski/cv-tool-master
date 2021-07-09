@@ -519,22 +519,27 @@ class Bullet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        isFill
+        Padding(padding: EdgeInsets.only(top: 14),
+        child: isFill
             ? Icon(
-                Icons.circle,
-                color: Colors.black,
-                size: 8,
-              )
+          Icons.circle,
+          color: Colors.black,
+          size: 8,
+        )
             : Icon(
-                Icons.circle,
-                color: Colors.black,
-                size: 8,
-              ),
+          Icons.circle,
+          color: Colors.black,
+          size: 8,
+        ),),
         SizedBox(width: 16.0),
-        Text(
-          '$text',
-          style: CommonStyle.size12W400black(context),
+        Expanded(
+          child: Text(
+            '$text',
+            textAlign: TextAlign.start,
+            style: CommonStyle.size12W400black(context),
+          ),
         )
       ],
     );

@@ -19,26 +19,30 @@ class RouteGenerator {
       queryParameters: uriData.queryParameters,
       route: uriData.path,
     );
-
+    var token = SharedPreferencesService.getToken;
       switch (routingData.route) {
-         case routeLogin:
+        case routeLogin:
         case '/':
-          return MaterialPageRoute(
-              builder: (_) => LoginScreen(), settings: settings);
+          if (token != null && token.isNotEmpty) {
+            return MaterialPageRoute(
+                builder: (_) => HomeScreen(), settings: settings.copyWith(name: routeHome));
+          } else {
+            return MaterialPageRoute(
+                builder: (_) => LoginScreen(), settings: settings);
+          }
           break;
         case routeHome:
-          String fullname;
           return MaterialPageRoute(
-              builder: (_) => HomeScreen(fullName:fullname,), settings: settings);
+              builder: (_) => HomeScreen(), settings: settings);
           break;
         case routeAdmin:
           return MaterialPageRoute(builder: (_) => AdminPage(),settings: settings);
         case routeCreateCV:
         // Get arguments
-          var data = settings.arguments;
+          var id = routingData['id'];
           // Pass data to CreateCV screen
           return MaterialPageRoute(
-              builder: (_) => CreateCV(cvModel: data as CVModel), settings: settings);
+              builder: (_) => CreateCV( id: id,), settings: settings);
           break;
         case routeChangePass:
           return MaterialPageRoute(builder: (_) => ChangePasswordScreen(),settings: settings);

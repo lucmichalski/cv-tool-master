@@ -100,6 +100,25 @@ class DeleteCvError extends CVState {
   @override
   List<Object> get props => [message];
 }
+
+// get CV success
+class GetCVByIdSuccess extends CVState {
+  final CVModel cvModel;
+
+  GetCVByIdSuccess(this.cvModel);
+
+  @override
+  List<Object> get props => [cvModel];
+}
+
+// create cv error
+class GetCVByIdError extends CVState {
+  final String message;
+
+  GetCVByIdError({this.message});
+  @override
+  List<Object> get props => [message];
+}
 // get CV data position
 class GetDataPositionSuccess extends CVState {
   final List<DataPosition> dataPosition;
