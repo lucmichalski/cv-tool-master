@@ -5,9 +5,8 @@ import 'package:flutter_cv_maker/common/common_style.dart';
 import 'package:flutter_cv_maker/common/common_ui.dart';
 import 'package:flutter_cv_maker/common/option_view_builder.dart';
 import 'package:flutter_cv_maker/constants/constants.dart';
-import 'package:flutter_cv_maker/models/cv_model/master_model.dart';
 import 'package:flutter_cv_maker/models/cv_model/cv_model.dart';
-import 'package:flutter_cv_maker/utils/validation.dart';
+import 'package:flutter_cv_maker/models/cv_model/master_model.dart';
 
 class SectionOneScreen extends StatefulWidget {
   final CVModel cvModel;
@@ -268,13 +267,16 @@ bool _isInit = true;
                         });
                       }),
           ),
-          ListView.builder(
-              shrinkWrap: true,
-              itemCount: widget.cvModel.technicalSummaryList.length,
-              itemBuilder: (context, index) {
-                final item = widget.cvModel.technicalSummaryList[index];
-                return _buildTechnicalSumItem(context, item, index);
-              }),
+          Column(
+            children: List.generate(widget.cvModel.technicalSummaryList.length, (index) => _buildTechnicalSumItem(context, widget.cvModel.technicalSummaryList[index], index)),
+          ),
+          // ListView.builder(
+          //     shrinkWrap: true,
+          //     itemCount: widget.cvModel.technicalSummaryList.length,
+          //     itemBuilder: (context, index) {
+          //       final item = widget.cvModel.technicalSummaryList[index];
+          //       return _buildTechnicalSumItem(context, item, index);
+          //     }),
           Container(
             margin:
                 EdgeInsets.only(left: MediaQuery.of(context).size.width * 0.05),
@@ -331,10 +333,11 @@ bool _isInit = true;
         children: [
           Expanded(
               child: TextFieldCommon(
-            controller: _generateController('technical-$index', technical),
+            maxLines: 1,
+            controller: _generateController('summary-$index', technical),
             onChanged: (val) {
               setState(() {
-                _cvModel.technicalSummaryList[index] = val;
+                widget.cvModel.technicalSummaryList[index] = val;
               });
             },
           )),

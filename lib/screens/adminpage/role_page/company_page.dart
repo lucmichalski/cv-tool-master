@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_cv_maker/common/common_style.dart';
 import 'package:flutter_cv_maker/common/common_ui.dart';
+import 'package:flutter_cv_maker/common/expanded_section.dart';
 import 'package:flutter_cv_maker/constants/constants.dart';
 import 'package:flutter_cv_maker/models/cv_model/master_model.dart';
 
@@ -39,8 +40,8 @@ class _CompanyPageState extends State<CompanyPage> {
               textButton: 'ADD COMPANY RESPONSIBILITY',
               onPressed: () {
                 setState(() {
-                  widget.masterData.companyMaster
-                      .add(CompanyMaster(role: '', responsibilities: ['']));
+                  widget.masterData.companyMaster.add(CompanyMaster(
+                      role: '', responsibilities: [''], isExpand: false));
                 });
               },
             ),
@@ -70,6 +71,17 @@ class _CompanyPageState extends State<CompanyPage> {
           children: [
             Row(
               children: [
+                IconButton(
+                    tooltip: company.isExpand ? 'Collapse' : 'Expand',
+                    hoverColor: Colors.transparent,
+                    splashRadius: 1,
+                    onPressed: () {
+                      setState(() {
+                        print('Tap expand: ${company.isExpand}');
+                        company.isExpand = !company.isExpand;
+                      });
+                    },
+                    icon: Icon(Icons.wrap_text)),
                 Spacer(),
                 IconButton(
                   hoverColor: Colors.transparent,
@@ -98,33 +110,40 @@ class _CompanyPageState extends State<CompanyPage> {
                 company.role,
               ),
             ),
-            Padding(
-              padding: EdgeInsets.only(top: 16.0),
-              child: Row(
+            ExpandedSection(
+              child: Column(
                 children: [
-                  Icon(
-                    Icons.work,
-                    color: Color(0xff434b65),
+                  Padding(
+                    padding: EdgeInsets.only(top: 16.0),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.work,
+                          color: Color(0xff434b65),
+                        ),
+                        Text(
+                          'Company Responsibilities',
+                          style: CommonStyle.size16W400hintTitle(context)
+                              .copyWith(fontSize: 16),
+                        )
+                      ],
+                    ),
                   ),
-                  Text(
-                    'Company Responsibilities',
-                    style: CommonStyle.size16W400hintTitle(context)
-                        .copyWith(fontSize: 16),
+                  buildResponsibilities(
+                      context,
+                      widget.masterData.companyMaster[index].responsibilities,
+                      'company-$index'),
+                  AddButton(
+                    isButtonText: true,
+                    textButton: 'ADD RESPONSIBILITY',
+                    onPressed: () => setState(() => widget
+                        .masterData.companyMaster[index].responsibilities
+                        .add('')),
                   )
                 ],
               ),
+              expand: company.isExpand,
             ),
-            buildResponsibilities(
-                context,
-                widget.masterData.companyMaster[index].responsibilities,
-                'company-$index'),
-            AddButton(
-              isButtonText: true,
-              textButton: 'ADD RESPONSIBILITY',
-              onPressed: () => setState(() => widget
-                  .masterData.companyMaster[index].responsibilities
-                  .add('')),
-            )
           ],
         ));
   }

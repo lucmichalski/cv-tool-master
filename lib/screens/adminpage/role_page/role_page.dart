@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_cv_maker/common/common_style.dart';
 import 'package:flutter_cv_maker/common/common_ui.dart';
+import 'package:flutter_cv_maker/common/expanded_section.dart';
 import 'package:flutter_cv_maker/models/cv_model/master_model.dart';
 
 class RolePage extends StatefulWidget {
@@ -48,7 +49,7 @@ class _RolePageState extends State<RolePage> {
             AddButton(
               onPressed: () {
                 setState(() {
-                  widget.masterData.summary.add(Summary(levels: [], role: ''));
+                  widget.masterData.summary.add(Summary(levels: [], role: '',isExpand: false));
                 });
               },
               isButtonText: true,
@@ -87,6 +88,17 @@ class _RolePageState extends State<RolePage> {
           children: [
             Row(
               children: [
+                IconButton(
+                    tooltip: summary.isExpand ? 'Collapse' : 'Expand',
+                    hoverColor: Colors.transparent,
+                    splashRadius: 1,
+                    onPressed: () {
+                      setState(() {
+                        print('Tap expand: ${summary.isExpand}');
+                        summary.isExpand = !summary.isExpand;
+                      });
+                    },
+                    icon: Icon(Icons.wrap_text)),
                 Spacer(),
                 IconButton(
                   hoverColor: Colors.transparent,
@@ -103,6 +115,7 @@ class _RolePageState extends State<RolePage> {
                 ),
               ],
             ),
+            SizedBox(height: 20,),
             TextFieldCommon(
               controller: _generateController('role-$index', summary.role),
               label: 'Role',
@@ -113,16 +126,25 @@ class _RolePageState extends State<RolePage> {
                 });
               },
             ),
-            _buildLevel(context, summary.levels, 'role-$index'),
-            AddButton(
-              isButtonText: true,
-              textButton: 'ADD LEVEL',
-              onPressed: () {
-                setState(() {
-                  summary.levels.add(Levels(levelName: '', technicals: []));
-                });
-              },
+            ExpandedSection(
+              child: Column(
+                children: [
+                  _buildLevel(context, summary.levels, 'role-$index'),
+                  AddButton(
+                    isButtonText: true,
+                    textButton: 'ADD LEVEL',
+                    onPressed: () {
+                      setState(() {
+                        summary.levels.add(Levels(levelName: '', technicals: []));
+                      });
+                    },
+                  ),
+                ],
+              ),
+              expand: summary.isExpand,
             ),
+
+
           ],
         ));
   }

@@ -11,8 +11,10 @@ class AlertDialogCustom extends StatelessWidget {
   final String title;
   final String message;
   final Function function;
+  final bool isHideCloseBtn;
+  final Function functionClose;
 
-  AlertDialogCustom({this.title, @required this.message, this.function});
+  AlertDialogCustom({this.title, @required this.message, this.function,this.functionClose, this.isHideCloseBtn = false});
 
   @override
   Widget build(BuildContext context) {
@@ -55,13 +57,16 @@ class AlertDialogCustom extends StatelessWidget {
                 style: CommonStyle.grey900Size48(context),
               ),
               Spacer(),
-              IconButton(
-                  hoverColor: Color(0xff5C5C5C),
-                  icon: Icon(
-                    Icons.close_rounded,
-                    size: w * 0.015,
-                  ),
-                  onPressed: () => Navigator.pop(context))
+              Visibility(
+                visible: !this.isHideCloseBtn,
+                child: IconButton(
+                    hoverColor: Color(0xff5C5C5C),
+                    icon: Icon(
+                      Icons.close_rounded,
+                      size: w * 0.015,
+                    ),
+                    onPressed: () => Navigator.pop(context)),
+              )
             ],
           ),
           Padding(
@@ -77,11 +82,10 @@ class AlertDialogCustom extends StatelessWidget {
     );
   }
 }
-
 void showAlertDialog(
     BuildContext context, String title, String msg, Function func) async {
   var message = msg.contains('Exception: ') ? msg.replaceAll('Exception: ', '') : msg;
-  if (message.contains('token')) {
+  if (message.toLowerCase().contains('token')) {
     await showDialog(
         context: context,
         barrierDismissible: false,
@@ -89,6 +93,7 @@ void showAlertDialog(
           return AlertDialogCustom(
               title: title,
               message: message,
+              isHideCloseBtn: true,
               function: () async {
                 final pref = await SharedPreferencesService.instance;
                 pref.removeAccessToken();
@@ -107,7 +112,25 @@ void showAlertDialog(
               message: 'Server Down',
               function: () => Navigator.pop(context));
         });
-  } else {
+  // } else if(message.toLowerCase().contains('Error') || message.toLowerCase().contains('token đã hết hạn')){
+  //   await showDialog(
+  //       context: context,
+  //       barrierDismissible: false,
+  //       builder: (BuildContext context) {
+  //         return AlertDialogCustom(
+  //             title: title,
+  //             message: message,
+  //             isHideCloseBtn:true,
+  //             function: () async {
+  //               final pref = await SharedPreferencesService.instance;
+  //               pref.removeAccessToken();
+  //               pref.removeUserNm();
+  //               navKey.currentState
+  //                   .pushNamedAndRemoveUntil(routeLogin, (route) => false);
+  //             });
+  //       });
+  }
+  else {
     await showDialog(
         context: context,
         barrierDismissible: false,

@@ -27,51 +27,53 @@ class _SkillPageState extends State<SkillPage> {
   @override
   Widget build(BuildContext context) {
     var w = MediaQuery.of(context).size.width;
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: w * 0.1),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Padding(
-            padding: EdgeInsets.only(top: 30.0, bottom: 15),
-            child: HorizontalLine('Skill'),
-          ),
-          Container(
-            margin: EdgeInsets.symmetric(vertical: 16),
-            padding: EdgeInsets.all(16),
-            decoration: BoxDecoration(
-                color: Color(0xFFedf4ff),
-                border: Border.all(color: Color(0xffccdfff), width: 1)),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.text_snippet_outlined,
-                  color: kmainColor,
-                ),
-                SizedBox(
-                  width: 8,
-                ),
-                Text(
-                    'Example: Programming Language, Framework/Library, Operating System,...',
-                    style: CommonStyle.size16W400hintTitle(context)
-                        .copyWith(color: Color(0xff5869a2)))
-              ],
+    return SingleChildScrollView(
+      child: Container(
+        margin: EdgeInsets.symmetric(horizontal: w * 0.1),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Padding(
+              padding: EdgeInsets.only(top: 30.0, bottom: 15),
+              child: HorizontalLine('Skill'),
             ),
-          ),
-          _buildSkill(context),
-          AddButton(
-            isButtonText: true,
-            textButton: 'ADD SKILL',
-            onPressed: () {
-              setState(() {
-                widget.masterData.skills.add('');
-              });
-            },
-          ),
-          SizedBox(
-            height: 50,
-          ),
-        ],
+            Container(
+              margin: EdgeInsets.symmetric(vertical: 16),
+              padding: EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                  color: Color(0xFFedf4ff),
+                  border: Border.all(color: Color(0xffccdfff), width: 1)),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.text_snippet_outlined,
+                    color: kmainColor,
+                  ),
+                  SizedBox(
+                    width: 8,
+                  ),
+                  Text(
+                      'Example: Programming Language, Framework/Library, Operating System,...',
+                      style: CommonStyle.size16W400hintTitle(context)
+                          .copyWith(color: Color(0xff5869a2)))
+                ],
+              ),
+            ),
+            _buildSkill(context),
+            AddButton(
+              isButtonText: true,
+              textButton: 'ADD SKILL',
+              onPressed: () {
+                setState(() {
+                  widget.masterData.skills.add('');
+                });
+              },
+            ),
+            SizedBox(
+              height: 50,
+            ),
+          ],
+        ),
       ),
     );
   }

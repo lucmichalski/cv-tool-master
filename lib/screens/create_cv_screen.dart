@@ -23,7 +23,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../common/common_style.dart';
 
 class CreateCV extends StatefulWidget {
-  final String id ;
+  final String id;
 
   const CreateCV({this.id});
 
@@ -96,15 +96,34 @@ class _CreateCVState extends State<CreateCV> {
   @override
   void initState() {
     _fetchMasterData();
-    _fetchCVById();
+    if (widget.id != null) {
+      _fetchCVById();
+    }
     if (_cvModel == null) {
       _cvModel = CVModel(
           name: '',
           email: '',
           position: '',
+          highLightProjectList: [
+            HighLightProjectList(
+                projectNm: '',
+                responsibility: [],
+                technologies: [],
+                position: '',
+                teamSize: '',
+                projectDescription: '',
+                communicationused: '',
+                documentcontrol: '',
+                projectmanagementtool: '',
+                uiuxdesign: '')
+          ],
           technicalSummaryList: [],
           status: false,
-          gender: 'Male');
+          educationList: [],
+          skills: [],
+          professionalList: [],
+          certificateList: [],
+          gender: 'Mr.');
     } 
     _addItemsSteps();
     _pageController = PageController(initialPage: 0);
@@ -633,16 +652,22 @@ class _CreateCVState extends State<CreateCV> {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 5, horizontal: 35),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(
-            Icons.circle,
-            color: Colors.black,
-            size: 8,
+          Padding(
+            padding: EdgeInsets.only(top: 5.0),
+            child: Icon(
+              Icons.circle,
+              color: Colors.black,
+              size: 8,
+            ),
           ),
           SizedBox(width: 10.0),
-          Text(
-            summaryItem,
-            style: CommonStyle.size8W400black(context),
+          Flexible(
+            child: Text(
+              summaryItem,
+              style: CommonStyle.size8W400black(context),
+            ),
           )
         ],
       ),

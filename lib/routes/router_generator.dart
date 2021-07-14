@@ -37,12 +37,15 @@ class RouteGenerator {
           break;
         case routeAdmin:
           return MaterialPageRoute(builder: (_) => AdminPage(),settings: settings);
-        case routeCreateCV:
-        // Get arguments
+          break;
+        case routeUpdateCV:
           var id = routingData['id'];
-          // Pass data to CreateCV screen
           return MaterialPageRoute(
               builder: (_) => CreateCV( id: id,), settings: settings);
+          break;
+        case routeCreateCV:
+          return MaterialPageRoute(
+              builder: (_) => CreateCV(), settings: settings);
           break;
         case routeChangePass:
           return MaterialPageRoute(builder: (_) => ChangePasswordScreen(),settings: settings);

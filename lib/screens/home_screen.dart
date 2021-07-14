@@ -112,6 +112,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   bool _isChangeCurrent;
 
   bool _isChangeNew;
+  bool _isDisplayAlert = false;
   AnimationController _animationController;
   AnimationController _rotateParentController;
   Animation<double> _rotateAnimation;
@@ -182,8 +183,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           } else if (state is GetMasterDataError) {
             print('GetMasterDataError: ${state.message}');
             _isLoading = false;
-            showAlertDialog(
-                context, 'Error', state.message, () => Navigator.pop(context));
+            // showAlertDialog(
+            //     context, 'Error', state.message, () => Navigator.pop(context));
           } else if (state is GetCvListSuccess) {
             _totalRecords = state.cvList.total;
             _totalCompleted = state.cvList.totalCompleted;
@@ -210,16 +211,18 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           } else if (state is GetCvListError) {
             print('GetCvListError: ${state.message}');
             _isLoading = false;
-            showAlertDialog(
-                context, 'Error', state.message, () => Navigator.pop(context));
+            if (!_isDisplayAlert)
+              showAlertDialog(
+                  context, 'Error', state.message, () => Navigator.pop(context));
+            _isDisplayAlert = true;
           } else if (state is DeleteCvSuccess) {
             _isLoading = false;
             _fetchCVList(1);
             _fetchDataPosition();
           } else if (state is DeleteCvError) {
             _isLoading = false;
-            showAlertDialog(
-                context, 'Error', state.message, () => Navigator.pop(context));
+              showAlertDialog(
+                  context, 'Error', state.message, () => Navigator.pop(context));
           } else if (state is GetDataPositionSuccess) {
             _isLoading = false;
             _dataPosition = state.dataPosition;
@@ -937,7 +940,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           borderRadius: BorderRadius.all(Radius.circular(12)),
           onTap: () {
             var routeName =
-            Uri(path: routeCreateCV, queryParameters: {'id': model.id})
+            Uri(path: routeUpdateCV, queryParameters: {'id': model.id})
                 .toString();
             navKey.currentState.pushNamed(routeName);
           },

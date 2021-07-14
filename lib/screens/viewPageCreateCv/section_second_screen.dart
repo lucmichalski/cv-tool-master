@@ -45,7 +45,7 @@ class _SecondScreenState extends State<SecondScreen> {
       _skillNmList = widget.masterData.skills ?? [];
     }
     if(widget.cvModel.educationList == null || widget.cvModel.educationList.isEmpty) {
-      widget.cvModel.educationList.add(EducationList(majorNm: '',schoolNm: '',classYear: '2021'));
+      widget.cvModel.educationList.add(EducationList(majorNm:'',schoolNm: '',classYear: '2021'));
     }
     super.initState();
   }
@@ -181,8 +181,7 @@ class _SecondScreenState extends State<SecondScreen> {
             isButtonText: true,
             textButton: 'ADD EDUCATION',
             onPressed: () => setState(() {
-              widget.cvModel.educationList
-                  .add(EducationList(classYear: '', schoolNm: '', majorNm: ''));
+              widget.cvModel.educationList.add(EducationList());
             }),
           )
         ],

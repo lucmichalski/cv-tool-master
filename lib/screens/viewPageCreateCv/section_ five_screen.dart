@@ -27,45 +27,45 @@ class SectionFive extends StatefulWidget {
 
 class _SectionFiveState extends State<SectionFive> {
   // FONT 20 BOLD
-  final styles20bold = pw.TextStyle(
-    fontSize: 20,
-    color: PdfColor.fromInt(0xFF000000),
-    font: pw.Font.timesBold(),
-  );
+  // final styles20bold = pw.TextStyle(
+  //   fontSize: 20,
+  //   color: PdfColor.fromInt(0xFF000000),
+  //   font: pw.Font.timesBold(),
+  // );
 
   // FONT 12 BOLD
-  final style12Bold = pw.TextStyle(
-    fontSize: 12,
-    color: PdfColor.fromInt(0xFF000000),
-    font: pw.Font.timesBold(),
-  );
+  // final style12Bold = pw.TextStyle(
+  //   fontSize: 12,
+  //   color: PdfColor.fromInt(0xFF000000),
+  //   font: pw.Font.timesBold(),
+  // );
 
   // FONT 12 REGULAR
-  final styles12regular = pw.TextStyle(
-    fontSize: 12,
-    color: PdfColor.fromInt(0xFF000000),
-    font: pw.Font.times(),
-  );
+  // final styles12regular = pw.TextStyle(
+  //   fontSize: 12,
+  //   color: PdfColor.fromInt(0xFF000000),
+  //   font: pw.Font.times(),
+  // );
 
   // FONT 14 REGULAR
-  final styles14bold = pw.TextStyle(
-    fontSize: 14,
-    color: PdfColor.fromInt(0xFF000000),
-    font: pw.Font.times(),
-  );
+  // final styles14bold = pw.TextStyle(
+  //   fontSize: 14,
+  //   color: PdfColor.fromInt(0xFF000000),
+  //   font: pw.Font.times(),
+  // );
 
   // FONT 8 REGULAR
-  final styles8 = pw.TextStyle(
-    fontSize: 8,
-    color: PdfColor.fromInt(0xFF000000),
-    font: pw.Font.times(),
-  );
+  // final styles8 = pw.TextStyle(
+  //   fontSize: 8,
+  //   color: PdfColor.fromInt(0xFF000000),
+  //   font: pw.Font.times(),
+  // );
 
   // FONT 16 BOLD
-  final styles16bold = pw.TextStyle(
-      fontSize: 16,
-      color: PdfColor.fromInt(0xFF000000),
-      font: pw.Font.timesBold());
+  // final styles16bold = pw.TextStyle(
+  //     fontSize: 16,
+  //     color: PdfColor.fromInt(0xFF000000),
+  //     font: pw.Font.timesBold());
 
   Future<html.Blob> myGetBlobPdfContent() async {
     final imageSvg =
@@ -76,44 +76,71 @@ class _SectionFiveState extends State<SectionFive> {
       pw.MultiPage(
           build: (pw.Context context) => [
                 pw.Text(widget.cvModel.name + ' (${widget.cvModel.gender})',
-                    style: styles20bold),
+                    style: pw.TextStyle(
+                      fontSize: 20,
+                      color: PdfColor.fromInt(0xFF000000),
+                      font: pw.Font.timesBold(),
+                    )),
                 pw.SizedBox(
                   height: 6,
                 ),
-                pw.Text(widget.cvModel.position, style: styles14bold),
+                pw.Text(widget.cvModel.position, style: pw.TextStyle(
+                  fontSize: 14,
+                  color: PdfColor.fromInt(0xFF000000),
+                  font: pw.Font.times(),
+                )),
                  widget.cvModel.email.isNotEmpty ?   pw.Padding(
                      padding: pw.EdgeInsets.symmetric(
                          horizontal: 35.0, vertical: 16.0),
                      child: pw.Text('Email: ${widget.cvModel.email}',
-                         style: styles12regular)) :pw.Container(),
+                         style: pw.TextStyle(
+                           fontSize: 12,
+                           color: PdfColor.fromInt(0xFF000000),
+                           font: pw.Font.times(),
+                         ))) :pw.Container(),
                 widget.cvModel.professionalList.isNotEmpty
                     ? _buildSectionTitlePdf(
-                        'Professional summary', styles16bold)
+                        'Professional summary', pw.TextStyle(
+                    fontSize: 16,
+                    color: PdfColor.fromInt(0xFF000000),
+                    font: pw.Font.timesBold()))
                     : pw.Container(),
                 widget.cvModel.professionalList.isNotEmpty
                     ? _buildProfessionalPdf()
                     : pw.Container(),
                 widget.cvModel.educationList.isNotEmpty
-                    ? _buildSectionTitlePdf('Education', styles16bold)
+                    ? _buildSectionTitlePdf('Education', pw.TextStyle(
+                    fontSize: 16,
+                    color: PdfColor.fromInt(0xFF000000),
+                    font: pw.Font.timesBold()))
                     : pw.Container(),
                 widget.cvModel.educationList.isNotEmpty
                     ? _buildEducationPdf()
                     : pw.Container(),
                 widget.cvModel.technicalSummaryList.isNotEmpty
-                    ? _buildSectionTitlePdf('Technical Skills', styles16bold)
+                    ? _buildSectionTitlePdf('Technical Skills', pw.TextStyle(
+                    fontSize: 16,
+                    color: PdfColor.fromInt(0xFF000000),
+                    font: pw.Font.timesBold()))
                     : pw.Container(),
                 widget.cvModel.technicalSummaryList.isNotEmpty
                     ? _buildTechnicalSkillsPdf()
                     : pw.Container(),
                 widget.cvModel.professionalList.isNotEmpty
                     ? _buildSectionTitlePdf(
-                        'Professional Experience', styles16bold)
+                        'Professional Experience', pw.TextStyle(
+                    fontSize: 16,
+                    color: PdfColor.fromInt(0xFF000000),
+                    font: pw.Font.timesBold()))
                     : pw.Container(),
                 widget.cvModel.professionalList.isNotEmpty
                     ? _buildProfessionalExperiencesPdf()
                     : pw.Container(),
                 widget.cvModel.certificateList.isNotEmpty
-                    ? _buildSectionTitlePdf('Certificates', styles16bold)
+                    ? _buildSectionTitlePdf('Certificates', pw.TextStyle(
+                    fontSize: 16,
+                    color: PdfColor.fromInt(0xFF000000),
+                    font: pw.Font.timesBold()))
                     : pw.Container(),
                 widget.cvModel.certificateList.isNotEmpty
                     ? _buildCertificatesPdf()
@@ -121,7 +148,10 @@ class _SectionFiveState extends State<SectionFive> {
                 widget.cvModel.highLightProjectList.isNotEmpty
                     ? _buildHighLightProjectsPdf()
                     : pw.Container(),
-                _buildSectionTitlePdf('Languages', styles16bold),
+                _buildSectionTitlePdf('Languages', pw.TextStyle(
+                    fontSize: 16,
+                    color: PdfColor.fromInt(0xFF000000),
+                    font: pw.Font.timesBold())),
                 _buildLanguagePdf()
               ],
           header: (context) {
@@ -139,9 +169,17 @@ class _SectionFiveState extends State<SectionFive> {
             return pw.Row(
                 mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                 children: [
-                  pw.Text('TECHVIFY., JSC - CV - Confidential', style: styles8),
+                  pw.Text('TECHVIFY., JSC - CV - Confidential', style: pw.TextStyle(
+                    fontSize: 8,
+                    color: PdfColor.fromInt(0xFF000000),
+                    font: pw.Font.times(),
+                  )),
                   pw.Text('Page ${context.pageNumber} of ${context.pagesCount}',
-                      style: styles8)
+                      style: pw.TextStyle(
+                        fontSize: 8,
+                        color: PdfColor.fromInt(0xFF000000),
+                        font: pw.Font.times(),
+                      ))
                 ]);
           }),
     );
@@ -210,22 +248,31 @@ class _SectionFiveState extends State<SectionFive> {
     return pw.Padding(
       padding: pw.EdgeInsets.symmetric(vertical: 5, horizontal: 35),
       child: pw.Row(
+        crossAxisAlignment: pw.CrossAxisAlignment.start,
         children: [
-          pw.Container(
-            height: 8,
-            width: 8,
-            decoration: pw.BoxDecoration(
-                color: PdfColor.fromInt(0xFF000000),
-                borderRadius: pw.BorderRadius.circular(5)),
-          ),
+     pw.Padding(
+       padding: pw.EdgeInsets.only(top: 5),
+       child: pw.Container(
+
+         height: 5,
+         width: 5,
+         decoration: pw.BoxDecoration(
+           color: PdfColor.fromInt(0xFF000000),
+           shape: pw.BoxShape.circle,
+         ),
+       ),
+     ),
           pw.SizedBox(width: 16.0),
-          pw.Text(
-            summaryItem,
-            style: pw.TextStyle(
-              fontSize: 12,
-              color: PdfColor.fromInt(0xFF000000),
-              font: pw.Font.times(),
-            ),
+          pw.Flexible(
+            child:
+            pw.Text(
+              summaryItem,
+              style: pw.TextStyle(
+                fontSize: 12,
+                color: PdfColor.fromInt(0xFF000000),
+                font: pw.Font.times(),
+              ),
+            )
           )
         ],
       ),
@@ -248,7 +295,11 @@ class _SectionFiveState extends State<SectionFive> {
         children: [
           pw.Text(
             '${education.schoolNm} - class of ${education.classYear}',
-            style: styles12regular,
+            style: pw.TextStyle(
+              fontSize: 12,
+              color: PdfColor.fromInt(0xFF000000),
+              font: pw.Font.times(),
+            ),
           ),
           pw.Padding(
               padding: pw.EdgeInsets.symmetric(vertical: 8.0),
@@ -274,12 +325,20 @@ class _SectionFiveState extends State<SectionFive> {
           children: [
             pw.Text(
               '${skill.skillNm} :',
-              style: style12Bold,
+              style: pw.TextStyle(
+                fontSize: 12,
+                color: PdfColor.fromInt(0xFF000000),
+                font: pw.Font.timesBold(),
+              ),
             ),
             pw.SizedBox(width: 8.0),
             pw.Text(
               '${skill.skillData} ',
-              style: styles12regular,
+              style: pw.TextStyle(
+                fontSize: 12,
+                color: PdfColor.fromInt(0xFF000000),
+                font: pw.Font.times(),
+              ),
             ),
           ]),
     );
@@ -524,12 +583,20 @@ class _SectionFiveState extends State<SectionFive> {
                             child: pw.Text(
                                 widget.cvModel.certificateList[index]
                                     .certificateNm,
-                                style: styles12regular),
+                                style: pw.TextStyle(
+                                  fontSize: 12,
+                                  color: PdfColor.fromInt(0xFF000000),
+                                  font: pw.Font.times(),
+                                )),
                           ),
                           pw.Text(
                               widget.cvModel.certificateList[index]
                                   .certificateYear,
-                              style: styles12regular)
+                              style: pw.TextStyle(
+                                fontSize: 12,
+                                color: PdfColor.fromInt(0xFF000000),
+                                font: pw.Font.times(),
+                              ))
                         ],
                       )),
             )

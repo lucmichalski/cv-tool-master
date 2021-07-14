@@ -61,8 +61,9 @@ class Summary {
   String role;
   List<Levels> levels;
   bool isChecked;
+  bool isExpand = false;
 
-  Summary({this.role, this.levels, this.isChecked = false});
+  Summary({this.role, this.levels, this.isChecked = false,this.isExpand =false});
 
   Summary.fromJson(Map<String, dynamic> json) {
     role = json['role'];
@@ -132,8 +133,9 @@ class Technicals {
 class CompanyMaster {
   String role;
   List<String> responsibilities;
+  bool isExpand = false;
 
-  CompanyMaster({this.role, this.responsibilities});
+  CompanyMaster({this.role, this.responsibilities,this.isExpand=false});
 
   CompanyMaster.fromJson(Map<String, dynamic> json) {
     role = json['role'];
@@ -150,8 +152,9 @@ class CompanyMaster {
 class ProjectMaster {
   String role;
   List<String> responsibilities;
+  bool isExpand = false;
 
-  ProjectMaster({this.role, this.responsibilities});
+  ProjectMaster({this.role, this.responsibilities, this.isExpand = false});
 
   ProjectMaster.fromJson(Map<String, dynamic> json) {
     role = json['role'];

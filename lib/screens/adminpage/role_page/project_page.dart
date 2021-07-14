@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_cv_maker/common/common_style.dart';
 import 'package:flutter_cv_maker/common/common_ui.dart';
+import 'package:flutter_cv_maker/common/expanded_section.dart';
 import 'package:flutter_cv_maker/constants/constants.dart';
 import 'package:flutter_cv_maker/models/cv_model/master_model.dart';
 
@@ -70,6 +71,17 @@ class _ProjectPageState extends State<ProjectPage> {
           children: [
             Row(
               children: [
+                IconButton(
+                    tooltip: company.isExpand ? 'Collapse' : 'Expand',
+                    hoverColor: Colors.transparent,
+                    splashRadius: 1,
+                    onPressed: () {
+                      setState(() {
+                        print('Tap expand: ${company.isExpand}');
+                        company.isExpand = !company.isExpand;
+                      });
+                    },
+                    icon: Icon(Icons.wrap_text)),
                 Spacer(),
                 IconButton(
                   hoverColor: Colors.transparent,
@@ -98,33 +110,40 @@ class _ProjectPageState extends State<ProjectPage> {
                 company.role,
               ),
             ),
-            Padding(
-              padding: EdgeInsets.only(top: 16.0),
-              child: Row(
+            ExpandedSection(
+              child: Column(
                 children: [
-                  Icon(
-                    Icons.work,
-                    color: Color(0xff434b65),
+                  Padding(
+                    padding: EdgeInsets.only(top: 16.0),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.work,
+                          color: Color(0xff434b65),
+                        ),
+                        Text(
+                          'Project Responsibilities',
+                          style: CommonStyle.size16W400hintTitle(context)
+                              .copyWith(fontSize: 16),
+                        )
+                      ],
+                    ),
                   ),
-                  Text(
-                    'Project Responsibilities',
-                    style: CommonStyle.size16W400hintTitle(context)
-                        .copyWith(fontSize: 16),
+                  buildResponsibilities(
+                      context,
+                      widget.masterData.projectMaster[index].responsibilities,
+                      'company-$index'),
+                  AddButton(
+                    isButtonText: true,
+                    textButton: 'ADD RESPONSIBILITY',
+                    onPressed: () => setState(() => widget
+                        .masterData.projectMaster[index].responsibilities
+                        .add('')),
                   )
                 ],
               ),
+              expand: company.isExpand,
             ),
-            buildResponsibilities(
-                context,
-                widget.masterData.projectMaster[index].responsibilities,
-                'company-$index'),
-            AddButton(
-              isButtonText: true,
-              textButton: 'ADD RESPONSIBILITY',
-              onPressed: () => setState(() => widget
-                  .masterData.projectMaster[index].responsibilities
-                  .add('')),
-            )
           ],
         ));
   }

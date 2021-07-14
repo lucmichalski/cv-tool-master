@@ -138,22 +138,31 @@ pw.Widget _buildProfessionalItemPdf(String summaryItem) {
   return pw.Padding(
     padding: pw.EdgeInsets.symmetric(vertical: 5, horizontal: 35),
     child: pw.Row(
+      crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
-        pw.Container(
-          height: 8,
-          width: 8,
-          decoration: pw.BoxDecoration(
+        pw.Padding(
+          padding: pw.EdgeInsets.only(top: 5),
+          child: pw.Container(
+
+            height: 5,
+            width: 5,
+            decoration: pw.BoxDecoration(
               color: PdfColor.fromInt(0xFF000000),
-              borderRadius: pw.BorderRadius.circular(5)),
+              shape: pw.BoxShape.circle,
+            ),
+          ),
         ),
         pw.SizedBox(width: 16.0),
-        pw.Text(
-          summaryItem,
-          style: pw.TextStyle(
-            fontSize: 12,
-            color: PdfColor.fromInt(0xFF000000),
-            font: pw.Font.times(),
-          ),
+        pw.Flexible(
+            child:
+            pw.Text(
+              summaryItem,
+              style: pw.TextStyle(
+                fontSize: 12,
+                color: PdfColor.fromInt(0xFF000000),
+                font: pw.Font.times(),
+              ),
+            )
         )
       ],
     ),
